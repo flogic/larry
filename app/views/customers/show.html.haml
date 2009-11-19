@@ -1,0 +1,9 @@
+%h1 Customer details
+
+%span Name:
+%span= @customer.name
+
+%h2 Apps:
+%ul
+  - @customer.apps.each do |app|
+    %li= link_to app.name, app
