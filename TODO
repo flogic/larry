@@ -1,9 +1,9 @@
 
+ -> create an actual layout
+
  -> navigation views for browing the stored information
 
  -> start adding forms for maintaining data
-
- -> we should be using jQuery + jrails instead of prototype stuffs
 
  -> looks like services controller doesn't have specs for the alternate formats being delivered
 
@@ -16,4 +16,16 @@
  -> destination.rb:  is this defunct?
  
  -> instance links to services via a requirements many:many model.  Should there be a graph closure from instance (and maybe vice-versa) so that we get the full set?  Maybe this should just be driven from the view.
+
+ -> add linkages to nagios details for a host, service, etc.
+ 
+ -> add linkages from customers to invoicing, e.g.
+ 
+ -> is it possible to link from apps (or instances) to github pages?
+ -> is it possible to link apps / customer to trouble ticket pages?
+ -> what about linking to PT, e.g.
+ 
+ : this probably speaks to a general facility to associate an URL with a class (customer, app, instance, deployment, host, etc.); in which case it might well be possible to have parsers for the data at the end of those URLs so that we could aggregate data; if we push out RSS, e.g., from larry then it would be possible for larry to be a central dashboard.
+
+
 
