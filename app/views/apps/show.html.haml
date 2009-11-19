@@ -1,0 +1,11 @@
+%h1 App details
+
+%span Name:
+%span= @app.name
+
+.description= @app.description
+
+%h2== Services deployed to #{pluralize(@app.hosts.size, 'host')}:
+%ol
+  - @app.hosts.each do |host|
+    %li= render :partial => 'hosts/summary', :locals => { :host => host }
