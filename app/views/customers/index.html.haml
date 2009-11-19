@@ -3,4 +3,4 @@
 %ul
   - @customers.each do |customer|
     %li
-      = link_to customer.name, customer
+      = render :partial => 'customers/summary', :locals => { :customer => customer }

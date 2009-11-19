@@ -9,17 +9,10 @@ describe '/customers/index' do
     render '/customers/index'
   end
 
-  it 'should display the name of each customer' do
-    do_render
+  it 'should show a summary for each customer' do
     @customers.each do |customer|
-      response.should have_text(Regexp.new(customer.name))
+      template.should_receive(:render).with(has_entry(:partial, 'customers/summary'), has_entry(:locals => { :customer => customer }))
     end
-  end
-  
-  it 'should link the customer name to the page for that customer' do
     do_render
-    @customers.each do |customer|
-      response.should have_tag('a[href=?]', customer_path(customer), :text => customer.name)
-    end
   end
 end
