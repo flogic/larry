@@ -1,7 +1,12 @@
 
  -> navigation views for browsing the stored information
 
+ -> links to indexes from various places
+ -> does this imply some sort of global menu of nouns?
  -> start adding forms for maintaining data
+ -> links to edit forms
+ -> deletion links
+ -> operations:  un-deploy, deploy, shut down, start host, provision new host, etc.
 
  -> looks like services controller doesn't have specs for the alternate formats being delivered
 
