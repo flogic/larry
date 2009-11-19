@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), *%w[.. .. spec_helper
 
 describe '/customers/show' do
   before :each do
-    assigns[:customer] = @customer = Customer.generate!
+    assigns[:customer] = @customer = Customer.generate!(:description => 'Test Customer')
     @apps = Array.new(3) { App.generate!(:customer => @customer) }
   end
 
@@ -15,6 +15,11 @@ describe '/customers/show' do
     response.should have_text(Regexp.new(@customer.name))
   end
   
+  it 'should display the description of the customer' do
+    do_render
+    response.should have_text(Regexp.new(@customer.description))
+  end
+
   it 'should list the hosts the customer has deployments on' do
     app = @apps.first
     instance = Instance.generate!(:app => app)

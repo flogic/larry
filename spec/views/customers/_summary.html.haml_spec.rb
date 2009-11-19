@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), *%w[.. .. spec_helper
 
 describe '/customers/summary' do
   before :each do
-    @customer = Customer.generate!
+    @customer = Customer.generate!(:description => 'Test Customer')
   end
 
   def do_render
@@ -17,5 +17,10 @@ describe '/customers/summary' do
   it 'should link the customer name to the customer show page' do
     do_render
     response.should have_tag('a[href=?]', customer_path(@customer), :text => @customer.name)
+  end
+
+  it 'should display the description of the customer' do
+    do_render
+    response.should have_text(Regexp.new(@customer.description))
   end
 end
