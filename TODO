@@ -1,9 +1,9 @@
 
+ -> navigation views for browing the stored information
+
  -> start adding forms for maintaining data
 
  -> we should be using jQuery + jrails instead of prototype stuffs
-
- -> more views
 
  -> looks like services controller doesn't have specs for the alternate formats being delivered
 
