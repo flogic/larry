@@ -2,3 +2,7 @@
   = link_to customer.name, customer
   - unless customer.description.blank?
     .description= customer.description
+  - unless customer.apps.blank?
+    %ul
+      - customer.apps.each do |app|
+        %li.included= render :partial => 'apps/summary', :locals => { :app => app }

@@ -23,4 +23,12 @@ describe '/customers/summary' do
     do_render
     response.should have_text(Regexp.new(@customer.description))
   end
+
+  it 'should display the names of the various customer apps' do
+    apps = Array.new(3) { App.generate!(:customer => @customer) }
+    do_render
+    apps.each do |app|
+      response.should have_text(Regexp.new(app.name))
+    end
+  end
 end
