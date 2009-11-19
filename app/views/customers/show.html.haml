@@ -6,4 +6,4 @@
 %h2 Apps:
 %ul
   - @customer.apps.each do |app|
-    %li= link_to app.name, app
+    %li= render :partial => 'apps/summary', :locals => { :app => app }

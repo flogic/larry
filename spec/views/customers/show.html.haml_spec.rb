@@ -22,10 +22,10 @@ describe '/customers/show' do
     end
   end
   
-  it 'should link each app to the app view page' do
-    do_render
+  it 'should show a summary for each app' do
     @apps.each do |app|
-      response.should have_tag('a[href=?]', app_path(app), :text => app.name)
-    end    
+      template.should_receive(:render).with(has_entry(:partial, 'app/summary'), has_entry(:locals => { :app => app }))
+    end
+    do_render
   end
 end
