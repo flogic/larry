@@ -3,7 +3,12 @@
 %span Name:
 %span= @customer.name
 
-%h2 Apps:
-%ul
+%h2== #{pluralize(@customer.apps.size, 'app')}:
+%ol
   - @customer.apps.each do |app|
     %li= render :partial => 'apps/summary', :locals => { :app => app }
+
+%h2== Services deployed to #{pluralize(@customer.hosts.size, 'host')}:
+%ol
+  - @customer.hosts.each do |host|
+    %li= render :partial => 'hosts/summary', :locals => { :host => host }
