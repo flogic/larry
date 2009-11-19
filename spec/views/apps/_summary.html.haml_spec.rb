@@ -23,4 +23,9 @@ describe '/apps/summary' do
     do_render
     response.should have_text(Regexp.new(@app.description))
   end
+  
+  it 'should include the name of the customer who owns the app' do
+    do_render 
+    response.should have_text(Regexp.new(@app.customer.name))
+  end
 end

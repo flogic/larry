@@ -19,6 +19,11 @@ describe '/apps/show' do
     response.should have_text(Regexp.new(@app.description))
   end
 
+  it 'should display the customer who owns the app' do
+    do_render
+    response.should have_text(Regexp.new(@app.customer.name))
+  end
+
   it 'should list the hosts the app has deployments on' do
     instance = Instance.generate!(:app => @app)
     deployments = Array.new(3) { Deployment.generate!(:instance => instance) }

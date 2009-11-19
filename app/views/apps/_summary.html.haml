@@ -1,4 +1,5 @@
 .app
   = link_to app.name, app
+  == (#{link_to app.customer.name, app.customer})
   - unless app.description.blank?
     .description= app.description 
