@@ -1,0 +1,11 @@
+%h1 Host details
+
+%span Name:
+%span= @host.name
+
+.description= @host.description
+
+%h2== Has #{pluralize(@host.apps.size, 'app')} deployed:
+%ol
+  - @host.apps.each do |app|
+    %li= render :partial => 'apps/summary', :locals => { :app => app }
