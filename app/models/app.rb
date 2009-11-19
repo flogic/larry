@@ -4,6 +4,8 @@ class App < ActiveRecord::Base
   
   validates_presence_of :name
   validates_presence_of :customer
+
+  default_scope :order => :name
   
   def deployments
     instances.collect(&:deployment)

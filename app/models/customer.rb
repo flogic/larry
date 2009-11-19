@@ -3,6 +3,8 @@ class Customer < ActiveRecord::Base
   validates_uniqueness_of :name
   
   has_many :apps
+
+  default_scope :order => :name
   
   def instances
     apps.collect(&:instances).flatten
