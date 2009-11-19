@@ -3,7 +3,8 @@
 %span Name:
 %span= @host.name
 
-.description= @host.description
+- unless @host.description.blank?
+  .description= @host.description
 
 %h2== Has #{pluralize(@host.apps.size, 'app')} deployed:
 %ol

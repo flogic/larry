@@ -1,3 +1,4 @@
 .app
   = link_to app.name, app
-  .description= app.description 
+  - unless app.description.blank?
+    .description= app.description 

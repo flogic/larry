@@ -1,3 +1,4 @@
 .host
   = link_to host.name, host
-  .description= host.description
+  - unless host.description.blank?
+    .description= host.description

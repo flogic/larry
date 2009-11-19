@@ -3,7 +3,8 @@
 %span Name:
 %span= @customer.name
 
-.description= @customer.description
+- unless @customer.description.blank?
+  .description= @customer.description
 
 %h2== #{pluralize(@customer.apps.size, 'app')}:
 %ol

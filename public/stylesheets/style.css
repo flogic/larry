@@ -62,3 +62,8 @@ body {
 #footer p a { 
   color:#999;
 }
+
+.description {
+  font-style: italic;
+  border: 1px solid #eee;
+}
