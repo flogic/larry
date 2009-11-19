@@ -65,5 +65,5 @@ body {
 
 .description {
   font-style: italic;
-  border: 1px solid #eee;
+  border-bottom: 1px solid #eee;
 }
