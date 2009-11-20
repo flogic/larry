@@ -1,5 +1,5 @@
 html { 
-  background:#efefef; 
+  background: #cceecc; 
   font-family:Arial, Verdana, sans-serif; 
   font-size:13px; ´
 }
@@ -10,9 +10,17 @@ body {
 }
 
 .header { 
-  background:#cfcfff; 
-  padding:8px 5% 0 5%; 
-  border-bottom:5px solid #bdbdbd;
+  -moz-background-clip:border;
+  -moz-background-inline-policy:continuous;
+  -moz-background-origin:padding;
+  -moz-border-radius-bottomleft:5px;
+  -moz-border-radius-bottomright:5px;
+  -moz-border-radius-topleft:5px;
+  -moz-border-radius-topright:5px;
+  padding:6px 10px;
+  margin: 3px 3px; 
+  background:#fafafb;
+  border: 1px solid #aad; 
 }
 
 .header ul {
@@ -41,9 +49,19 @@ body {
 }
 
 #main { 
+  -moz-background-clip:border;
+  -moz-background-inline-policy:continuous;
+  -moz-background-origin:padding;
+  -moz-border-radius-bottomleft:5px;
+  -moz-border-radius-bottomright:5px;
+  -moz-border-radius-topleft:5px;
+  -moz-border-radius-topright:5px;
+  margin: 3px;
   padding:10px 5%; 
   background:#fff; 
   overflow:hidden; 
+  border: 1px solid #aad; 
+  
 }
 
 #main h1 { 
@@ -75,18 +93,18 @@ body {
 }
 
 #footer { 
-  padding:10px 5%; 
-  background:#efefef; 
-  color:#999; 
-  font-size:85%; 
-  line-height:1.5; 
-  border-top:5px solid #ccc; 
-  padding-top:10px;
+  -moz-background-clip:border;
+  -moz-background-inline-policy:continuous;
+  -moz-background-origin:padding;
+  -moz-border-radius-bottomleft:5px;
+  -moz-border-radius-bottomright:5px;
+  -moz-border-radius-topleft:5px;
+  -moz-border-radius-topright:5px;
+  padding:6px 10px;
+  margin: 3px 3px; 
+  background:#fafafb;
+  border: 1px solid #aad;
 }  
-
-#footer p a { 
-  color:#999;
-}
 
 .description {
   font-style: italic;
