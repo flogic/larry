@@ -31,7 +31,7 @@ body {
   margin:0;
 }
 
-.header {
+#header {
   .rounded_corners;
   padding:6px 10px;
   margin: 3px 3px; 
@@ -39,29 +39,28 @@ body {
   border: 1px solid @border_color; 
 }
 
-.header ul {
+#header ul {
   margin-left: 0;
   padding-left: 0;
 }
 
-.header ul li {
+#header ul li {
   display: inline;
   margin-right: 1ex;
 }
 
-.header ul li a {
+#header ul li a {
   font-weight: bold;
   font-size: larger;
   text-decoration: none;
   color: @nav_link_color;
 }
 
-.header ul li a:hover {
+#header ul li a:hover {
   color: @nav_link_hover_color;
 }
 
-.header ul li .current {
-  
+#header ul li .current { 
 }
 
 #main { 
@@ -107,7 +106,30 @@ body {
   margin: 3px 3px; 
   background: @nav_background;
   border: 1px solid @border_color;
-}  
+}
+
+#footer ul {
+  margin-left: 0;
+  padding-left: 0;
+  text-align: right;
+}
+
+#footer ul li {
+  display: inline;
+  margin-right: 1ex;
+}
+
+#footer ul li a {
+  font-weight: bold;
+  font-size: normal;
+  text-decoration: none;
+  color: @nav_link_color;
+}
+
+#footer ul li a:hover {
+  color: @nav_link_hover_color;
+}
+
 
 .description {
   font-style: italic;

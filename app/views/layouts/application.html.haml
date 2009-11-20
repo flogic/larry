@@ -15,7 +15,7 @@
     = javascript_include_tag :defaults
     
   %body
-    .header
+    #header
       %ul
         %li= link_to 'customers', customers_path
         %li= link_to 'apps', apps_path
@@ -24,7 +24,9 @@
         %li= link_to 'instances', instances_path
         %li= link_to 'deployments', deployments_path
         %li= link_to 'destinations', destinations_path
-    .subnav
     #main
       = yield
     #footer
+      %ul
+        %li
+          %a{:href => 'http://github.com/rick/larry'} larry
