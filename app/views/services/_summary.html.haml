@@ -1,10 +1,10 @@
 .service
   = brief(service)
-  == (used by #{service.dependents.size} services, #{service.apps.size} apps,
+  == (used by #{pluralize(service.dependents.size, 'service')}, #{pluralize(service.apps.size, 'app')},
   - if service.hosts.blank?
     deployed to no hosts)
   -else
-    == on hosts: #{list(service.hosts)})
+    == on #{pluralize(service.hosts.size, 'host')}: #{list(service.hosts)})
 
   - unless service.description.blank?
     .description= service.description

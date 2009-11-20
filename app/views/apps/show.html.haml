@@ -1,14 +1,12 @@
 %h1 App details
 
 %div
-  %span Name:
-  %span= @app.name
+  %span== Name: #{brief(@app)}
   - unless @app.description.blank?
     .description= @app.description
 
 %div
-  %span Owned by:
-  %span= summarize(@app.customer)
+  %span== Owned by: #{brief(@app.customer)}
 
 %h2== Services deployed to #{pluralize(@app.hosts.size, 'host')}:
 %ol
