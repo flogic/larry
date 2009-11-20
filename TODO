@@ -1,6 +1,5 @@
 
- -> navigation views for browsing the stored information  
- 
+ -> views (show, index) for services, instances, deployments, destinations
  -> start adding forms for maintaining data
  -> links to edit forms
  -> deletion links
@@ -17,6 +16,8 @@
  -> there should be a services method for hosts, so that we can easily see what services are supposed to be on the host.  The deployments are, in a sense, the detailed "Actually deployed on the host" services.  So, in a sense, the services are being linked via destinations to deployments on hosts (if the destination is a same-host destination then destination is almost a no-op way to get from service to deployment, which belongs_to host)
 
  -> would be useful for customer, app, instance to have deployed? predicates so that we can know if they are deployed anywhere
+
+ -> probably useful to have a display of services that are not deployed for instances (why did we not deploy the searchd for this site?)
 
  -> app.rb:  hosts does a double-method call (demeter!).  Have instance.rb declare :host and delegate to that instead
  
