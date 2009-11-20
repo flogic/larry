@@ -30,4 +30,60 @@ describe ApplicationHelper do
       helper.summarize(instance)      
     end
   end
+  
+  it 'should be able to present a really brief version of a model instance' do
+    helper.should respond_to(:brief)
+  end
+  
+  describe 'when presenting a really brief version of a model instance' do
+    it 'should accept a model instance' do
+      lambda { helper.brief(:foo) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should require a model instance' do
+      lambda { helper.brief }.should raise_error(ArgumentError)
+    end
+    
+    it 'should fail when an empty model instance is given' do
+      lambda { helper.brief(nil) }.should raise_error
+    end
+
+    it 'should return a link to the model instance with the model name as the link body if model has a name' do
+      instance = Customer.generate!
+      helper.brief(instance).should == link_to(instance.name, customer_path(instance))
+    end
+    
+    it 'should return a link to the model instance with the model as a string as the link body if model has no name' do
+      instance = Deployment.generate!
+      helper.brief(instance).should == link_to(instance.to_s, deployment_path(instance))
+    end
+  end
+  
+  it 'should be able to generate a list of brief versions of model instances' do
+    helper.should respond_to(:list)
+  end
+  
+  describe 'when generating a list of brief versions of model instances' do
+    it 'should accept a list of model instances' do
+      lambda { helper.list(:foo) }.should_not raise_error(ArgumentError)
+    end
+
+    it 'should return the empty string when the list of model instances is empty' do
+      helper.list().should == ''
+    end
+    
+    it 'should return the empty string when the list of model instances is blank' do
+      helper.list([]).should == ''
+    end
+    
+    it 'should return a ","-joined list of the brief versions of the provided model instances when passed as an array' do
+      instances = [ Customer.generate!, Host.generate!, Deployment.generate!, App.generate! ]
+      helper.list(instances).should == instances.collect {|i| helper.brief(i)}.join(", ")
+    end
+    
+    it 'should return a ","-joined list of the brief versions of the provided model instances when passed as separate arguments' do
+      instances = [ Customer.generate!, Host.generate!, Deployment.generate!, App.generate! ]
+      helper.list(*instances).should == instances.collect {|i| helper.brief(i)}.join(", ")
+    end
+  end
 end
