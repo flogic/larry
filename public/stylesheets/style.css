@@ -15,6 +15,31 @@ body {
   border-bottom:5px solid #bdbdbd;
 }
 
+.header ul {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.header ul li {
+  display: inline;
+  margin-right: 1ex;
+}
+
+.header ul li a {
+  font-weight: bold;
+  font-size: larger;
+  text-decoration: none;
+  color: #363;
+}
+
+.header ul li a:hover {
+  color: #797;
+}
+
+.header ul li .current {
+  
+}
+
 #main { 
   padding:10px 5%; 
   background:#fff; 

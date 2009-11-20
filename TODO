@@ -1,13 +1,12 @@
 
- -> make an even briefer inline view/helper?
  -> navigation views for browsing the stored information
- -> links to indexes from various places
- -> does this imply some sort of global menu of nouns?
  -> start adding forms for maintaining data
  -> links to edit forms
  -> deletion links
  -> operations:  un-deploy, deploy, shut down, start host, provision new host, etc.
  
+ -> make an even briefer inline view/helper?
+
  -> looks like services controller doesn't have specs for the alternate formats being delivered
 
  -> various lists could presumable benefit from pagination / search
