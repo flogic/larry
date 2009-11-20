@@ -3,4 +3,4 @@
 %ul
   - @customers.each do |customer|
     %li
-      = render :partial => 'customers/summary', :locals => { :customer => customer }
+      = summarize(customer)

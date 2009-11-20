@@ -9,4 +9,4 @@
 %h2== Has #{pluralize(@host.apps.size, 'app')} deployed:
 %ol
   - @host.apps.each do |app|
-    %li= render :partial => 'apps/summary', :locals => { :app => app }
+    %li= summarize(app)

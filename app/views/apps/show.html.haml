@@ -8,9 +8,9 @@
 
 %div
   %span Owned by:
-  %span= render :partial => 'customers/summary', :locals => { :customer => @app.customer }
+  %span= summarize(@app.customer)
 
 %h2== Services deployed to #{pluralize(@app.hosts.size, 'host')}:
 %ol
   - @app.hosts.each do |host|
-    %li= render :partial => 'hosts/summary', :locals => { :host => host }
+    %li= summarize(host)
