@@ -1,4 +1,4 @@
-
+ -> host index sould show apps deployed (host summary?)
  -> views (show, index) for services, instances, deployments, destinations
  -> start adding forms for maintaining data
  -> links to edit forms
