@@ -1,17 +1,15 @@
  -> views (show, index, _summary) for services, instances, deployments, destinations
+ -> app show should have more service information
+ -> generate some sort of YAML dump
+ -> import data from YAML dump
+ -> operations:  un-deploy, deploy, shut down, start host, provision new host, etc. (what impact do these have out in the world?)
  -> start adding forms for maintaining data
  -> links to edit forms
  -> deletion links (rules about deployed or not)
- -> operations:  un-deploy, deploy, shut down, start host, provision new host, etc.
-
- -> generate some sort of YAML dump
- -> import data from YAML dump
  
  -> looks like services controller doesn't have specs for the alternate formats being delivered
 
  -> could have indexes identify strange situations:  customers with undeployed apps, hosts with no deployments, apps which are not deployed, etc.
-
- -> various lists could presumable benefit from pagination / search
 
  -> I think the puppet-classifer "class"/"service" modeling did a disservice to what I'm trying to do.  Need to unwind this.
 
@@ -37,4 +35,7 @@
  
  : this probably speaks to a general facility to associate an URL with a class (customer, app, instance, deployment, host, etc.); in which case it might well be possible to have parsers for the data at the end of those URLs so that we could aggregate data; if we push out RSS, e.g., from larry then it would be possible for larry to be a central dashboard.
 
+
+ -> paginate index pages?  We'll see
+ 
  -> favicon.ico

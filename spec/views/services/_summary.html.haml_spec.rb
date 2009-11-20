@@ -42,7 +42,10 @@ describe '/services/summary' do
   
   it 'should show a count of the apps using this service' do
     instances = Array.new(4) { Instance.generate! }
-    instances.each {|i| i.services << @service }
+    instances.each do |i| 
+      i.services << @service
+      Deployment.generate!(:instance => i)
+    end
     do_render
     response.should have_text(/\s+#{@service.apps.size}\b/)    
   end
