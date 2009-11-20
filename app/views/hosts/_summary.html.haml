@@ -2,3 +2,7 @@
   = link_to host.name, host
   - unless host.description.blank?
     .description= host.description
+  - unless host.apps.blank?
+    %ul
+      - host.apps.each do |app|
+        %li= summarize(app)
