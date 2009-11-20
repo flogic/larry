@@ -1,0 +1,6 @@
+%h1 Apps
+
+%ul
+  - @apps.each do |app|
+    %li
+      = summarize(app)
