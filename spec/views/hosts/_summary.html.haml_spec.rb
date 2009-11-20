@@ -27,8 +27,8 @@ describe '/hosts/summary' do
   it 'should include the list of apps deployed to the host' do
     deployed = Array.new(3) { Deployment.generate!(:host => @host)}
     do_render
-    deployed.each do |deployed|
-      response.should have_text(Regexp.new(deployed.instance.app.name))
+    @host.apps.each do |app|
+      response.should have_text(Regexp.new(app.name))
     end
   end
 end

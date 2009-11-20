@@ -28,4 +28,13 @@ describe '/apps/summary' do
     do_render 
     response.should have_text(Regexp.new(@app.customer.name))
   end
+  
+  it 'should list any hosts to which the app is deployed' do
+    instance = Instance.generate!(:app => @app)
+    deployments = Array.new(3) { Deployment.generate!(:instance => instance) }
+    do_render
+    @app.hosts.each do |host|
+      response.should have_text(Regexp.new(host.name))
+    end
+  end
 end

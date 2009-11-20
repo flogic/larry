@@ -8,7 +8,11 @@
 
  -> looks like services controller doesn't have specs for the alternate formats being delivered
 
+ -> could have indexes identify strange situations:  customers with undeployed apps, hosts with no deployments, apps which are not deployed, etc.
+
  -> various lists could presumable benefit from pagination / search
+
+
 
  -> I think the puppet-classifer "class"/"service" modeling did a disservice to what I'm trying to do.  Need to unwind this.
 

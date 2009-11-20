@@ -1,5 +1,9 @@
 .app
   = link_to app.name, app
   == (#{link_to app.customer.name, app.customer})
+  - unless app.hosts.blank?
+    \->
+    - app.hosts.each do |host|
+      = link_to host.name, host
   - unless app.description.blank?
     .description= app.description 
