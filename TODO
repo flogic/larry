@@ -13,8 +13,6 @@
 
  -> various lists could presumable benefit from pagination / search
 
-
-
  -> I think the puppet-classifer "class"/"service" modeling did a disservice to what I'm trying to do.  Need to unwind this.
 
  -> there should be a services method for hosts, so that we can easily see what services are supposed to be on the host.  The deployments are, in a sense, the detailed "Actually deployed on the host" services.  So, in a sense, the services are being linked via destinations to deployments on hosts (if the destination is a same-host destination then destination is almost a no-op way to get from service to deployment, which belongs_to host)

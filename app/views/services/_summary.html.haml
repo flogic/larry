@@ -1,0 +1,15 @@
+.service
+  = brief(service)
+  == (used by #{service.dependents.size} services, #{service.apps.size} apps,
+  - if service.hosts.blank?
+    deployed to no hosts)
+  -else
+    == on hosts: #{list(service.hosts)})
+
+  - unless service.description.blank?
+    .description= service.description
+
+  - unless service.depends_on.blank?
+    .depends_on
+      \->   
+      = list(service.depends_on)
