@@ -35,5 +35,4 @@
  
  : this probably speaks to a general facility to associate an URL with a class (customer, app, instance, deployment, host, etc.); in which case it might well be possible to have parsers for the data at the end of those URLs so that we could aggregate data; if we push out RSS, e.g., from larry then it would be possible for larry to be a central dashboard.
 
-
-
+ -> favicon.ico
