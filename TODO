@@ -1,6 +1,3 @@
- -> would we like to have a brief() helper which just shows a minimal bit of information about an object?
- -> would we like to have a list(@list) helper which just renders brief(<each>) and joins by ',' ?   (apply to apps -> hosts listing)
-
  -> views (show, index, _summary) for services, instances, deployments, destinations
  -> start adding forms for maintaining data
  -> links to edit forms

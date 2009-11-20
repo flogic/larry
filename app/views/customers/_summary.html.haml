@@ -1,5 +1,5 @@
 .customer
-  = link_to customer.name, customer
+  = brief(customer)
   - unless customer.description.blank?
     .description= customer.description
   - unless customer.apps.blank?

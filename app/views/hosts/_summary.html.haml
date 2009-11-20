@@ -1,5 +1,5 @@
 .host
-  = link_to host.name, host
+  = brief(host)
   - unless host.description.blank?
     .description= host.description
   - unless host.apps.blank?
