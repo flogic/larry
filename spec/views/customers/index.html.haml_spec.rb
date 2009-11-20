@@ -11,7 +11,7 @@ describe '/customers/index' do
 
   it 'should show a summary for each customer' do
     @customers.each do |customer|
-      template.should_receive(:render).with(has_entry(:partial, 'customers/summary'), has_entry(:locals => { :customer => customer }))
+      template.expects(:summarize).with(customer)
     end
     do_render
   end

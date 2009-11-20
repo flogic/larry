@@ -39,7 +39,7 @@ describe '/customers/show' do
   
   it 'should show a summary for each app' do
     @apps.each do |app|
-      template.should_receive(:render).with(has_entry(:partial, 'apps/summary'), has_entry(:locals => { :app => app }))
+      template.expects(:summarize).with(app)
     end
     do_render
   end
