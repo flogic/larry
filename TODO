@@ -1,11 +1,18 @@
- -> views (show, index, _summary) for services, instances, deployments, destinations
+ -> services show view
+ -> ability to manage service dependencies from the services show page (add, remove edge, basically)
  -> app show should have more service information
+
  -> generate some sort of YAML dump
  -> import data from YAML dump
+
  -> operations:  un-deploy, deploy, shut down, start host, provision new host, etc. (what impact do these have out in the world?)
- -> start adding forms for maintaining data
- -> links to edit forms
- -> deletion links (rules about deployed or not)
+
+ ?-> start adding forms for maintaining data
+ ?-> links to edit forms
+ ?-> deletion links (rules about deployed or not)
+ ?-> views (show, index, _summary) for instances, deployments, destinations
+ 
+ -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we life in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
  
  -> looks like services controller doesn't have specs for the alternate formats being delivered
 
