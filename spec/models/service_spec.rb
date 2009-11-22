@@ -260,6 +260,80 @@ describe Service do
     end    
   end
   
+  it 'should be able to return a list of unrelated services' do
+    Service.new.should respond_to(:unrelated)
+  end
+  
+  describe 'when returning a list of unrelated services' do
+    before :all do
+      Service.delete_all
+    end
+    
+    before :each do
+      @service = Service.generate!
+    end
+    
+    it 'should not require arguments' do
+      lambda { @service.unrelated }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @service.unrelated(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    it 'should not return the service itself' do
+      @service.unrelated.should_not include(@service)
+    end
+    
+    it 'should not return services which this service depends on' do
+      others = Array.new(2) { Service.generate! }
+      @service.depends_on << others
+      result = @service.unrelated
+      others.each do |other|
+        result.should_not include(other)
+      end
+    end
+    
+    it 'should not return services which this service has a transitive dependency on' do
+      intermediate = Service.generate!
+      others = Array.new(2) { Service.generate! }
+      intermediate.depends_on << others
+      @service.depends_on << intermediate
+      result = @service.unrelated
+      others.each do |other|
+        result.should_not include(other)
+      end      
+    end
+    
+    it 'should not return services which depend on this service' do
+      others = Array.new(2) { Service.generate! }
+      @service.dependents << others
+      result = @service.unrelated
+      others.each do |other|
+        result.should_not include(other)
+      end
+    end
+    
+    it 'should not return services which have a transitive dependency on this service' do
+      intermediate = Service.generate!
+      others = Array.new(2) { Service.generate! }
+      intermediate.dependents << others
+      @service.dependents << intermediate
+      result = @service.unrelated
+      others.each do |other|
+        result.should_not include(other)
+      end      
+    end
+    
+    it 'should return all services which have no depency relationship with this service' do
+      unrelateds = Array.new(2) { Service.generate! }
+      result = @service.unrelated
+      unrelateds.each do |unrelated|
+        result.should include(unrelated)
+      end
+    end
+  end
+  
   it 'should be able to generate a configuration name' do
     Service.new.should respond_to(:configuration_name)
   end

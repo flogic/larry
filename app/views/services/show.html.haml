@@ -28,3 +28,9 @@
     %h3 This service depends on no other services
   - else
     %h3== This service depends on these other services: #{list(@service.depends_on)}
+
+#unrelated_services
+  %h2 Unrelated Services
+  %ul
+    - @service.unrelated.each do |unrelated|
+      %li= brief(unrelated)

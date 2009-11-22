@@ -67,4 +67,9 @@ class Service < ActiveRecord::Base
     end
     results
   end
+  
+  # this is going to be painful, at some point, but premature optimization is the root of all evil
+  def unrelated
+    Service.all - all_depends_on - all_dependents - [ self ]
+  end
 end

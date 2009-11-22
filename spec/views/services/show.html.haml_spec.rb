@@ -57,4 +57,38 @@ describe '/services/show' do
       response.should have_text(Regexp.new(host.name))
     end
   end
+  
+  it 'should show the list of services which are not related to this service' do
+    unrelated = Service.generate!
+    do_render
+    response.should have_tag('div[id=?]', 'unrelated_services')
+  end
+  
+  describe 'list of unrelated services' do
+    it 'should not contain services which depend on this service' do
+      others = Array.new(3) { Service.generate! }
+      @service.dependents << others
+      do_render
+      others.each do |other|
+        response.should_not have_tag('div[id=?]', 'unrelated_services', :text => Regexp.new(other.name))
+      end
+    end
+    
+    it 'should not contain services which this service depends on' do
+      others = Array.new(3) { Service.generate! }
+      @service.depends_on << others
+      do_render
+      others.each do |other|
+        response.should_not have_tag('div[id=?]', 'unrelated_services', :text => Regexp.new(other.name))
+      end      
+    end
+    
+    it 'should contain all the services which are unrelated to this service' do
+      unrelated = Array.new(3) { Service.generate! }
+      do_render
+      unrelated.each do |service|
+        response.should have_tag('div[id=?]', 'unrelated_services', :text => Regexp.new(service.name))
+      end
+    end
+  end
 end

@@ -1,5 +1,10 @@
+
  -> ability to manage service dependencies from the services show page (add, remove edge, basically)
- -> ability to manage instance -> service dependencies from the instance show page
+ 
+   /services/1/edges {POST} id => 2 
+   -> creates an edge from service 1 to service 2
+
+   -> ability to manage instance -> service dependencies from the instance show page
 
 
  -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we live in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
