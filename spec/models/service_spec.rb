@@ -85,6 +85,12 @@ describe Service do
       @service.hosts.sort_by(&:id).should == @deployments.collect(&:host).sort_by(&:id)      
     end
 
+    it 'should not include empty instance hosts when looking up hosts' do
+      instances = Array.new(3) { Instance.generate! }
+      @service.instances << instances
+      @service.hosts.should == []
+    end
+
     it 'should have many apps' do
       @service.should respond_to(:apps)      
     end

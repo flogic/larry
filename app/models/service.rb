@@ -31,7 +31,7 @@ class Service < ActiveRecord::Base
   end
   
   def hosts
-    instances.collect(&:host)
+    instances.collect(&:host).compact
   end
   
   def root?
