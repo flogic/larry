@@ -28,6 +28,8 @@
     %h3 This service depends on no other services
   - else
     %h3== This service depends on these other services: #{list(@service.depends_on)}
+    %h4 Dependency tree:
+    = display_tree(@service.depends_on_tree)
 
 #unrelated_services
   %h2 Unrelated Services

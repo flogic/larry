@@ -19,4 +19,25 @@ module ApplicationHelper
     return '' if instances.blank?
     instances.flatten.collect {|i| brief(i) }.join(", ")
   end
+  
+  def display_tree(tree)
+    return '' if tree.blank?
+    content_tag(:ul) do
+      tree.inject('') do |buffer, node|
+        if buffer.is_a?(Array)
+          buffer << display_tree(node)
+        else
+          buffer << content_tag(:li, brief(node))
+        end
+        buffer
+      end
+    end
+  end
 end
+
+__END__
+
+[ x, y, z ]
+
+[ x, [ a, b ], y, z, [ w ]]
+

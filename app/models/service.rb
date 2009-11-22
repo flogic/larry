@@ -68,6 +68,24 @@ class Service < ActiveRecord::Base
     results
   end
   
+  def depends_on_tree
+    depends_on.inject([]) do |list, service|
+      list << service
+      nested = service.depends_on_tree
+      list << nested unless nested.blank?
+      list
+    end
+  end
+  
+  def dependents_tree
+    dependents.inject([]) do |list, service|
+      list << service
+      nested = service.dependents_tree
+      list << nested unless nested.blank?
+      list
+    end
+  end
+
   # this is going to be painful, at some point, but premature optimization is the root of all evil
   def unrelated
     Service.all - all_depends_on - all_dependents - [ self ]

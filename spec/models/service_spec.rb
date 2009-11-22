@@ -260,6 +260,78 @@ describe Service do
     end    
   end
   
+  it 'should be able to return a "tree" of services we depend on' do
+    Service.new.should respond_to(:depends_on_tree)
+  end
+  
+  describe 'when returning a "tree" of services we depend on' do
+    before :each do
+      @service = Service.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @service.depends_on_tree }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @service.depends_on_tree(:foo) }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should return an empty list if we do not depend on services' do
+      @service.depends_on_tree.should == []
+    end
+    
+    it 'should return a list of the services we depend on when there are no deeper nestings' do
+      others = Array.new(2) { Service.generate! }
+      @service.depends_on << others
+      @service.depends_on_tree.should == others
+    end
+    
+    it 'should nest any depends_on relationships as nested arrays' do
+      kids = Array.new(2) { Service.generate! }
+      grandkids = Array.new(2) { Service.generate! }
+      kids.first.depends_on << grandkids
+      @service.depends_on << kids
+      @service.depends_on_tree.should == [ kids.first, grandkids, kids.last ]      
+    end
+  end
+  
+  it 'should be able to return a "tree" of services that depend on us' do
+    Service.new.should respond_to(:dependents_tree)
+  end
+  
+  describe 'when returning a "tree" of services that depend on us' do
+    before :each do
+      @service = Service.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @service.dependents_tree }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @service.dependents_tree(:foo) }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should return an empty list if we do not depend on services' do
+      @service.dependents_tree.should == []
+    end
+    
+    it 'should return a list of the services we depend on when there are no deeper nestings' do
+      others = Array.new(2) { Service.generate! }
+      @service.dependents << others
+      @service.dependents_tree.should == others
+    end
+    
+    it 'should nest any depends_on relationships as nested arrays' do
+      parents = Array.new(2) { Service.generate! }
+      grandparents = Array.new(2) { Service.generate! }
+      parents.first.dependents << grandparents
+      @service.dependents << parents
+      @service.dependents_tree.should == [ parents.first, grandparents, parents.last ]      
+    end
+  end
+  
   it 'should be able to return a list of unrelated services' do
     Service.new.should respond_to(:unrelated)
   end

@@ -86,4 +86,34 @@ describe ApplicationHelper do
       helper.list(*instances).should == instances.collect {|i| helper.brief(i)}.join(", ")
     end
   end
+  
+  it 'should be able to display a tree' do
+    helper.should respond_to(:display_tree)
+  end
+  
+  describe 'when displaying a tree' do
+    it 'should accept a tree' do
+      lambda { helper.display_tree([]) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should require a tree' do
+      lambda { helper.display_tree }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should return the empty string when the tree is empty' do
+      helper.display_tree([]).should == ''
+    end
+
+    it 'should return an unordered list with a list element for each tree node when the tree is flat' do
+      tree = Array.new(3) { Customer.generate! }
+      response = helper.display_tree(tree)
+      response.should have_tag('ul') do
+        tree.each do |customer|
+          with_tag('li', :text => Regexp.new(customer.name))
+        end
+      end
+    end
+    
+    it 'should have more behavior'
+  end
 end
