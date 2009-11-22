@@ -9,7 +9,7 @@
   - unless service.description.blank?
     .description= service.description
 
-  - unless service.depends_on.blank?
+  - unless service.leaf?
     .depends_on
       \->   
       = list(service.depends_on)

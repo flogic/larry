@@ -18,13 +18,13 @@
     %h3== Instances which require this service: #{list(@service.instances)}
 
 .dependents
-  - if @service.dependents.blank?
+  - if @service.root?
     %h3 No services depend on this service
   - else
     %h3== Services which depend on this service: #{list(@service.dependents)}
 
 .depends_on
-  - if @service.depends_on.blank?
+  - if @service.leaf?
     %h3 This service depends on no other services
   - else
     %h3== This service depends on these other services: #{list(@service.depends_on)}
