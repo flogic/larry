@@ -1,0 +1,60 @@
+require File.expand_path(File.join(File.dirname(__FILE__), *%w[.. .. spec_helper]))
+
+describe '/services/show' do
+  before :each do
+    assigns[:service] = @service = Service.generate!(:description => 'Test Service')
+  end
+
+  def do_render
+    render '/services/show'
+  end
+
+  it 'should display the name of the service' do
+    do_render
+    response.should have_text(Regexp.new(@service.name))
+  end
+  
+  it 'should display the description of the service' do
+    do_render
+    response.should have_text(Regexp.new(@service.description))
+  end
+
+  it 'should show the services which depends on this service' do
+    others = Array.new(3) { Service.generate! }
+    @service.dependents << others
+    do_render
+    others.each do |other|
+      response.should have_text(Regexp.new(other.name))
+    end
+  end
+  
+  it 'should show the services which this service depends on' do
+    others = Array.new(3) { Service.generate! }
+    @service.depends_on << others
+    do_render
+    others.each do |other|
+      response.should have_text(Regexp.new(other.name))
+    end
+  end
+  
+  it 'should show the list of instances which require the service' do
+    instances = Array.new(3) { Instance.generate! }
+    @service.instances << instances
+    do_render
+    instances.each do |instance|
+      response.should have_text(Regexp.new(instance.name))
+    end
+  end
+  
+  it 'should show the list of hosts on which the service is deployed' do
+    instances = Array.new(5) { Instance.generate! }
+    instances.each do |i| 
+      i.services << @service
+      Deployment.generate!(:instance => i)
+    end
+    do_render
+    @service.hosts.each do |host|
+      response.should have_text(Regexp.new(host.name))
+    end
+  end
+end

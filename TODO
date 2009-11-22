@@ -1,9 +1,16 @@
- -> services show view
  -> ability to manage service dependencies from the services show page (add, remove edge, basically)
  -> app show should have more service information
 
- -> generate some sort of YAML dump
- -> import data from YAML dump
+ -> ability to manage instance -> service dependencies from the instance show page
+
+ -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we live in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
+
+ -> parameters for services
+ -> bubble-up of parameters for services to instances for setting (implies that when we generate a service+parameter list we down-propagate, filling in variables)
+ -> parameters being complete are a pre-condition for being able to deploy an instance
+ -> parameters could be computed from host (e.g., ip addresses, etc.) ... does this imply bad design of the manifest/recipe that enforces them?  (maybe) ... what about multiple IP addresses for, say, multiple SSL domain names for a web app?
+ 
+ -> would be useful for customer, app, instance to have deployed? predicates so that we can know if they are deployed anywhere
 
  -> operations:  un-deploy, deploy, shut down, start host, provision new host, etc. (what impact do these have out in the world?)
 
@@ -11,8 +18,6 @@
  ?-> links to edit forms
  ?-> deletion links (rules about deployed or not)
  ?-> views (show, index, _summary) for instances, deployments, destinations
- 
- -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we life in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
  
  -> looks like services controller doesn't have specs for the alternate formats being delivered
 
@@ -22,7 +27,8 @@
 
  -> there should be a services method for hosts, so that we can easily see what services are supposed to be on the host.  The deployments are, in a sense, the detailed "Actually deployed on the host" services.  So, in a sense, the services are being linked via destinations to deployments on hosts (if the destination is a same-host destination then destination is almost a no-op way to get from service to deployment, which belongs_to host)
 
- -> would be useful for customer, app, instance to have deployed? predicates so that we can know if they are deployed anywhere
+ -> generate some sort of YAML dump
+ -> import data from YAML dump
 
  -> probably useful to have a display of services that are not deployed for instances (why did we not deploy the searchd for this site?)
 
