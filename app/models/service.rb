@@ -14,6 +14,8 @@ class Service < ActiveRecord::Base
   has_many :dependent_edges, :class_name => 'Edge', :foreign_key => 'target_id'  
   has_many :dependents, :through => :dependent_edges, :source => :source
   
+  default_scope :order => 'name'
+  
   def configuration_name
     normalize_name(name)
   end
