@@ -42,6 +42,16 @@ class Service < ActiveRecord::Base
     depends_on.empty?
   end
   
+  def edge_to(other)
+    return nil unless other
+    source_edges.find_by_target_id(other.id)
+  end
+  
+  def edge_from(other)
+    return nil unless other
+    target_edges.find_by_source_id(other.id)
+  end
+  
   def all_depends_on
     candidates, results, seen = depends_on.dup, [], {}
     while !candidates.empty?

@@ -406,6 +406,86 @@ describe Service do
     end
   end
   
+  it 'should be possible to find an edge to another service' do
+    Service.new.should respond_to(:edge_to)
+  end
+  
+  describe 'when finding an edge to another service' do
+    before :each do
+      @service = Service.generate!
+    end
+    
+    it 'should accept a service' do
+      lambda { @service.edge_to(:foo) }.should_not raise_error(ArgumentError)
+    end
+
+    it 'should require a service' do
+      lambda { @service.edge_to }.should raise_error(ArgumentError)      
+    end
+
+    it 'should return nil if the service cannot be located' do
+      @service.edge_to(Service.new).should be_nil
+    end
+    
+    it 'should return nil if there is no edge from this service to the other service' do
+      @service.edge_to(Service.generate!).should be_nil
+    end
+    
+    it 'should return nil if there is no edge in the proper direction from this service to the other service' do
+      other = Service.generate!
+      other.depends_on << @service
+      @service.edge_to(other).should be_nil      
+    end
+    
+    it 'should return the edge from this service to the other service' do
+      other = Service.generate!
+      other.dependents << @service
+      result = @service.edge_to(other)
+      result.source.should == @service
+      result.target.should == other
+    end
+  end
+
+  it 'should be possible to find an edge from another service' do
+    Service.new.should respond_to(:edge_from)
+  end
+  
+  describe 'when finding an edge from another service' do
+    before :each do
+      @service = Service.generate!
+    end
+    
+    it 'should accept a service' do
+      lambda { @service.edge_from(:foo) }.should_not raise_error(ArgumentError)
+    end
+
+    it 'should require a service' do
+      lambda { @service.edge_from }.should raise_error(ArgumentError)      
+    end
+
+    it 'should return nil if the service cannot be located' do
+      @service.edge_from(Service.new).should be_nil
+    end
+
+    it 'should return nil if there is no edge from this service to the other service' do
+      @service.edge_from(Service.generate!).should be_nil
+    end
+    
+    it 'should return nil if there is no edge in the proper direction from the other service to this service' do
+      other = Service.generate!
+      other.dependents << @service
+      @service.edge_from(other).should be_nil      
+    end
+    
+    it 'should return the edge from the other service to this service' do
+      other = Service.generate!
+      other.depends_on << @service
+      result = @service.edge_from(other)
+      result.source.should == other
+      result.target.should == @service
+    end
+  end
+  
   it 'should be able to generate a configuration name' do
     Service.new.should respond_to(:configuration_name)
   end
