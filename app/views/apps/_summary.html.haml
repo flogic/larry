@@ -1,6 +1,6 @@
 .app
   = brief(app)
-  == (#{brief app.customer.name})
+  == (#{brief app.customer})
   - unless app.hosts.blank?
     \->
     = list(app.hosts)
