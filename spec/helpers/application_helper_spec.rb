@@ -114,6 +114,27 @@ describe ApplicationHelper do
       end
     end
     
-    it 'should have more behavior'
+    it 'should return nested unordered lists when the tree has multiple levels' do
+      grandparent, parent = Service.generate!, Service.generate!
+      grandparent.depends_on << parent 
+      parent.depends_on << Array.new(2) { Service.generate! }
+      parent.depends_on.first.depends_on << Array.new(2) { Service.generate! }
+      parent.depends_on.last.depends_on << Array.new(2) { Service.generate! }
+      
+      response = helper.display_tree(grandparent.depends_on_tree)
+      response.should have_tag('ul') do
+        with_tag('li', :text => Regexp.new(parent.name))
+        with_tag('ul') do
+          parent.depends_on.each do |kid|
+            with_tag('li', :text => Regexp.new(kid.name))
+            with_tag('ul') do
+              kid.depends_on.each do |grandkid|
+                with_tag('li', :text => Regexp.new(grandkid.name))
+              end
+            end
+          end
+        end
+      end
+    end
   end
 end

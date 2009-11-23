@@ -1,5 +1,3 @@
- - bugfix on service depends_on tree view
-
  -> show instance -> service tree on instance show page
  -> ability to manage instance -> service dependencies from the instance show page (this is instances/link and requirements/destroy, if we follow the pattern used in services/edges)
 
