@@ -19,6 +19,11 @@ describe '/instances/show' do
     response.should have_text(Regexp.new(@instance.description))
   end
 
+  it 'should display the app which this instance belongs to' do
+    do_render
+    response.should have_text(Regexp.new(@instance.app.name))
+  end
+
   it 'should show any host on which the instance is deployed' do
     Deployment.generate!(:instance => @instance)
     do_render
