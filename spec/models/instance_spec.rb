@@ -228,6 +228,36 @@ describe Instance do
     end
   end
   
+  it 'should be able to locate a requirement for a service' do
+    Instance.new.should respond_to(:requirement_for)
+  end
+  
+  describe 'when locating a requirement for a service' do
+    before :each do
+      @instance = Instance.generate!
+    end
+    
+    it 'should accept a service' do 
+      lambda { @instance.requirement_for(:foo) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should require a service' do
+      lambda { @instance.requirement_for }.should raise_error(ArgumentError)
+    end
+    
+    it 'should return nil when the service cannot be found' do
+      @instance.requirement_for(Service.new).should be_nil
+    end
+    
+    it 'should return the requirement instance that is associated with this instance and the provided service' do
+      service = Service.generate!
+      @instance.services << service
+      result = @instance.requirement_for(service)
+      result.instance.should == @instance
+      result.service.should == service
+    end
+  end  
+  
   it 'should be able to find a set of unrelated services' do
     Instance.new.should respond_to(:unrelated_services)
   end

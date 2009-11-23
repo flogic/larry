@@ -33,4 +33,9 @@ class Instance < ActiveRecord::Base
   def unrelated_services
     Service.unrelated_services(services)
   end
+  
+  def requirement_for(service)
+    return nil unless service
+    requirements.find_by_service_id(service.id)
+  end
 end
