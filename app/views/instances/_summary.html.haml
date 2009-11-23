@@ -2,3 +2,6 @@
   == #{brief(instance.customer)} -> #{brief(instance.app)} -> #{brief(instance)}
   - unless instance.description.blank?
     .description= instance.description
+  - if instance.host
+    %ul
+      %li== deployed to: #{brief(instance.host)}
