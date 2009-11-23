@@ -1,6 +1,6 @@
 class ServicesController < ApplicationController
   resources_controller_for :service
-
+  
   response_for :index do |format|
     format.html # index.rhtml
     format.js

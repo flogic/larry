@@ -66,6 +66,38 @@ describe EdgesController, 'when integrating' do
 
     it_should_behave_like "a redirecting action"
   end
+  
+  describe 'link' do
+    before :each do
+      @source, @target = Service.generate!, Service.generate!
+      @source_id, @target_id = @source.id.to_s, @target.id.to_s
+    end
+    
+    it 'should fail when no source_id is provided' do
+      lambda { post :link, :target_id => @target_id }.should raise_error      
+    end
+
+    it 'should fail when no target_id is provided' do
+      lambda { post :link, :source_id => @source_id }.should raise_error
+    end
+    
+    it 'should fail when an invalid source_id is provided' do
+      lambda { post :link, :source_id => (@source.id+100).to_s, :target_id => @target_id }.should raise_error      
+    end
+    
+    it 'should fail when an invalid target_id is provided' do
+      lambda { post :link, :source_id => @source_id, :target_id => (@target.id+100).to_s }.should raise_error            
+    end
+    
+    it 'should create a new edge from the source to the target' do
+      lambda { post :link, :source_id => @source_id, :target_id => @target_id }.should change(Edge, :count)
+    end
+    
+    it 'should redirect to the source show page' do
+      post :link, :source_id => @source_id, :target_id => @target_id
+      response.should redirect_to(service_path(@source))
+    end
+  end
 end
 
 describe EdgesController, 'when not integrating' do

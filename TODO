@@ -1,7 +1,4 @@
-
- - UI to add service as depends_on
-   /services/1/edges {POST} id => 2 
-   -> creates an edge from service 1 to service 2     
+ - bugfix on service depends_on tree view
  - UI to remove depends_on service
 
  -> add customer

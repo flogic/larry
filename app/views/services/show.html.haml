@@ -35,4 +35,4 @@
   %h2 Unrelated Services
   %ul
     - @service.unrelated.each do |unrelated|
-      %li= brief(unrelated)
+      %li== #{brief(unrelated)} - #{link_to 'Add a dependency to this service', link_edges_path(:source_id => @service, :target_id => unrelated), :method => 'post'}

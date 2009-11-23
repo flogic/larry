@@ -90,5 +90,15 @@ describe '/services/show' do
         response.should have_tag('div[id=?]', 'unrelated_services', :text => Regexp.new(service.name))
       end
     end
+    
+    it 'should provide a link to create a dependency on each unrelated service' do
+      unrelated = Array.new(3) { Service.generate! }
+      do_render
+      unrelated.each do |service|
+        response.should have_tag('div[id=?]', 'unrelated_services') do
+          with_tag('a[href=?]', html_escape(link_edges_path(:source_id => @service, :target_id => service)))
+        end
+      end      
+    end
   end
 end
