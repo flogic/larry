@@ -228,6 +228,34 @@ describe Instance do
     end
   end
   
+  it 'should be able to find a set of unrelated services' do
+    Instance.new.should respond_to(:unrelated_services)
+  end
+  
+  describe 'when finding a set of unrelated services' do
+    before :each do
+      @instance = Instance.new
+    end
+    
+    it 'should not require any arguments' do
+      lambda { @instance.unrelated_services }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow any arguments' do
+      lambda { @instance.unrelated_services(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    it "should ask for the list of services unrelated to this instance's required services" do
+      Service.expects(:unrelated_services).with(@instance.services)
+      @instance.unrelated_services
+    end
+    
+    it "should return the list of services unrelated to this instance's required services" do
+      Service.stubs(:unrelated_services).with(@instance.services).returns('foo')
+      @instance.unrelated_services.should == 'foo'
+    end
+  end
+  
   it 'should be able to generate a set of configuration parameters' do
     Instance.new.should respond_to(:configuration_parameters)
   end

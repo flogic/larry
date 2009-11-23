@@ -29,4 +29,8 @@ class Instance < ActiveRecord::Base
   def configuration_parameters
     parameters || {}
   end
+  
+  def unrelated_services
+    Service.unrelated_services(services)
+  end
 end
