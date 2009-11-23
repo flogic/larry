@@ -260,6 +260,39 @@ describe Service do
     end    
   end
   
+  describe 'as a class' do
+    it 'should be able to return a list of services unrelated to another list of services' do
+      Service.should respond_to(:unrelated_services)
+    end
+    
+    describe 'when returning a list of services unrelated to another list of services' do
+      before :all do
+        Service.delete_all
+      end
+      
+      it 'should accept a list of services' do
+        lambda { Service.unrelated_services([]) }.should_not raise_error(ArgumentError)
+      end
+
+      it 'should return all services if the service list is empty' do
+        unrelated = Array.new(2) { Service.generate! }
+        Service.unrelated_services([]).should == unrelated
+      end
+      
+      it 'should return those services unrelated to the services in the list' do
+        known = Array.new(2) { Service.generate! }
+        unrelated = Array.new(2) { Service.generate! }
+        Service.unrelated_services(known).should == unrelated
+      end
+      
+      it 'should return those services unrelated to the services in the list even when the list is passed as separate arguments' do
+        known = Array.new(2) { Service.generate! }
+        unrelated = Array.new(2) { Service.generate! }
+        Service.unrelated_services(*known).should == unrelated        
+      end
+    end
+  end
+  
   it 'should be able to return a "tree" of services we depend on' do
     Service.new.should respond_to(:depends_on_tree)
   end
@@ -332,11 +365,11 @@ describe Service do
     end
   end
   
-  it 'should be able to return a list of unrelated services' do
+  it 'should be able to return a list of services unrelated to this service' do
     Service.new.should respond_to(:unrelated)
   end
   
-  describe 'when returning a list of unrelated services' do
+  describe 'when returning a list of services unrelated to this service' do
     before :all do
       Service.delete_all
     end

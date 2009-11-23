@@ -16,6 +16,11 @@ class Service < ActiveRecord::Base
   
   default_scope :order => 'name'
   
+  # this is going to be painful, at some point, but premature optimization is the root of all evil
+  def self.unrelated_services(*services)
+    all - services.flatten
+  end
+  
   def configuration_name
     normalize_name(name)
   end
@@ -98,8 +103,7 @@ class Service < ActiveRecord::Base
     end
   end
 
-  # this is going to be painful, at some point, but premature optimization is the root of all evil
   def unrelated
-    Service.all - all_depends_on - all_dependents - [ self ]
+    self.class.unrelated_services(all_depends_on, all_dependents, self)
   end
 end
