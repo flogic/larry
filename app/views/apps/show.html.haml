@@ -5,6 +5,14 @@
   - unless @app.description.blank?
     .description= @app.description
 
+- if @app.instances.blank?
+  %h3 No instances for this app.
+- else
+  %h3== App instances:
+  %ul
+    - @app.instances.each do |instance|
+      %li= summarize(instance)
+
 - if @app.hosts.blank?
   %h3 No app-related services deployed to hosts.
 - else
