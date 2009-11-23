@@ -60,11 +60,29 @@ describe EdgesController, 'when integrating' do
   end
 
   describe 'destroy' do
-    def do_request
-      delete :destroy, :id => @edge.id.to_s
+    before(:each) do
+      @edge = Edge.generate!
+      @edge_id = @edge.id.to_s
     end
 
-    it_should_behave_like "a redirecting action"
+    def do_delete
+      delete :destroy, { :id => @edge_id }
+    end
+    
+    it 'should fail if requested edge does not exist' do
+      @edge.destroy
+      lambda { do_delete }.should raise_error
+    end
+    
+    it 'should delete the requested edge' do
+      lambda { do_delete }.should change(Edge, :count)
+    end
+
+    it 'should redirect to the source service after deleting an edge' do
+      source = @edge.source
+      delete :destroy, :id => @edge_id
+      response.should redirect_to(service_path(source))
+    end
   end
   
   describe 'link' do
@@ -101,5 +119,10 @@ describe EdgesController, 'when integrating' do
 end
 
 describe EdgesController, 'when not integrating' do
-  it_should_behave_like 'a RESTful controller'
+  it_should_behave_like 'a RESTful controller with an index action'
+  it_should_behave_like 'a RESTful controller with a show action'
+  it_should_behave_like 'a RESTful controller with a new action'
+  it_should_behave_like 'a RESTful controller with a create action'
+  it_should_behave_like 'a RESTful controller with an edit action'
+  it_should_behave_like 'a RESTful controller with an update action'
 end
