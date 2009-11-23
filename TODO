@@ -1,11 +1,6 @@
- -> can we convert edges#link into just a #create?
  -> more instance information on other views (hosts, apps, customers?)
  -> more details on instance index (instance summary, actually)
  
- -> ability to manage instance -> service dependencies from the instance show page (this is instances/link and requirements/destroy, if we follow the pattern used in services/edges)
-
- -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we live in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
-
  ---
 
  -> add customer
@@ -33,10 +28,10 @@
 
  -> operations:  un-deploy, deploy, shut down, start host, provision new host, etc. (what impact do these have out in the world?)
 
- ?-> start adding forms for maintaining data
- ?-> links to edit forms
+ -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we live in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
+
  ?-> deletion links (rules about deployed or not)
- ?-> views (show, index, _summary) for instances, deployments, destinations
+ ?-> views (show, index, _summary) for deployments ?, destinations ?
  
  -> looks like services controller doesn't have specs for the alternate formats being delivered
 
