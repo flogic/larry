@@ -1,4 +1,3 @@
- -> bugfix for customer name on summary of apps (?)
  -> instance show
  -> show instance -> service tree on instance show page
  -> more instance information on other views (hosts, apps, customers?)
@@ -18,6 +17,8 @@
  ---
  
  "Audits":  aka, Service linkages that use Destinations to compute which Hosts they are to be deployed to (e.g., monitoring, backups, firewall rules, logrotate, etc.).  Services *about* other services.
+ 
+ - Currently we model the instance -> deployment -> host relationship in such a way that we presume every service for an instance is deployed to the same host; audits make this untrue, and hence the cardinality of the instance -> host(s) relationship also has to increase, as well as the cardinality of instance -> deployment ... need to revisit the domain_model graphic
 
  --- 
 

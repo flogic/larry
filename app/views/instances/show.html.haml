@@ -1,0 +1,12 @@
+%h1 Instance details
+
+%div
+  %span== Name: #{brief(@instance)}
+  - unless @instance.description.blank?
+    .description= @instance.description
+
+.hosts
+  - if @instance.host.blank?
+    %h3 This instance is not currently deployed.
+  - else
+    %h3== This instance is deployed on host: #{list(@instance.host)}
