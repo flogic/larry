@@ -37,6 +37,26 @@ describe '/services/show' do
     end
   end
   
+  it 'should show the tree of services this service depends on' do
+    kids = Array.new(3) { Service.generate! }
+    grandkids = Array.new(3) { Service.generate! }
+    kids.each {|k| k.depends_on << grandkids }
+    @service.depends_on << kids
+    do_render
+    [kids, grandkids].flatten.each do |other|
+      response.should have_text(Regexp.new(other.name))
+    end    
+  end
+  
+  it 'should provide a means to disconnect the services which this service directly depends on' do
+    others = Array.new(3) { Service.generate! }
+    @service.depends_on << others
+    do_render
+    others.each do |other|
+      response.should have_tag('a[href=?]', edge_path(@service.edge_to(other)))
+    end    
+  end
+    
   it 'should show the list of instances which require the service' do
     instances = Array.new(3) { Instance.generate! }
     @service.instances << instances

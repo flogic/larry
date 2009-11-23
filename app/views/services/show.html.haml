@@ -29,10 +29,13 @@
   - else
     %h3== This service depends on these other services: #{list(@service.depends_on)}
     %h4 Dependency tree:
-    = display_tree(@service.depends_on_tree)
+    %ul
+      - @service.depends_on.each do |kid|
+        %li== [#{link_to 'x', edge_path(@service.edge_to(kid)), :method => 'delete' }] #{brief(kid)}
+        = display_tree(kid.depends_on_tree)
 
 #unrelated_services
   %h2 Unrelated Services
   %ul
     - @service.unrelated.each do |unrelated|
-      %li== #{brief(unrelated)} - #{link_to 'Add a dependency to this service', link_edges_path(:source_id => @service, :target_id => unrelated), :method => 'post'}
+      %li== #{link_to '[+]', link_edges_path(:source_id => @service, :target_id => unrelated), :method => 'post'} #{summarize(unrelated)}
