@@ -1,17 +1,18 @@
- -> more instance information on other views (hosts, apps)
- 
- ---
-
  -> add customer
  -> add customer app
  -> add app instance
- -> add host
- -> deploy.
-
+ -> add host 
+ -> edit customer
+ -> edit app
+ -> edit instance
+ -> edit host
+ 
  ---
  
  "Audits":  aka, Service linkages that use Destinations to compute which Hosts they are to be deployed to (e.g., monitoring, backups, firewall rules, logrotate, etc.).  Services *about* other services.
- 
+  
+ ... Q:  is there any reason not to use Destinations for *all* deployments?  Meaning that audits are only distinguished then by their deployements' explicit association (aboutness) with another deployment.
+
  - Currently we model the instance -> deployment -> host relationship in such a way that we presume every service for an instance is deployed to the same host; audits make this untrue, and hence the cardinality of the instance -> host(s) relationship also has to increase, as well as the cardinality of instance -> deployment ... need to revisit the domain_model graphic
 
  --- 
@@ -22,6 +23,8 @@
  -> parameters could be computed from host (e.g., ip addresses, etc.) ... does this imply bad design of the manifest/recipe that enforces them?  (maybe) ... what about multiple IP addresses for, say, multiple SSL domain names for a web app?
 
  ---
+
+ -> deploy.  This may imply that we have a state machine associated with deployments (associated with instances/services).  This would also imply that getting deployment feedback (e.g., the puppet-reporter "report" data closing the loop, if that's possible; or monitoring information being able to be fed back in; both are tricky but at least one of them would be highly useful, imo)
 
  -> would be useful for customer, app, instance to have deployed? predicates so that we can know if they are deployed anywhere
 

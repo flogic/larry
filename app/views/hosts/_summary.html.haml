@@ -4,5 +4,5 @@
     .description= host.description
   - unless host.apps.blank?
     %ul
-      - host.apps.each do |app|
-        %li= summarize(app)
+      - host.instances.each do |instance|
+        %li= summarize(instance)

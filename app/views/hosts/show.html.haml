@@ -6,7 +6,7 @@
 - unless @host.description.blank?
   .description= @host.description
 
-%h2== Has #{pluralize(@host.apps.size, 'app')} deployed:
+%h2== Has #{pluralize(@host.instances.size, 'app instance')} deployed:
 %ol
-  - @host.apps.each do |app|
-    %li= summarize(app)
+  - @host.instances.each do |instance|
+    %li= summarize(instance)
