@@ -5,7 +5,10 @@
   - unless @app.description.blank?
     .description= @app.description
 
-%h2== Services deployed to #{pluralize(@app.hosts.size, 'host')}:
-%ol
-  - @app.hosts.each do |host|
-    %li= summarize(host)
+- if @app.hosts.blank?
+  %h3 No app-related services deployed to hosts.
+- else
+  %h3== App-related services deployed to #{pluralize(@app.hosts.size, 'host')}:
+  %ol
+    - @app.hosts.each do |host|
+      %li= summarize(host)

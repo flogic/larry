@@ -1,8 +1,9 @@
 .app
+  == #{brief app.customer} -> 
   = brief(app)
-  == (#{brief app.customer})
   - unless app.hosts.blank?
-    \->
-    = list(app.hosts)
+    %ul
+      - app.hosts.each do |host|
+        %li= brief(host)
   - unless app.description.blank?
     .description= app.description 

@@ -5,4 +5,4 @@
   - unless customer.apps.blank?
     %ul
       - customer.apps.each do |app|
-        %li.included= summarize(app)
+        %li.included= brief(app)
