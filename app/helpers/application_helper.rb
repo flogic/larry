@@ -35,9 +35,3 @@ module ApplicationHelper
   end
 end
 
-__END__
-
-[ x, y, z ]
-
-[ x, [ a, b ], y, z, [ w ]]
-
