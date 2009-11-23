@@ -1,6 +1,6 @@
- -> instance show
- -> show instance -> service tree on instance show page
+ -> can we convert edges#link into just a #create?
  -> more instance information on other views (hosts, apps, customers?)
+ -> more details on instance index (instance summary, actually)
  
  -> ability to manage instance -> service dependencies from the instance show page (this is instances/link and requirements/destroy, if we follow the pattern used in services/edges)
 

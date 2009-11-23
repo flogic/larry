@@ -24,4 +24,70 @@ describe '/instances/show' do
     do_render
     response.should have_text(Regexp.new(@instance.host.name))
   end
+  
+  describe 'service dependencies' do
+    it 'should show the services which this instance requires' do
+      services = Array.new(3) { Service.generate! }
+      @instance.services << services
+      do_render
+      services.each do |service|
+        response.should have_text(Regexp.new(service.name))
+      end
+    end
+
+    it 'should show the full tree of services this instance depends on' do
+      kids = Array.new(3) { Service.generate! }
+      grandkids = Array.new(3) { Service.generate! }
+      kids.each {|k| k.depends_on << grandkids }
+      @instance.services << kids
+      do_render
+      [kids, grandkids].flatten.each do |service|
+        response.should have_text(Regexp.new(service.name))
+      end    
+    end
+
+    it 'should provide a means to disconnect the services which this instance directly depends on' do
+      services = Array.new(3) { Service.generate! }
+      @instance.services << services
+      do_render
+      services.each do |service|
+        response.should have_tag('a[href=?]', requirement_path(@instance.requirement_for(service)))
+      end    
+    end
+
+    it 'should show the list of services which are not related to this instance' do
+      unrelated = Service.generate!
+      do_render
+      response.should have_tag('div[id=?]', 'unrelated_services')
+    end
+
+    describe 'list of unrelated services' do
+      it 'should not contain services which this instance depends on' do
+        services = Array.new(3) { Service.generate! }
+        @instance.services << services
+        do_render
+        services.each do |service|
+          response.should_not have_tag('div[id=?]', 'unrelated_services', :text => Regexp.new(service.name))
+        end      
+      end
+
+      it 'should contain all the services which are unrelated to this instance' do
+        unrelated = Array.new(3) { Service.generate! }
+        do_render
+        unrelated.each do |service|
+          response.should have_tag('div[id=?]', 'unrelated_services', :text => Regexp.new(service.name))
+        end
+      end
+
+      it 'should provide a link to create a dependency on each unrelated service' do
+        unrelated = Array.new(3) { Service.generate! }
+        do_render
+        unrelated.each do |service|
+          response.should have_tag('div[id=?]', 'unrelated_services') do
+            with_tag('a[href=?]', html_escape(requirements_path(:requirement => { :instance_id => @instance.id, :service_id => service.id })))
+          end
+        end
+      end
+    end
+  end
 end

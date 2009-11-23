@@ -10,3 +10,24 @@
     %h3 This instance is not currently deployed.
   - else
     %h3== This instance is deployed on host: #{list(@instance.host)}
+
+.depends_on
+  - if @instance.services.blank?
+    %h3 This instance requires no services.
+  - else
+    %h3== This instance requires these services: #{list(@instance.services)}
+    %h4 Service dependency tree:
+    %ul
+      - @instance.services.each do |service|
+        %li== #{link_to '[x]', requirement_path(@instance.requirement_for(service)), :method => 'delete'} #{brief(service)}
+        - unless service.leaf?
+          %ul
+            - service.depends_on.each do |kid|
+              %li= brief(kid)
+              = display_tree(kid.depends_on_tree)
+
+#unrelated_services
+  %h2 Unrelated Services
+  %ul
+  - @instance.unrelated_services.each do |unrelated|
+    %li== #{link_to '[+]', requirements_path(:requirement => { :instance_id => @instance, :service_id => unrelated }), :method => 'post'} #{summarize(unrelated)}
