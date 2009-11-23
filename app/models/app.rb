@@ -8,11 +8,11 @@ class App < ActiveRecord::Base
   default_scope :order => :name
   
   def deployments
-    instances.collect(&:deployment)
+    instances.collect(&:deployment).compact
   end
   
   def hosts
-    instances.collect(&:deployment).collect(&:host)
+    deployments.collect(&:host)
   end
   
   def services

@@ -99,6 +99,11 @@ describe App do
       @app.deployments.sort_by(&:id).should == @deployments.sort_by(&:id)
     end
     
+    it 'should return an empty list when there are no deployments' do
+      Array.new(2) { Instance.generate!(:app => @app) }
+      @app.deployments.should == []
+    end
+    
     it 'should have many hosts' do
       @app.should respond_to(:hosts)
     end
@@ -107,6 +112,11 @@ describe App do
       @deployments = Array.new(2) { Deployment.generate! }
       @app.instances << @deployments.collect(&:instance)
       @app.hosts.sort_by(&:id).should == @deployments.collect(&:host).flatten.sort_by(&:id)
+    end
+    
+    it 'should return an empty hosts list when there are no deployments' do
+      Array.new(2) { Instance.generate!(:app => @app) }
+      @app.hosts.should == []
     end
     
     it 'should have services' do
