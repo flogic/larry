@@ -1,22 +1,21 @@
  - bugfix on service depends_on tree view
- - UI to remove depends_on service
+ - remove containing div from summarize output (require callers to format it)
+
+ -> show instance -> service tree on instance show page
+ -> ability to manage instance -> service dependencies from the instance show page (this is instances/link and requirements/destroy, if we follow the pattern used in services/edges)
+
+ -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we live in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
+
+ -> parameters for services
+ -> bubble-up of parameters for services to instances for setting (implies that when we generate a service+parameter list we down-propagate, filling in variables)
+ -> parameters being complete are a pre-condition for being able to deploy an instance
+ -> parameters could be computed from host (e.g., ip addresses, etc.) ... does this imply bad design of the manifest/recipe that enforces them?  (maybe) ... what about multiple IP addresses for, say, multiple SSL domain names for a web app?
 
  -> add customer
  -> add customer app
  -> add app instance
  -> add host
  -> deploy.
-
- -> show instance -> service tree on instance show page
- -> ability to manage instance -> service dependencies from the instance show page
- -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we live in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
-
-
-
- -> parameters for services
- -> bubble-up of parameters for services to instances for setting (implies that when we generate a service+parameter list we down-propagate, filling in variables)
- -> parameters being complete are a pre-condition for being able to deploy an instance
- -> parameters could be computed from host (e.g., ip addresses, etc.) ... does this imply bad design of the manifest/recipe that enforces them?  (maybe) ... what about multiple IP addresses for, say, multiple SSL domain names for a web app?
  
  -> would be useful for customer, app, instance to have deployed? predicates so that we can know if they are deployed anywhere
 
@@ -56,7 +55,6 @@
  
  : this probably speaks to a general facility to associate an URL with a class (customer, app, instance, deployment, host, etc.); in which case it might well be possible to have parsers for the data at the end of those URLs so that we could aggregate data; if we push out RSS, e.g., from larry then it would be possible for larry to be a central dashboard.
 
-
  -> paginate index pages?  We'll see
  
- -> favicon.ico
+ -> favicon.ico, heh
