@@ -1,0 +1,6 @@
+%h1 Instances
+
+%ul
+  - @instances.each do |instance|
+    %li
+      = summarize(instance)

@@ -15,6 +15,15 @@ describe Instance do
       @instance.name.should == 'Test Instance'
     end
     
+    it 'can have a description' do
+      @instance.should respond_to(:description)
+    end
+    
+    it 'should allow setting and retrieving the description' do
+      @instance.description = 'Test Instance Description'
+      @instance.description.should == 'Test Instance Description'
+    end
+     
     it 'can be active' do
       @instance.should respond_to(:is_active)
     end
