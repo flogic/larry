@@ -40,9 +40,7 @@ describe RequirementsController, 'when integrating' do
       response.should redirect_to(instance_path(instance))
     end
   end
-end
-
-describe RequirementsController, 'when not integrating' do 
+  
   describe 'create' do
     before :each do
       @instance, @service = Instance.generate!, Service.generate!
