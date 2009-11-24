@@ -115,4 +115,31 @@ describe Customer do
       @customer.required_services.sort_by(&:id).should == @instances.collect(&:required_services).flatten.sort_by(&:id)      
     end
   end
+  
+  it 'should have a means to determine if it is safe to delete this customer' do
+    Customer.new.should respond_to(:safe_to_delete?)
+  end
+  
+  describe 'when determining if it is safe to delete this customer' do
+    before :each do
+      @customer = Customer.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @customer.safe_to_delete? }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not accept arguments' do
+      lambda { @customer.safe_to_delete?(:foo) }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should return false if the customer has apps' do
+      @customer.apps.generate!
+      @customer.safe_to_delete?.should be_false
+    end
+    
+    it 'should return true if the customer has no apps' do
+      @customer.safe_to_delete?.should be_true
+    end
+  end
 end

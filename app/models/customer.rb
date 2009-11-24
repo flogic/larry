@@ -25,4 +25,8 @@ class Customer < ActiveRecord::Base
   def required_services
     instances.collect(&:required_services).flatten
   end
+  
+  def safe_to_delete?
+    apps.blank?
+  end
 end
