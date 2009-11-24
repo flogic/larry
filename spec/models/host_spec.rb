@@ -223,8 +223,7 @@ describe Host do
       end
     end
   end
-  
-  
+    
   it 'should have a means to determine if it is safe to delete this host' do
     Host.new.should respond_to(:safe_to_delete?)
   end
