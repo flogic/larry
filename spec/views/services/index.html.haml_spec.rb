@@ -16,6 +16,18 @@ describe '/services/index' do
     do_render
   end
   
+  it 'should include a link to add a new service' do
+    do_render
+    response.should have_tag('a[href=?]', new_service_path)
+  end
+  
+  it 'should include a link to edit each service' do
+    do_render
+    @services.each do |service|
+      response.should have_tag('a[href=?]', edit_service_path(service))
+    end
+  end
+  
   it 'should include a link to delete each service if it is safe to delete the service' do
     @services.each { |service| service.stubs(:safe_to_delete?).returns(true) }
     do_render

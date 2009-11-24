@@ -19,6 +19,11 @@ describe '/services/show' do
     response.should have_text(Regexp.new(@service.description))
   end
   
+  it 'should include a link to edit the service' do
+    do_render
+    response.should have_tag('a[href=?]', edit_service_path(@service))    
+  end
+  
   it 'should include a link to delete the service if it is safe to delete the service' do
     @service.stubs(:safe_to_delete?).returns(true)
     do_render
