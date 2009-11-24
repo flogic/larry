@@ -1,7 +1,4 @@
 
- - service safe_to_delete?
- - service before_destroy safety check
-
  - delete host
  - delete app
  - delete instance

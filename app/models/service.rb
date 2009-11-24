@@ -16,6 +16,8 @@ class Service < ActiveRecord::Base
   
   default_scope :order => 'name'
   
+  before_destroy :safe_to_delete?
+  
   # this is going to be painful, at some point, but premature optimization is the root of all evil
   def self.unrelated_services(*services)
     all - services.flatten
@@ -105,5 +107,9 @@ class Service < ActiveRecord::Base
 
   def unrelated
     self.class.unrelated_services(all_depends_on, all_dependents, self)
+  end
+  
+  def safe_to_delete?
+    dependents.blank? and depends_on.blank? and requirements.blank?
   end
 end

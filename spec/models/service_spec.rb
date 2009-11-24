@@ -551,4 +551,57 @@ describe Service do
       @service.configuration_name.should == 'some_service_123'            
     end
   end
+  
+  it 'should have a means to determine if it is safe to delete this service' do
+    Service.new.should respond_to(:safe_to_delete?)
+  end
+
+  describe 'when determining if it is safe to delete this service' do
+    before :each do
+      @service = Service.generate!
+    end
+
+    it 'should work without arguments' do
+      lambda { @service.safe_to_delete? }.should_not raise_error(ArgumentError)
+    end
+
+    it 'should not accept arguments' do
+      lambda { @service.safe_to_delete?(:foo) }.should raise_error(ArgumentError)      
+    end
+
+    it 'should return false if the service has dependents' do
+      @service.dependents << Array.new(2) { Service.generate! }
+      @service.safe_to_delete?.should be_false
+    end
+    
+    it 'should return false if the service depends on other services' do
+      @service.depends_on << Array.new(2) { Service.generate! }
+      @service.safe_to_delete?.should be_false
+    end
+
+    it 'should return false if the service is required by some instance' do
+      @service.requirements.generate!
+      @service.safe_to_delete?.should be_false      
+    end
+
+    it 'should return true if the service has no deployements' do
+      @service.safe_to_delete?.should be_true
+    end
+  end
+
+  describe 'when deleting' do
+    before :each do
+      @service = Service.generate!
+    end
+
+    it 'should not allow deletion when it is not safe to delete' do
+      @service.stubs(:safe_to_delete?).returns(false)
+      lambda { @service.destroy }.should_not change(Service, :count)
+    end
+
+    it 'should allow deletion when it is safe to delete' do
+      @service.stubs(:safe_to_delete?).returns(true)
+      lambda { @service.destroy }.should change(Service, :count)    
+    end
+  end
 end
