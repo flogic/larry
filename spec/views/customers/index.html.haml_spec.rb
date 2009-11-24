@@ -15,4 +15,9 @@ describe '/customers/index' do
     end
     do_render
   end
+  
+  it 'should include a link to add a new customer' do
+    do_render
+    response.should have_tag('a[href=?]', new_customer_path)
+  end
 end
