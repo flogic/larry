@@ -1,6 +1,4 @@
 
- - app safe_to_delete?
- - app before_destroy safety check
  - instance safe_to_delete?
  - instance before_destroy safety check
  - service safe_to_delete?

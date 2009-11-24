@@ -156,4 +156,47 @@ describe App do
       @app.required_services.sort_by(&:id).should == [ @service, @child, @grandchild ].sort_by(&:id)
     end
   end
+  
+  it 'should have a means to determine if it is safe to delete this app' do
+    App.new.should respond_to(:safe_to_delete?)
+  end
+  
+  describe 'when determining if it is safe to delete this app' do
+    before :each do
+      @app = App.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @app.safe_to_delete? }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not accept arguments' do
+      lambda { @app.safe_to_delete?(:foo) }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should return false if the app has instances' do
+      @app.instances.generate!
+      @app.safe_to_delete?.should be_false
+    end
+    
+    it 'should return true if the app has no instances' do
+      @app.safe_to_delete?.should be_true
+    end
+  end
+  
+  describe 'when deleting' do
+    before :each do
+      @app = App.generate!
+    end
+    
+    it 'should not allow deletion when it is not safe to delete' do
+      @app.stubs(:safe_to_delete?).returns(false)
+      lambda { @app.destroy }.should_not change(App, :count)
+    end
+  
+    it 'should allow deletion when it is safe to delete' do
+      @app.stubs(:safe_to_delete?).returns(true)
+      lambda { @app.destroy }.should change(App, :count)    
+    end
+  end
 end

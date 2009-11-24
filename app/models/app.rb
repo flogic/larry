@@ -7,6 +7,8 @@ class App < ActiveRecord::Base
 
   default_scope :order => :name
   
+  before_destroy :safe_to_delete?
+  
   def deployments
     instances.collect(&:deployment).compact
   end
@@ -21,5 +23,9 @@ class App < ActiveRecord::Base
   
   def required_services
     instances.collect(&:required_services).flatten.uniq
+  end
+  
+  def safe_to_delete?
+    instances.blank?
   end
 end
