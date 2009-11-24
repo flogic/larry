@@ -1,15 +1,9 @@
-= javascript_include_tag "customers.js"
-
 %h1 Customers
 
-#add
-  #add_customer_link
-    = link_to 'Add new customer', new_customer_path
-  #add_customer_cancel_link{ :style => 'display: none' }
-    = link_to 'cancel', customers_path
-  #add_customer
+= link_to 'Add new customer', new_customer_path
 
 %ul
   - @customers.each do |customer|
     %li
+      = link_to 'edit', edit_customer_path(customer)
       = summarize(customer)
