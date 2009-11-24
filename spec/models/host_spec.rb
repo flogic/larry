@@ -223,4 +223,48 @@ describe Host do
       end
     end
   end
+  
+  
+  it 'should have a means to determine if it is safe to delete this host' do
+    Host.new.should respond_to(:safe_to_delete?)
+  end
+  
+  describe 'when determining if it is safe to delete this host' do
+    before :each do
+      @host = Host.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @host.safe_to_delete? }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not accept arguments' do
+      lambda { @host.safe_to_delete?(:foo) }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should return false if the host has deployments' do
+      @host.deployments.generate!
+      @host.safe_to_delete?.should be_false
+    end
+    
+    it 'should return true if the host has no deployements' do
+      @host.safe_to_delete?.should be_true
+    end
+  end
+  
+  describe 'when deleting' do
+    before :each do
+      @host = Host.generate!
+    end
+    
+    it 'should not allow deletion when it is not safe to delete' do
+      @host.stubs(:safe_to_delete?).returns(false)
+      lambda { @host.destroy }.should_not change(Host, :count)
+    end
+  
+    it 'should allow deletion when it is safe to delete' do
+      @host.stubs(:safe_to_delete?).returns(true)
+      lambda { @host.destroy }.should change(Host, :count)    
+    end
+  end
 end

@@ -1,21 +1,21 @@
 
- -> host safe_to_delete?
- -> host before_destroy safety check
- -> delete host
  - app safe_to_delete?
  - app before_destroy safety check
- - delete app
  - instance safe_to_delete?
  - instance before_destroy safety check
- - delete instance
  - service safe_to_delete?
  - service before_destroy safety check
+
+ - delete host
+ - delete app
+ - delete instance
  - delete service
- 
- -> add customer app
- -> edit app
- -> add app instance
- -> edit instance 
+
+ - edit app
+ - edit instance 
+
+ - add customer app
+ - add app instance
  
  ---
  

@@ -7,6 +7,8 @@ class Host < ActiveRecord::Base
   
   default_scope :order => :name
   
+  before_destroy :safe_to_delete?
+  
   def apps
     deployments.collect(&:app)
   end
@@ -37,5 +39,9 @@ class Host < ActiveRecord::Base
       result += "include #{instance.configuration_name}\n"
     end
     result
+  end
+  
+  def safe_to_delete?
+    deployments.blank?
   end
 end
