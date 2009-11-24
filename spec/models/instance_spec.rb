@@ -317,4 +317,52 @@ describe Instance do
       @instance.configuration_parameters.should == @instance.parameters
     end
   end
+  
+  it 'should have a means to determine if it is safe to delete this instance' do
+    Instance.new.should respond_to(:safe_to_delete?)
+  end
+
+  describe 'when determining if it is safe to delete this instance' do
+    before :each do
+      @instance = Instance.generate!
+    end
+
+    it 'should work without arguments' do
+      lambda { @instance.safe_to_delete? }.should_not raise_error(ArgumentError)
+    end
+
+    it 'should not accept arguments' do
+      lambda { @instance.safe_to_delete?(:foo) }.should raise_error(ArgumentError)      
+    end
+
+    it 'should return false if the instance has no deployment' do
+      Deployment.generate!(:instance => @instance)
+      @instance.safe_to_delete?.should be_false
+    end
+    
+    it 'should return false if the instance has service requirements' do      
+      @instance.requirements.generate!
+      @instance.safe_to_delete?.should be_false
+    end
+
+    it 'should return true if the instance has no deployement nor service requirements' do
+      @instance.safe_to_delete?.should be_true
+    end
+  end
+
+  describe 'when deleting' do
+    before :each do
+      @instance = Instance.generate!
+    end
+
+    it 'should not allow deletion when it is not safe to delete' do
+      @instance.stubs(:safe_to_delete?).returns(false)
+      lambda { @instance.destroy }.should_not change(Instance, :count)
+    end
+
+    it 'should allow deletion when it is safe to delete' do
+      @instance.stubs(:safe_to_delete?).returns(true)
+      lambda { @instance.destroy }.should change(Instance, :count)    
+    end
+  end
 end

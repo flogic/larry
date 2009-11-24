@@ -14,6 +14,8 @@ class Instance < ActiveRecord::Base
   
   serialize :parameters
   
+  before_destroy :safe_to_delete?
+  
   def customer
     app.customer
   end
@@ -37,5 +39,9 @@ class Instance < ActiveRecord::Base
   def requirement_for(service)
     return nil unless service
     requirements.find_by_service_id(service.id)
+  end
+  
+  def safe_to_delete?
+    deployment.blank? and requirements.blank?
   end
 end
