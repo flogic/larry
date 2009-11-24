@@ -1,3 +1,4 @@
+
  -> add host 
  -> edit host
 
@@ -9,6 +10,9 @@
  -> add app instance
  -> edit instance
  
+ -> delete customer app (safe_to_delete?)
+ -> delete app instance (safe_to_delete?)
+ 
  ---
  
  "Audits":  aka, Service linkages that use Destinations to compute which Hosts they are to be deployed to (e.g., monitoring, backups, firewall rules, logrotate, etc.).  Services *about* other services.
@@ -16,6 +20,10 @@
  ... Q:  is there any reason not to use Destinations for *all* deployments?  Meaning that audits are only distinguished then by their deployements' explicit association (aboutness) with another deployment.
 
  - Currently we model the instance -> deployment -> host relationship in such a way that we presume every service for an instance is deployed to the same host; audits make this untrue, and hence the cardinality of the instance -> host(s) relationship also has to increase, as well as the cardinality of instance -> deployment ... need to revisit the domain_model graphic
+ 
+ - so, this is where host classification might actually be useful.  Make various host classes ("database server", "web server", "high throughput box", etc.), then have Destinations for Services be by host class membership.
+ 
+ - note also that host class membership may set a floor on the type of provisioning we can do (or, at least, could say, this host class requires something of this size or larger, cf, the rubycloud notion of per-provider flavors, and so any of the flavors mapped to this size or larger could suffice)
 
  --- 
 
