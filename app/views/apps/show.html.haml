@@ -5,6 +5,9 @@
   - unless @app.description.blank?
     .description= @app.description
 
+- if @app.safe_to_delete?
+  %h4= link_to 'delete this app', app_path(@app), :method => 'delete', :confirm => "Are you sure you wish to delete the app '#{@app.name}'?"
+
 - if @app.instances.blank?
   %h3 No instances for this app.
 - else

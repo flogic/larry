@@ -15,4 +15,20 @@ describe '/apps/index' do
     end
     do_render
   end
+  
+  it 'should include a link to delete each app if it is safe to delete the app' do
+    @apps.each { |app| app.stubs(:safe_to_delete?).returns(true) }
+    do_render
+    @apps.each do |app|
+      response.should have_tag('a[href=?]', app_path(app), :text => /[Dd]elete/)
+    end
+  end
+  
+  it 'should not include a link to delete each app if it is not safe to delete the app' do
+    @apps.each { |app| app.stubs(:safe_to_delete?).returns(false) }
+    do_render
+    @apps.each do |app|
+      response.should_not have_tag('a[href=?]', app_path(app), :text => /[Dd]elete/)    
+    end
+  end
 end

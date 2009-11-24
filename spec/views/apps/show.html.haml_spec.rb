@@ -18,6 +18,18 @@ describe '/apps/show' do
     do_render
     response.should have_text(Regexp.new(@app.description))
   end
+  
+  it 'should include a link to delete the app if it is safe to delete the app' do
+    @app.stubs(:safe_to_delete?).returns(true)
+    do_render
+    response.should have_tag('a[href=?]', app_path(@app), :text => /[Dd]elete/)
+  end
+  
+  it 'should not include a link to delete the app if it is not safe to delete the app' do
+    @app.stubs(:safe_to_delete?).returns(false)
+    do_render
+    response.should_not have_tag('a[href=?]', app_path(@app), :text => /[Dd]elete/)    
+  end
 
   it 'should display the customer who owns the app' do
     do_render
