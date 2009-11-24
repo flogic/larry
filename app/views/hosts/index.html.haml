@@ -1,6 +1,9 @@
 %h1 Hosts
 
-%ul
-  - @hosts.each do |host|
-    %li
-      = summarize(host)
+- if @hosts.blank?
+  %h3 No hosts.
+- else
+  %ul
+    - @hosts.each do |host|
+      %li
+        = summarize(host)

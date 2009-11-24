@@ -1,6 +1,9 @@
 %h1 Instances
 
-%ul
-  - @instances.each do |instance|
-    %li
-      = summarize(instance)
+- if @instances.blank?
+  %h3 No instances.
+- else
+  %ul
+    - @instances.each do |instance|
+      %li
+        = summarize(instance)

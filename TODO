@@ -1,15 +1,13 @@
- -> default "%h3 no <whatever>" conditional on index pages for { customers, apps, instances, hosts, services }
-
  -> add host 
  -> edit host
+
+ -> delete customer (requires safe_to_delete? predicate on customer)
+ -> delete host (ditto)
 
  -> add customer app
  -> edit app
  -> add app instance
  -> edit instance
-
- -> delete customer (requires safe_to_delete? predicate on customer)
- -> delete host (ditto)
  
  ---
  

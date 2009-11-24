@@ -1,6 +1,9 @@
 %h1 Services
 
-%ul
-  - @services.each do |service|
-    %li
-      = summarize(service)
+- if @services.blank?
+  %h3 No services.
+- else  
+  %ul
+    - @services.each do |service|
+      %li
+        = summarize(service)

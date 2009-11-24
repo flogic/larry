@@ -2,8 +2,11 @@
 
 = link_to 'Add new customer', new_customer_path
 
-%ul
-  - @customers.each do |customer|
-    %li
-      = link_to 'edit', edit_customer_path(customer)
-      = summarize(customer)
+- if @customers.blank?
+  %h3 No customers.
+- else
+  %ul
+    - @customers.each do |customer|
+      %li
+        = link_to '[edit]', edit_customer_path(customer)
+        = summarize(customer)

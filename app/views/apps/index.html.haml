@@ -1,6 +1,9 @@
 %h1 Apps
 
-%ul
-  - @apps.each do |app|
-    %li
-      = summarize(app)
+- if @apps.blank?
+  %h3 No apps.
+- else
+  %ul
+    - @apps.each do |app|
+      %li
+        = summarize(app)
