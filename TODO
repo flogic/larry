@@ -1,6 +1,5 @@
 
- -> add host 
- -> edit host
+ -> index / show linkages for host new/edit
 
  -> delete customer (requires safe_to_delete? predicate on customer)
  -> delete host (ditto)

@@ -18,6 +18,11 @@ describe '/hosts/show' do
     do_render
     response.should have_text(Regexp.new(@host.description))
   end
+  
+  it 'should include a link to edit the host' do
+    do_render
+    response.should have_tag('a[href=?]', edit_host_path(@host))    
+  end
 
   it 'should list the apps the host has deployed' do
     deployments = Array.new(3) { Deployment.generate!(:host => @host) }

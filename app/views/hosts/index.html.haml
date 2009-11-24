@@ -1,9 +1,12 @@
 %h1 Hosts
 
+= link_to 'Add new host', new_host_path
+
 - if @hosts.blank?
   %h3 No hosts.
 - else
   %ul
     - @hosts.each do |host|
       %li
+        = link_to '[edit]', edit_host_path(host)
         = summarize(host)

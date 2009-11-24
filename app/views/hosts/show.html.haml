@@ -6,6 +6,8 @@
 - unless @host.description.blank?
   .description= @host.description
 
+%h4= link_to 'edit this host', edit_host_path(@host)
+
 - if @host.instances.blank?
   %h3  No deployed instances.
 - else

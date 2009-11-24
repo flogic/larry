@@ -15,4 +15,16 @@ describe '/hosts/index' do
     end
     do_render
   end
+  
+  it 'should include a link to add a new host' do
+    do_render
+    response.should have_tag('a[href=?]', new_host_path)
+  end
+  
+  it 'should include a link to edit each host' do
+    do_render
+    @hosts.each do |host|
+      response.should have_tag('a[href=?]', edit_host_path(host))
+    end
+  end
 end
