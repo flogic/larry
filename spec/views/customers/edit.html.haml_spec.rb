@@ -9,6 +9,11 @@ describe '/customers/edit' do
     render '/customers/edit'
   end
 
+  it 'should include a link to the original customer' do
+    do_render
+    response.should have_tag('a[href=?]', customer_path(@customer))
+  end
+
   it 'should include a customer edit form' do
     do_render
     response.should have_tag('form[id=?]', "edit_customer_#{@customer.id}")

@@ -1,3 +1,3 @@
-%h2== Edit customer
+%h2== Edit customer #{brief(@customer)} (#{link_to '#' + @customer.id.to_s, @customer})
 
 = render :partial => 'form'
