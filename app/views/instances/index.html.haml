@@ -6,4 +6,6 @@
   %ul
     - @instances.each do |instance|
       %li
+        - if instance.safe_to_delete?
+          = link_to '[delete]', instance_path(instance), :method => 'delete', :confirm => "Are you sure you wish to delete the instance '#{instance.name}'?"      
         = summarize(instance)

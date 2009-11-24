@@ -19,6 +19,18 @@ describe '/instances/show' do
     response.should have_text(Regexp.new(@instance.description))
   end
 
+  it 'should include a link to delete the instance if it is safe to delete the instance' do
+    @instance.stubs(:safe_to_delete?).returns(true)
+    do_render
+    response.should have_tag('a[href=?]', instance_path(@instance), :text => /[Dd]elete/)
+  end
+  
+  it 'should not include a link to delete the instance if it is not safe to delete the instance' do
+    @instance.stubs(:safe_to_delete?).returns(false)
+    do_render
+    response.should_not have_tag('a[href=?]', instance_path(@instance), :text => /[Dd]elete/)    
+  end
+
   it 'should display the app which this instance belongs to' do
     do_render
     response.should have_text(Regexp.new(@instance.app.name))

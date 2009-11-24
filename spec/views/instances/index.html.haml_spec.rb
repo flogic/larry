@@ -15,4 +15,20 @@ describe '/instances/index' do
     end
     do_render
   end
+  
+  it 'should include a link to delete each instance if it is safe to delete the instance' do
+    @instances.each { |instance| instance.stubs(:safe_to_delete?).returns(true) }
+    do_render
+    @instances.each do |instance|
+      response.should have_tag('a[href=?]', instance_path(instance), :text => /[Dd]elete/)
+    end
+  end
+  
+  it 'should not include a link to delete each instance if it is not safe to delete the instance' do
+    @instances.each { |instance| instance.stubs(:safe_to_delete?).returns(false) }
+    do_render
+    @instances.each do |instance|
+      response.should_not have_tag('a[href=?]', instance_path(instance), :text => /[Dd]elete/)    
+    end
+  end
 end
