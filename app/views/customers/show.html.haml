@@ -7,10 +7,13 @@
 
 %h4= link_to 'edit this customer', edit_customer_path(@customer)
 
-%h3== #{pluralize(@customer.apps.size, 'app')}:
-%ol
-  - @customer.apps.each do |app|
-    %li= summarize(app)
+- if @customer.apps.blank?
+  %h3 No apps.
+- else
+  %h3== #{pluralize(@customer.apps.size, 'app')}:
+  %ol
+    - @customer.apps.each do |app|
+      %li= summarize(app)
 
 - if @customer.hosts.blank?
   %h3 No services deployed to hosts.

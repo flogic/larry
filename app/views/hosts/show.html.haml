@@ -1,12 +1,15 @@
 %h1 Host details
 
-%span Name:
-%span= @host.name
-
+%div
+  %span== #{brief(@host)}
+  
 - unless @host.description.blank?
   .description= @host.description
 
-%h2== Has #{pluralize(@host.instances.size, 'app instance')} deployed:
-%ol
-  - @host.instances.each do |instance|
-    %li= summarize(instance)
+- if @host.instances.blank?
+  %h3  No deployed instances.
+- else
+  %h2== Has #{pluralize(@host.instances.size, 'app instance')} deployed:
+  %ol
+    - @host.instances.each do |instance|
+      %li= summarize(instance)
