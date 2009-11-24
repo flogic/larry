@@ -19,6 +19,11 @@ describe '/instances/show' do
     response.should have_text(Regexp.new(@instance.description))
   end
 
+  it 'should include a link to edit the instance' do
+    do_render
+    response.should have_tag('a[href=?]', edit_instance_path(@instance))    
+  end
+
   it 'should include a link to delete the instance if it is safe to delete the instance' do
     @instance.stubs(:safe_to_delete?).returns(true)
     do_render

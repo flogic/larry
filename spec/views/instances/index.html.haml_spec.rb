@@ -16,6 +16,13 @@ describe '/instances/index' do
     do_render
   end
   
+  it 'should include a link to edit each instance' do
+    do_render
+    @instances.each do |instance|
+      response.should have_tag('a[href=?]', edit_instance_path(instance))
+    end
+  end
+
   it 'should include a link to delete each instance if it is safe to delete the instance' do
     @instances.each { |instance| instance.stubs(:safe_to_delete?).returns(true) }
     do_render

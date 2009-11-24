@@ -5,6 +5,8 @@
   - unless @instance.description.blank?
     .description= @instance.description
 
+%h4= link_to 'edit this instance', edit_instance_path(@instance)
+
 - if @instance.safe_to_delete?
   %h4= link_to 'delete this instance', instance_path(@instance), :method => 'delete', :confirm => "Are you sure you wish to delete the instance '#{@instance.name}'?"
 
