@@ -18,6 +18,18 @@ describe '/services/show' do
     do_render
     response.should have_text(Regexp.new(@service.description))
   end
+  
+  it 'should include a link to delete the service if it is safe to delete the service' do
+    @service.stubs(:safe_to_delete?).returns(true)
+    do_render
+    response.should have_tag('a[href=?]', service_path(@service), :text => /[Dd]elete/)
+  end
+  
+  it 'should not include a link to delete the service if it is not safe to delete the service' do
+    @service.stubs(:safe_to_delete?).returns(false)
+    do_render
+    response.should_not have_tag('a[href=?]', service_path(@service), :text => /[Dd]elete/)    
+  end
 
   it 'should show the services which depends on this service' do
     others = Array.new(3) { Service.generate! }

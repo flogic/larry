@@ -15,4 +15,20 @@ describe '/services/index' do
     end
     do_render
   end
+  
+  it 'should include a link to delete each service if it is safe to delete the service' do
+    @services.each { |service| service.stubs(:safe_to_delete?).returns(true) }
+    do_render
+    @services.each do |service|
+      response.should have_tag('a[href=?]', service_path(service), :text => /[Dd]elete/)
+    end
+  end
+  
+  it 'should not include a link to delete each service if it is not safe to delete the service' do
+    @services.each { |service| service.stubs(:safe_to_delete?).returns(false) }
+    do_render
+    @services.each do |service|
+      response.should_not have_tag('a[href=?]', service_path(service), :text => /[Dd]elete/)    
+    end
+  end
 end
