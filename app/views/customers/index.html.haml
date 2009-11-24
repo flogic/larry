@@ -9,4 +9,6 @@
     - @customers.each do |customer|
       %li
         = link_to '[edit]', edit_customer_path(customer)
+        - if customer.safe_to_delete?
+          = link_to '[delete]', customer_path(customer), :method => 'delete', :confirm => "Are you sure you wish to delete the customer '#{customer.name}'?"
         = summarize(customer)

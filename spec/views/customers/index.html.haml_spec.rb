@@ -27,4 +27,20 @@ describe '/customers/index' do
       response.should have_tag('a[href=?]', edit_customer_path(customer))
     end
   end
+  
+  it 'should include a link to delete each customer if it is safe to delete the customer' do
+    @customers.each { |customer| customer.stubs(:safe_to_delete?).returns(true) }
+    do_render
+    @customers.each do |customer|
+      response.should have_tag('a[href=?]', customer_path(customer), :text => /[Dd]elete/)
+    end
+  end
+  
+  it 'should not include a link to delete each customer if it is not safe to delete the customer' do
+    @customers.each { |customer| customer.stubs(:safe_to_delete?).returns(false) }
+    do_render
+    @customers.each do |customer|
+      response.should_not have_tag('a[href=?]', customer_path(customer), :text => /[Dd]elete/)    
+    end
+  end
 end

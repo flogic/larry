@@ -7,6 +7,9 @@
 
 %h4= link_to 'edit this customer', edit_customer_path(@customer)
 
+- if @customer.safe_to_delete?
+  %h4= link_to 'delete this customer', customer_path(@customer), :method => 'delete', :confirm => "Are you sure you wish to delete the customer '#{@customer.name}'?"
+
 - if @customer.apps.blank?
   %h3 No apps.
 - else
