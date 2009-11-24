@@ -19,6 +19,11 @@ describe '/apps/show' do
     response.should have_text(Regexp.new(@app.description))
   end
   
+  it 'should include a link to edit the app' do
+    do_render
+    response.should have_tag('a[href=?]', edit_app_path(@app))    
+  end
+
   it 'should include a link to delete the app if it is safe to delete the app' do
     @app.stubs(:safe_to_delete?).returns(true)
     do_render

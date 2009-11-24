@@ -16,6 +16,13 @@ describe '/apps/index' do
     do_render
   end
   
+  it 'should include a link to edit each app' do
+    do_render
+    @apps.each do |app|
+      response.should have_tag('a[href=?]', edit_app_path(app))
+    end
+  end
+
   it 'should include a link to delete each app if it is safe to delete the app' do
     @apps.each { |app| app.stubs(:safe_to_delete?).returns(true) }
     do_render
