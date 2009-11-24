@@ -1,7 +1,3 @@
-
- -> link to edit customer from show page
- -> cancel or show customer from edit page
-
  -> default "%h3 no <whatever>" conditional on index pages for { customers, apps, instances, hosts, services }
 
  -> add host 

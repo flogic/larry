@@ -20,6 +20,11 @@ describe '/customers/show' do
     response.should have_text(Regexp.new(@customer.description))
   end
 
+  it 'should include a link to edit the customer' do
+    do_render
+    response.should have_tag('a[href=?]', edit_customer_path(@customer))    
+  end
+
   it 'should list the hosts the customer has deployments on' do
     app = @apps.first
     instance = Instance.generate!(:app => app)
