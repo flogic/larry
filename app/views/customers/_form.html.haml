@@ -1,0 +1,6 @@
+.form
+  - semantic_form_for @customer do |form|
+    - form.inputs do
+      = form.input :name
+      = form.input :description, :input_html => { :class => 'inline' }
+    = form.buttons
