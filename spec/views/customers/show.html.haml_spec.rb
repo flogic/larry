@@ -47,6 +47,11 @@ describe '/customers/show' do
     end
   end
   
+  it 'should include a link to add a new app' do
+    do_render
+    response.should have_tag('a[href=?]', new_customer_app_path(@customer))
+  end
+  
   it 'should list the apps the customer owns' do
     do_render
     @apps.each do |app|

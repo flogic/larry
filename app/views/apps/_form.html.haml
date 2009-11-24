@@ -1,5 +1,5 @@
 .form
-  - semantic_form_for @app do |form|
+  - semantic_form_for [@customer, @app].compact do |form|
     - form.inputs do
       = form.input :name
       = form.input :description, :input_html => { :class => 'inline' }

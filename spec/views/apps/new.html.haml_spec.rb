@@ -20,6 +20,12 @@ describe '/apps/new' do
       response.should have_tag('form[id=?][action=?]', 'new_app', apps_path)
     end
     
+    it 'should send its contents to the customer app create action when a customer is specified' do
+      assigns[:customer] = customer = Customer.generate!
+      do_render
+      response.should have_tag('form[id=?][action=?]', 'new_app', customer_apps_path(customer))
+    end
+    
     it 'should use the POST HTTP method' do
       do_render
       response.should have_tag('form[id=?][method=?]', 'new_app', 'post')      

@@ -21,6 +21,18 @@ describe AppsController, 'when integrating' do
     end
 
     it_should_behave_like "a successful action"
+    
+    describe 'when a customer scope is specified' do
+      it 'should fail if the requested customer cannot be found' do
+        lambda { get :new, :customer_id => (Customer.last.id + 10).to_s }.should raise_error
+      end
+      
+      it 'should make the customer available to the view' do
+        customer = Customer.generate!
+        get :new, :customer_id => customer.id.to_s
+        assigns[:customer].should == customer
+      end
+    end
   end
 
   describe 'show' do
@@ -49,6 +61,18 @@ describe AppsController, 'when integrating' do
     end
 
     it_should_behave_like "a redirecting action"
+    
+    describe 'when a customer scope is specified' do
+      it 'should fail if the requested customer cannot be found' do
+        lambda { post :create, :app => @app.attributes, :customer_id => (Customer.last.id + 10).to_s }.should raise_error
+      end
+      
+      it 'should create a new app for the specified customer' do
+        customer = Customer.generate!
+        post :create, :app => @app.attributes, :customer_id => customer.id.to_s
+        customer.apps.should include(assigns[:app])
+      end
+    end
   end
 
   describe 'update' do
