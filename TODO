@@ -1,11 +1,19 @@
- -> add customer
- -> add customer app
- -> add app instance
+
+ -> link to edit customer from show page
+ -> cancel or show customer from edit page
+
+ -> default "%h3 no <whatever>" conditional on index pages for { customers, apps, instances, hosts, services }
+
  -> add host 
- -> edit customer
- -> edit app
- -> edit instance
  -> edit host
+
+ -> add customer app
+ -> edit app
+ -> add app instance
+ -> edit instance
+
+ -> delete customer (requires safe_to_delete? predicate on customer)
+ -> delete host (ditto)
  
  ---
  
