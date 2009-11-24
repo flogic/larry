@@ -27,4 +27,20 @@ describe '/hosts/index' do
       response.should have_tag('a[href=?]', edit_host_path(host))
     end
   end
+  
+  it 'should include a link to delete each host if it is safe to delete the host' do
+    @hosts.each { |host| host.stubs(:safe_to_delete?).returns(true) }
+    do_render
+    @hosts.each do |host|
+      response.should have_tag('a[href=?]', host_path(host), :text => /[Dd]elete/)
+    end
+  end
+  
+  it 'should not include a link to delete each host if it is not safe to delete the host' do
+    @hosts.each { |host| host.stubs(:safe_to_delete?).returns(false) }
+    do_render
+    @hosts.each do |host|
+      response.should_not have_tag('a[href=?]', host_path(host), :text => /[Dd]elete/)    
+    end
+  end
 end

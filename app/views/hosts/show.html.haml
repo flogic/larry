@@ -8,6 +8,9 @@
 
 %h4= link_to 'edit this host', edit_host_path(@host)
 
+- if @host.safe_to_delete?
+  %h4= link_to 'delete this host', host_path(@host), :method => 'delete', :confirm => "Are you sure you wish to delete the host '#{@host.name}'?"
+
 - if @host.instances.blank?
   %h3  No deployed instances.
 - else

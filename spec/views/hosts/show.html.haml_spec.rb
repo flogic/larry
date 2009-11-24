@@ -24,6 +24,18 @@ describe '/hosts/show' do
     response.should have_tag('a[href=?]', edit_host_path(@host))    
   end
 
+  it 'should include a link to delete the host if it is safe to delete the host' do
+    @host.stubs(:safe_to_delete?).returns(true)
+    do_render
+    response.should have_tag('a[href=?]', host_path(@host), :text => /[Dd]elete/)
+  end
+  
+  it 'should not include a link to delete the host if it is not safe to delete the host' do
+    @host.stubs(:safe_to_delete?).returns(false)
+    do_render
+    response.should_not have_tag('a[href=?]', host_path(@host), :text => /[Dd]elete/)    
+  end
+  
   it 'should list the apps the host has deployed' do
     deployments = Array.new(3) { Deployment.generate!(:host => @host) }
     do_render

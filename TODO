@@ -1,5 +1,4 @@
 
- - delete host
  - delete app
  - delete instance
  - delete service
