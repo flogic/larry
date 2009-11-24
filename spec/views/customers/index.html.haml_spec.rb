@@ -20,4 +20,11 @@ describe '/customers/index' do
     do_render
     response.should have_tag('a[href=?]', new_customer_path)
   end
+  
+  it 'should include a link to edit each customer' do
+    do_render
+    @customers.each do |customer|
+      response.should have_tag('a[href=?]', edit_customer_path(customer))
+    end
+  end
 end
