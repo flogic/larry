@@ -20,6 +20,12 @@ describe '/instances/new' do
       response.should have_tag('form[id=?][action=?]', 'new_instance', instances_path)
     end
     
+    it 'should send its contents to the app instance create action when a app is specified' do
+      assigns[:app] = app = App.generate!
+      do_render
+      response.should have_tag('form[id=?][action=?]', 'new_instance', app_instances_path(app))
+    end
+    
     it 'should use the POST HTTP method' do
       do_render
       response.should have_tag('form[id=?][method=?]', 'new_instance', 'post')      

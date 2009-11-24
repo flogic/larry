@@ -21,6 +21,18 @@ describe InstancesController, 'when integrating' do
     end
 
     it_should_behave_like "a successful action"
+    
+    describe 'when a app scope is specified' do
+      it 'should fail if the requested app cannot be found' do
+        lambda { get :new, :app_id => (App.last.id + 10).to_s }.should raise_error
+      end
+      
+      it 'should make the app available to the view' do
+        app = App.generate!
+        get :new, :app_id => app.id.to_s
+        assigns[:app].should == app
+      end
+    end
   end
 
   describe 'show' do
@@ -49,6 +61,18 @@ describe InstancesController, 'when integrating' do
     end
 
     it_should_behave_like "a redirecting action"
+    
+    describe 'when a app scope is specified' do
+      it 'should fail if the requested app cannot be found' do
+        lambda { post :create, :instance => @instance.attributes, :app_id => (App.last.id + 10).to_s }.should raise_error
+      end
+      
+      it 'should create a new instance for the specified app' do
+        app = App.generate!
+        post :create, :instance => @instance.attributes, :app_id => app.id.to_s
+        app.instances.should include(assigns[:instance])
+      end
+    end
   end
 
   describe 'update' do

@@ -41,6 +41,11 @@ describe '/apps/show' do
     response.should have_text(Regexp.new(@app.customer.name))
   end
 
+  it 'should include a link to add a new instance' do
+    do_render
+    response.should have_tag('a[href=?]', new_app_instance_path(@app))
+  end
+
   it 'should list the instances that belong to the app' do
     instances = Array.new(3) { Instance.generate!(:app => @app) }
     do_render

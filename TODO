@@ -1,7 +1,3 @@
- - add app instance
- 
- ---
-
  -> parameters for services
  -> bubble-up of parameters for services to instances for setting (implies that when we generate a service+parameter list we down-propagate, filling in variables)
  -> parameters being complete are a pre-condition for being able to deploy an instance
@@ -42,19 +38,14 @@
 
  -> generate some sort of YAML dump
  -> import data from YAML dump
-
  -> probably useful to have a display of services that are not deployed for instances (why did we not deploy the searchd for this site?)
 
- -> paginate index pages?  We'll see
- 
  -> favicon.ico, heh
  
  ---
 
  -> add linkages to nagios details for a host, service, etc.
- 
  -> add linkages from customers to invoicing, e.g.
- 
  -> is it possible to link from apps (or instances) to github pages?
  -> is it possible to link apps / customer to trouble ticket pages?
  -> what about linking to PT, e.g.
