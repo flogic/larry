@@ -142,4 +142,20 @@ describe Customer do
       @customer.safe_to_delete?.should be_true
     end
   end
+  
+  describe 'when deleting' do
+    before :each do
+      @customer = Customer.generate!
+    end
+    
+    it 'should not allow deletion when it is not safe to delete' do
+      @customer.stubs(:safe_to_delete?).returns(false)
+      lambda { @customer.destroy }.should_not change(Customer, :count)
+    end
+  
+    it 'should allow deletion when it is safe to delete' do
+      @customer.stubs(:safe_to_delete?).returns(true)
+      lambda { @customer.destroy }.should change(Customer, :count)    
+    end
+  end
 end

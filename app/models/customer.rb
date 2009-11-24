@@ -6,6 +6,8 @@ class Customer < ActiveRecord::Base
 
   default_scope :order => :name
   
+  before_destroy :safe_to_delete?
+  
   def instances
     apps.collect(&:instances).flatten
   end
