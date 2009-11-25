@@ -4,13 +4,18 @@
 
  - move computation of manifest and/or configuration into Instance -- Host methods should just be wrappers
 
- - change parameter computation in Instance (recently moved from host) so that it pulls parameter values from the Instance
+ - change parameter computation in Instance (recently moved from host) so that it pulls parameter values from the Instance (actually, this may properly reside in Service, but we'll see)
 
- Q: should a "blank" parameter value be considered "set"?
+ Q: does it make sense to be able to set non-required parameters on Apps and Customers?  If so, these wouldn't pull from services for a requirement list (like Instance parameters do), but would be consulted (Customer values first, then App values would override, then Instance values would override that).
+
+ Q: should a "blank" parameter value be considered "set"?  If so, it becomes easy to get "deployable" instances that will fail; if not, do we miss the ability not to set a blank parameter value?
+ 
+ Q: are there parameters for services that would be accepted but are not required (i.e., they should auto-fill in our instance parameter list, but not display as "required", and a can_deploy? call would ignore them)?
+  
 
  ---
 
- ??? should be able to see service parameter assignments for an instance from some instance detail view (i.e., here's how the services will be / were deployed).  That is, here's service detail, and when these services were deployed (will be deployed) they got assignments like this.  I feel like this might be a hidden model emerging -- the deployment set, or deployment event.
+ *** should be able to see service parameter assignments for an instance from some instance detail view (i.e., here's how the services will be / were deployed).  That is, here's service detail, and when these services were deployed (will be deployed) they got assignments like this.  I feel like this might be a hidden model emerging -- the deployment set, or deployment event.
 
  ??? parameters could be computed from host (e.g., ip addresses, etc.) ... does this imply bad design of the manifest/recipe that enforces them?  (maybe) ... what about multiple IP addresses for, say, multiple SSL domain names for a web app?
  
@@ -64,3 +69,6 @@
  -> what about linking to PT, e.g.
  
  : this probably speaks to a general facility to associate an URL with a class (customer, app, instance, deployment, host, etc.); in which case it might well be possible to have parsers for the data at the end of those URLs so that we could aggregate data; if we push out RSS, e.g., from larry then it would be possible for larry to be a central dashboard.
+
+ ... so, if there is a notion of a Deployment event, then it would be possible to say that at the time of that Deployment (make a timestamp), the various services represented the current state of, say, puppet manifest files.  It could conceivably be possible to get a git revision # associated with those manifests from a well-known repo.  Other than file contents (which could, with architecture changes, be git revision #'d) this should be sufficient to deploy the configuration to a host *as it was then*.  If the instance filesystem images (e.g., for a slice) are similarly revision #'d then it might be possible to actually provision a node, as it was then, deploy the OS and software, as it was then, push the services out, with file contents, as they were then, etc.  Which would meet the conditions for being able to do a rollback, regardless of the time since the deployment.  A pipe dream, but oh well.  
+
