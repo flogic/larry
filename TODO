@@ -1,6 +1,5 @@
  -> should auto-populate missing required parameters into parameters when editing services
  -> should segregate parameter editing into 2 parts: service-required and unknown (with unknown at the bottom by the add link)
- -> controller for handling instance parameter editing data
 
  -> should be able to edit service parameter requirements from service view
 

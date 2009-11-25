@@ -54,33 +54,92 @@ describe InstancesController, 'when integrating' do
   describe 'create' do
     before :each do
       @instance = Instance.spawn
+      @params = { :instance => @instance.attributes }
     end
 
     def do_request
-      post :create, :instance => @instance.attributes
+      post :create, @params
     end
 
     it_should_behave_like "a redirecting action"
     
     describe 'when a app scope is specified' do
       it 'should fail if the requested app cannot be found' do
-        lambda { post :create, :instance => @instance.attributes, :app_id => (App.last.id + 10).to_s }.should raise_error
+        lambda { post :create, :instance => @params, :app_id => (App.last.id + 10).to_s }.should raise_error
       end
       
       it 'should create a new instance for the specified app' do
         app = App.generate!
-        post :create, :instance => @instance.attributes, :app_id => app.id.to_s
+        post :create, @params.merge(:app_id => app.id.to_s)
         app.instances.should include(assigns[:instance])
+      end
+    end
+    
+    describe 'when parameters are provided' do
+      it 'should set the new instance parameters to an empty hash when the data provides no empty parameters list' do
+        @params[:instance].delete('parameters')
+        do_request
+        Instance.find_by_name(@instance.name).parameters.should == {}
+      end
+      
+      it 'should set the new instance parameters to an empty hash when the data provides an empty parameters list' do
+        @params[:instance]['parameters'] = {}
+        do_request
+        Instance.find_by_name(@instance.name).parameters.should == {}
+      end
+      
+      it 'should set the new instance parameters to an empty hash when the data provides no non-blank parameter names' do
+        @params[:instance]['parameters'] = { 'key' => ['', '', ''], 'value' => ['1', '2', '3'] }
+        do_request
+        Instance.find_by_name(@instance.name).parameters.should == {}          
+      end
+      
+      it 'should set the new instance parameters to a hash based on the data keys and values' do
+        @params[:instance]['parameters'] = { 'key' => ['a', '', 'c'], 'value' => ['b', 'x', 'd'] }
+        do_request
+        Instance.find_by_name(@instance.name).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
       end
     end
   end
 
   describe 'update' do
+    before :each do
+      @instance = Instance.generate!
+      @params = { :id => @instance.id.to_s, :instance => @instance.attributes }
+      
+    end
+    
     def do_request
-      put :update, :id => @instance.id.to_s, :instance => @instance.attributes
+      put :update, @params
     end
 
     it_should_behave_like "a redirecting action"
+    
+    describe 'when parameters are provided' do
+      it 'should set the instance parameters to an empty hash when the data provides no empty parameters list' do
+        @params[:instance].delete('parameters')
+        do_request
+        Instance.find(@instance.id).parameters.should == {}
+      end
+      
+      it 'should set the instance parameters to an empty hash when the data provides an empty parameters list' do
+        @params[:instance]['parameters'] = {}
+        do_request
+        Instance.find(@instance.id).parameters.should == {}
+      end
+      
+      it 'should set the instance parameters to an empty hash when the data provides no non-blank parameter names' do
+        @params[:instance]['parameters'] = { 'key' => ['', '', ''], 'value' => ['1', '2', '3'] }
+        do_request
+        Instance.find(@instance.id).parameters.should == {}          
+      end
+      
+      it 'should set the instance parameters to a hash based on the data keys and values' do
+        @params[:instance]['parameters'] = { 'key' => ['a', '', 'c'], 'value' => ['b', 'x', 'd'] }
+        do_request
+        Instance.find(@instance.id).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
+      end
+    end
   end
 
   describe 'destroy' do
@@ -93,5 +152,9 @@ describe InstancesController, 'when integrating' do
 end
 
 describe InstancesController, 'when not integrating' do
-  it_should_behave_like 'a RESTful controller'
+  it_should_behave_like 'a RESTful controller with an index action'
+  it_should_behave_like 'a RESTful controller with a show action'
+  it_should_behave_like 'a RESTful controller with a new action'
+  it_should_behave_like 'a RESTful controller with an edit action'
+  it_should_behave_like 'a RESTful controller with a destroy action'
 end
