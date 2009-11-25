@@ -62,4 +62,17 @@ describe '/apps/show' do
       response.should have_text(Regexp.new(host.name))
     end
   end
+  
+  describe 'parameters' do
+    before :each do
+      @app.parameters = { 'field 1' => 'value 1', 'field 2' => 'value 2' }
+    end
+    
+    it 'should show parameters for this app' do
+      do_render
+      @app.parameters.each_pair do |parameter, value|
+        response.should have_text(/#{parameter}.*#{value}/)
+      end
+    end
+  end
 end
