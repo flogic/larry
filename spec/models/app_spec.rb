@@ -51,6 +51,28 @@ describe App do
       @app.errors.should_not be_invalid(:name)
     end
     
+    it 'should not be valid without a name' do
+      @app.name = nil
+      @app.valid?
+      @app.errors.should be_invalid(:name)
+    end
+
+    it 'should not be valid with a duplicate name within the scope of its customer' do
+      other = App.generate!
+      @app = App.spawn(:customer => other.customer)
+      @app.name = other.name
+      @app.valid?
+      @app.errors.should be_invalid(:name)
+    end
+    
+    it 'should be valid with a duplicate name that is unique within the scope of its customer' do
+      other = App.generate!
+      @app = App.spawn
+      @app.name = other.name
+      @app.valid?
+      @app.errors.should_not be_invalid(:name)
+    end    
+    
     it 'should not be valid without a customer' do
       @app.customer = nil
       @app.valid?

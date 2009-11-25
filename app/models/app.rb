@@ -4,6 +4,7 @@ class App < ActiveRecord::Base
   
   validates_presence_of :name
   validates_presence_of :customer
+  validates_uniqueness_of :name, :scope => :customer_id
 
   default_scope :order => :name
   
