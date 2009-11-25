@@ -1,11 +1,28 @@
- -> app names should be unique w/in scope of customer
 
- -> parameters for services
- -> bubble-up of parameters for services to instances for setting (implies that when we generate a service+parameter list we down-propagate, filling in variables)
+ -> should be able to see service parameter requirements from service view
+ -> should be able to edit service parameter requirements from service view
+ -> instance should be able to get the set of service-required parameters
+ 
+ -> instance view should be able to show parameter settings in one of three states:
+   - service requires parameter but instance has no setting
+   - service requires parameter and instance has a setting
+   - instance has a setting but no service requires parameter
+ -> should be able to edit parameters from instance view
+ -> should be able to see service parameter assignments for an instance from some instance detail view (i.e., here's how the services will be / were deployed)
+
  -> parameters being complete are a pre-condition for being able to deploy an instance
- -> parameters could be computed from host (e.g., ip addresses, etc.) ... does this imply bad design of the manifest/recipe that enforces them?  (maybe) ... what about multiple IP addresses for, say, multiple SSL domain names for a web app?
+
+ - move computation of manifest and/or configuration into Instance -- Host methods should just be wrappers
+ - change parameter computation in Instance (recently moved from host) so that it pulls parameter values from the Instance
+
+
+ ??? parameters could be computed from host (e.g., ip addresses, etc.) ... does this imply bad design of the manifest/recipe that enforces them?  (maybe) ... what about multiple IP addresses for, say, multiple SSL domain names for a web app?
+
+ - computation of "possible to deploy" would be dependent upon parameter assignments being met, so, write Instance#can_deploy? with just this conditional so far
 
  ---
+
+ -> start implementing Destination stuff (see below) so we can make Instance#can_deploy? more meaningful
 
  -> deploy.  This may imply that we have a state machine associated with deployments (associated with instances/services).  This would also imply that getting deployment feedback (e.g., the puppet-reporter "report" data closing the loop, if that's possible; or monitoring information being able to be fed back in; both are tricky but at least one of them would be highly useful, imo)
 
@@ -26,6 +43,7 @@
  - note also that host class membership may set a floor on the type of provisioning we can do (or, at least, could say, this host class requires something of this size or larger, cf, the rubycloud notion of per-provider flavors, and so any of the flavors mapped to this size or larger could suffice)
 
  ---
+ 
  -> operations:  un-deploy, deploy, shut down, start host, provision new host, etc. (what impact do these have out in the world?)
 
  -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we live in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
@@ -41,7 +59,6 @@
  -> generate some sort of YAML dump
  -> import data from YAML dump
  -> probably useful to have a display of services that are not deployed for instances (why did we not deploy the searchd for this site?)
-
  -> favicon.ico, heh
  
  ---

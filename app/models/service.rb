@@ -14,6 +14,8 @@ class Service < ActiveRecord::Base
   has_many :dependent_edges, :class_name => 'Edge', :foreign_key => 'target_id'  
   has_many :dependents, :through => :dependent_edges, :source => :source
   
+  serialize :parameters, Array
+  
   default_scope :order => 'name'
   
   before_destroy :safe_to_delete?

@@ -23,6 +23,20 @@ describe Service do
       @service.description = 'test description'
       @service.description.should == 'test description'
     end
+    
+    it 'should have a list of required parameter names' do
+      @service.should respond_to(:parameters)
+    end
+    
+    it 'should allow setting and retrieving the list of required parameter names' do
+      @service.parameters = [ 'VHost name', 'SSL_required' ]
+      @service.parameters.should == [ 'VHost name', 'SSL_required' ]
+    end
+    
+    it 'should preserve the list of required parameter names as a list' do
+      @service = Service.generate!(:parameters => [ 'VHost name', 'SSL_required' ])
+      Service.find(@service.id).parameters.first.should == 'VHost name'    
+    end
   end
 
   describe 'validations' do
