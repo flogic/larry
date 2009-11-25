@@ -697,4 +697,40 @@ describe Instance do
       end
     end
   end
+  
+  it 'should be able to tell where a parameter setting comes from' do
+    Instance.new.should respond_to(:parameter_whence)
+  end
+  
+  describe 'when finding where a parameter setting comes from' do
+    before :each do
+      @instance = Instance.generate!(:parameters => { 'instance' => 'instance match' })
+    end
+    
+    it 'should allow a parameter name' do
+      lambda { @instance.parameter_whence('foo') }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should require a parameter name' do
+      lambda { @instance.parameter_whence }.should raise_error(ArgumentError)
+    end
+    
+    it 'should return nil if the parameter is not set' do
+      @instance.parameter_whence('missing').should be_nil
+    end
+    
+    it 'should return nil if the parameter is set in the instance' do
+      @instance.parameter_whence('instance').should be_nil      
+    end
+    
+    it 'should return the app if the parameter is set in the app but not the instance' do
+      @instance.app.parameters = { 'app' => 'app match' }
+      @instance.parameter_whence('app').should == @instance.app            
+    end
+    
+    it 'should return the customer if the parameter is set in the customer but not the app or the instance' do
+      @instance.customer.parameters = { 'customer' => 'customer match' }
+      @instance.parameter_whence('customer').should == @instance.customer                  
+    end
+  end
 end

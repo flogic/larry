@@ -78,4 +78,11 @@ class Instance < ActiveRecord::Base
     result += "}\n"
     result += "include #{configuration_name}\n"
   end
+  
+  def parameter_whence(parameter)
+    return nil unless configuration_parameters[parameter]
+    return nil if (parameters || {}).has_key?(parameter)
+    return app if (app.parameters || {}).has_key?(parameter)
+    return customer if (customer.parameters || {}).has_key?(parameter)
+  end
 end
