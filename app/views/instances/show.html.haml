@@ -2,19 +2,43 @@
 
 %div
   %span== #{brief(@instance.app.customer)} -> #{brief(@instance.app)} -> #{brief(@instance)}
+  %span== | #{link_to 'edit this instance', edit_instance_path(@instance)}
+  - if @instance.safe_to_delete?
+    %span== | #{link_to 'delete this instance', instance_path(@instance), :method => 'delete', :confirm => "Are you sure you wish to delete the instance '#{@instance.name}'?"}
   - unless @instance.description.blank?
     .description= @instance.description
-
-%h4= link_to 'edit this instance', edit_instance_path(@instance)
-
-- if @instance.safe_to_delete?
-  %h4= link_to 'delete this instance', instance_path(@instance), :method => 'delete', :confirm => "Are you sure you wish to delete the instance '#{@instance.name}'?"
 
 .hosts
   - if @instance.host.blank?
     %h3 This instance is not currently deployed.
   - else
     %h3== This instance is deployed on host: #{list(@instance.host)}
+
+.parameters
+  - matching = @instance.matching_parameters
+  - missing = @instance.missing_parameters
+  - unknown = @instance.unknown_parameters
+  - if matching.blank? and missing.blank? and unknown.blank?
+    %h3 This instance has no parameter settings or requirements.
+  - else
+    .matching_parameters
+      - unless matching.blank?
+        %h3 The following required parameters are set for this instance:
+        %ul
+          - matching.keys.sort.each do |param|
+            %li== "#{param}": "#{matching[param]}"
+    .missing_parameters
+      - unless missing.blank?
+        %h3 The following required parameters are not set for this instance:
+        %ul
+          - missing.sort.each do |param|
+            %li== "#{param}"
+    .unknown_parameters
+      - unless unknown.blank?
+        %h3 The following unknown parameters are set for this instance:
+        %ul
+          - unknown.keys.sort.each do |param|
+            %li== "#{param}": "#{unknown[param]}"
 
 .depends_on
   - if @instance.services.blank?
@@ -32,7 +56,10 @@
               = display_tree(kid.depends_on_tree)
 
 #unrelated_services
-  %h2 Unrelated Services
-  %ul
-  - @instance.unrelated_services.each do |unrelated|
-    %li== #{link_to '[+]', requirements_path(:requirement => { :instance_id => @instance, :service_id => unrelated }), :method => 'post'} #{summarize(unrelated)}
+  - if @instance.unrelated_services.blank?
+    %h3 There are no services available for assignment to this instance.
+  - else
+    %h3 These services are available for assignment to this instance:
+    %ul
+    - @instance.unrelated_services.each do |unrelated|
+      %li== #{link_to '[+]', requirements_path(:requirement => { :instance_id => @instance, :service_id => unrelated }), :method => 'post'} #{summarize(unrelated)}

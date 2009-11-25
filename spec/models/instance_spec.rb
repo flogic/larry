@@ -429,4 +429,132 @@ describe Instance do
       @instance.needed_parameters.sort.should == [ 'field 1', 'field 2', 'field 3', 'field 4' ]      
     end
   end
+  
+  it 'should be able to return those parameter keys of ours which match service parameter requirements' do
+    Instance.new.should respond_to(:matching_parameters)
+  end
+  
+  describe 'when returning matching parameters' do
+    before :each do
+      @parameters = { 
+        'matching 1' => 'value 1', 
+        'matching 2' => 'value 2',
+        'unknown 3'  => 'value 3' 
+      }
+      @instance = Instance.generate!()
+      @service = Service.generate!(:parameters => [ 'matching 1', 'matching 2', 'missing 3' ])
+      @instance.services << @service
+    end
+    
+    it 'should work without arguments' do
+      lambda { @instance.matching_parameters }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @instance.matching_parameters(:foo) }.should raise_error(ArgumentError)
+    end
+
+    it 'should return an empty hash when there are no service parameter requirements' do
+      @service.parameters = []
+      @instance.matching_parameters.should == { }
+    end
+    
+    it 'should return an empty hash when none of our parameters match service parameter requirements' do
+      @instance.parameters = { 'unknown 3' => 'value 3' }
+      @instance.matching_parameters.should == { }
+    end
+    
+    it 'should return a hash with pairs matching service parameter requirements' do
+      @instance.parameters = @parameters
+      @instance.matching_parameters.should == { 
+        'matching 1' => 'value 1', 
+        'matching 2' => 'value 2',
+      }      
+    end
+  end
+  
+  it 'should be able to return those service parameter names which are required but which we are missing' do
+    Instance.new.should respond_to(:missing_parameters)    
+  end
+  
+  describe 'when returning missing parameters' do
+    before :each do
+      @parameters = { 
+        'matching 1' => 'value 1', 
+        'matching 2' => 'value 2',
+        'unknown 3'  => 'value 3' 
+      }
+      @instance = Instance.generate!()
+      @service = Service.generate!(:parameters => [ 'matching 1', 'matching 2', 'missing 3' ])
+      @instance.services << @service
+    end
+    
+    it 'should work without arguments' do
+      lambda { @instance.missing_parameters }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @instance.missing_parameters(:foo) }.should raise_error(ArgumentError)
+    end
+
+    it 'should return an empty list when there are no service parameter requirements' do
+      @service.parameters = []
+      @service.save!
+      @instance.missing_parameters.should == []
+    end
+    
+    it 'should return an empty list when our parameters all match service parameter requirements' do
+      @instance.parameters = { 'matching 1' => 'value 1', 'matching 2' => 'value 2' }
+      @service.parameters = [ 'matching 1', 'matching 2']
+      @service.save!
+      @instance.missing_parameters.should == []
+    end
+    
+    it 'should return a list of service-required parameter names missing from our parameters' do
+      @instance.parameters = @parameters
+      @instance.missing_parameters.should == [ 'missing 3' ]
+    end
+  end
+  
+  it 'should be able to return those parameter keys of ours which do not match service parameter requirements' do |variable|
+    Instance.new.should respond_to(:unknown_parameters)
+  end
+  
+  describe 'when returning unknown parameters' do
+    before :each do
+      @parameters = { 
+        'matching 1' => 'value 1', 
+        'matching 2' => 'value 2',
+        'unknown 3'  => 'value 3' 
+      }
+      @instance = Instance.generate!()
+      @service = Service.generate!(:parameters => [ 'matching 1', 'matching 2', 'missing 3' ])
+      @instance.services << @service
+    end
+    
+    it 'should work without arguments' do
+      lambda { @instance.unknown_parameters }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @instance.unknown_parameters(:foo) }.should raise_error(ArgumentError)
+    end
+
+    it 'should return an empty hash when there are no parameters' do
+      @instance.parameters = {}
+      @instance.unknown_parameters.should == {}
+    end
+    
+    it 'should return an empty hash when our parameters all match service parameter requirements' do
+      @instance.parameters = { 'matching 1' => 'value 1', 'matching 2' => 'value 2' }
+      @service.parameters = [ 'matching 1', 'matching 2']
+      @service.save!
+      @instance.unknown_parameters.should == {}
+    end
+    
+    it 'should return a hash of parameter pairs which are not required by our services' do
+      @instance.parameters = @parameters
+      @instance.unknown_parameters.should == { 'unknown 3' => 'value 3' }
+    end
+  end
 end

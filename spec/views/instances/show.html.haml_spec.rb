@@ -47,6 +47,37 @@ describe '/instances/show' do
     response.should have_text(Regexp.new(@instance.host.name))
   end
   
+  describe 'parameters' do
+    before :each do
+      @parameters = { 
+        'matching 1' => 'value 1', 
+        'matching 2' => 'value 2',
+        'unknown 3'  => 'value 3' 
+      }
+      assigns[:instance] = @instance = Instance.generate!(:parameters => @parameters)
+      @instance.services << @service = Service.generate!(:parameters => ['matching 1', 'matching 2', 'missing 3'])
+    end
+    
+    it 'should show service parameters which have a value in this instance' do
+      matches = { 'matching 1' => 'value 1', 'matching 2' => 'value 2', }
+      
+      do_render
+      matches.each_pair do |parameter, value|
+        response.should have_tag('div[class=?]', 'matching_parameters', :text => /#{parameter}.*#{value}/)
+      end
+    end
+    
+    it 'should show service parameters which have no value in this instance' do
+      do_render
+      response.should have_tag('div[class=?]', 'missing_parameters', :text => /missing 3/)
+    end
+
+    it 'should show parameters settings in this instance which are not required by our services' do
+      do_render
+      response.should have_tag('div[class=?]', 'unknown_parameters', :text => /unknown 3/)      
+    end
+  end
+  
   describe 'service dependencies' do
     it 'should show the services which this instance requires' do
       services = Array.new(3) { Service.generate! }

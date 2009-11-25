@@ -45,6 +45,19 @@ class Instance < ActiveRecord::Base
     services.collect(&:needed_parameters).flatten.compact.uniq
   end
   
+  def matching_parameters
+    (parameters || {}).slice(*needed_parameters)
+  end
+  
+  def missing_parameters
+    needed_parameters.select {|p| !(parameters || {}).has_key?(p) }
+  end
+  
+  def unknown_parameters
+    params = (parameters || {})
+    params.slice(*(params.keys - needed_parameters))
+  end
+  
   def safe_to_delete?
     deployment.blank? and requirements.blank?
   end
