@@ -35,7 +35,7 @@
             %li== "#{param}"
     .unknown_parameters
       - unless unknown.blank?
-        %h3 The following unknown parameters are set for this instance:
+        %h3 The following non-required parameters are set for this instance:
         %ul
           - unknown.keys.sort.each do |param|
             %li== "#{param}": "#{unknown[param]}"

@@ -5,15 +5,24 @@
       = form.input :name
       = form.input :description, :input_html => { :class => 'inline' }
       .instance_parameters
-        %label Parameters
-        %br
+        - needed = @instance.needed_parameters
+        - unless needed.blank?
+          %label Required parameters
+          %br
+          %ul
+            - updated = needed.inject(@instance.parameters || {}) {|h,p| h[p] ||= nil; h }
+            - needed.sort.each do |required|        
+              = render :partial => 'parameter_input', :object => [ required, updated[required] ]
+          %br
+        - unknown = @instance.unknown_parameters
+        - unless unknown.blank?
+          %label Non-required parameters
+          %br
+          %ul
+            - unknown.keys.sort.each do |key|
+              = render :partial => 'parameter_input', :object => [ key, unknown[key] ]            
         %ul#parameters
-          - if @instance.parameters.blank?
-            = render :partial => 'parameter_input', :object => []
-          - else
-            = render :partial => 'parameter_input', :collection => @instance.parameters.to_a
-        %br
-        = link_to_function('Add Another Parameter', :id => 'add_parameter_link') { |page|  page.insert_html :bottom, 'parameters', :partial => 'parameter_input', :object => [] }
+        = link_to_function('Add a non-required parameter', :id => 'add_parameter_link') { |page|  page.insert_html :bottom, 'parameters', :partial => 'parameter_input', :object => [] }
         %br
         %br
       

@@ -61,46 +61,16 @@ describe '/instances/new' do
       end            
     end
 
-    describe 'when the instance has no parameters' do
-      before :each do
-        @instance.parameters = []
-      end
-      
-      it 'should have a blank input for parameter name' do
-        do_render
+    it 'should have an input with proper name for each parameter required by services' do
+      @instance.services << service = Service.generate!(:parameters => ['value 1', 'value 2'])
+      do_render
+      service.parameters.each do |key|
         response.should have_tag('form[id=?]', 'new_instance') do
-          with_tag('input[type=?][name=?]:not([value])', 'text', 'instance[parameters][key][]')
-        end
-      end
-
-      it 'should have a blank input for parameter value' do
-        do_render
-        response.should have_tag('form[id=?]', 'new_instance') do
-          with_tag('input[type=?][name=?]:not([value])', 'text', 'instance[parameters][value][]')
-        end
+          with_tag('input[type=?][name=?][value=?]', 'text', 'instance[parameters][key][]', key)
+        end        
       end
     end
-    
-    describe 'when the instance has nil parameters' do
-      before :each do
-        @instance.parameters = nil
-      end
-      
-      it 'should have a blank input for parameter name' do
-        do_render
-        response.should have_tag('form[id=?]', 'new_instance') do
-          with_tag('input[type=?][name=?]:not([value])', 'text', 'instance[parameters][key][]')
-        end
-      end
 
-      it 'should have a blank input for parameter value' do
-        do_render
-        response.should have_tag('form[id=?]', 'new_instance') do
-          with_tag('input[type=?][name=?]:not([value])', 'text', 'instance[parameters][value][]')
-        end
-      end
-    end
-    
     describe 'when the instance has parameters' do
       before :each do
         @parameters = { 'a' => 'b', 'c' => 'd', 'e' => 'f' }
