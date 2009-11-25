@@ -1,3 +1,5 @@
+ -> app names should be unique w/in scope of customer
+
  -> parameters for services
  -> bubble-up of parameters for services to instances for setting (implies that when we generate a service+parameter list we down-propagate, filling in variables)
  -> parameters being complete are a pre-condition for being able to deploy an instance
