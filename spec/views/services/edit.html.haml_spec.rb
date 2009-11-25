@@ -60,6 +60,31 @@ describe '/services/edit' do
       end            
     end
     
+    it 'should have an input for each existing parameter' do
+      @service.parameters = ['field 1', 'field 2']
+      do_render
+      response.should have_tag('form[id=?]', "edit_service_#{@service.id}") do
+        @service.parameters.each do |parameter|
+          with_tag('input[type=?][name=?][value=?]', 'text', 'service[parameters][]', parameter)
+        end
+      end      
+    end
+    
+    it 'should have a link to delete each existing parameter' do
+      @service.parameters = ['field 1', 'field 2']
+      do_render
+      response.should have_tag('form[id=?]', "edit_service_#{@service.id}") do
+        with_tag('a[class=?]', 'delete_parameter_link', :count => @service.parameters.size)
+      end
+    end
+    
+    it 'should have a link to add a new parameter' do
+      do_render
+      response.should have_tag('form[id=?]', "edit_service_#{@service.id}") do
+        with_tag('a[id=?]', 'add_parameter_link')
+      end
+    end
+    
     it 'should have a submit button' do
       do_render
       response.should have_tag('form[id=?]', "edit_service_#{@service.id}") do

@@ -1,6 +1,6 @@
- -> should be able to edit service parameter requirements from service view
-
  - computation of "possible to deploy" would be dependent upon parameter assignments being met, so, write Instance#can_deploy? with just this conditional so far
+
+ - refactor that index _form view ugliness
 
  - move computation of manifest and/or configuration into Instance -- Host methods should just be wrappers
 

@@ -1,6 +1,13 @@
+= javascript_include_tag 'service'
 .form
   - semantic_form_for @service do |form|
     - form.inputs do
       = form.input :name
       = form.input :description, :input_html => { :class => 'inline' }
+      .form_parameters
+        %ul#parameters
+          - (@service.parameters || []).sort.each do |parameter|
+            = render :partial => 'parameter_input', :object => parameter
+        = link_to_function('Add a parameter', :id => 'add_parameter_link') { |page|  page.insert_html :bottom, 'parameters', :partial => 'parameter_input', :object => '' }
+          
     = form.buttons
