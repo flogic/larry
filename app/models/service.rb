@@ -111,6 +111,10 @@ class Service < ActiveRecord::Base
     self.class.unrelated_services(all_depends_on, all_dependents, self)
   end
   
+  def needed_parameters
+    ((parameters || []) + depends_on.collect(&:needed_parameters)).flatten.compact.uniq
+  end
+  
   def safe_to_delete?
     dependents.blank? and depends_on.blank? and requirements.blank?
   end

@@ -1,7 +1,6 @@
 
  -> should be able to see service parameter requirements from service view
  -> should be able to edit service parameter requirements from service view
- -> instance should be able to get the set of service-required parameters
  
  -> instance view should be able to show parameter settings in one of three states:
    - service requires parameter but instance has no setting
@@ -30,6 +29,7 @@
  
  -> would be useful for customer, app, instance to have deployed? predicates so that we can know if they are deployed anywhere
 
+ *** -> brainstorming:  we could aggregate a set of Deployments by a Time Period, which reflects an interval in time when this deployment was true, is & will be true, or will be true in the future.  We could also archive off a deployment set (even if we do nothing else with it) to generate a deployment history.  This could make reversion to a prior state possible.
 ---
 
  "Audits":  aka, Service linkages that use Destinations to compute which Hosts they are to be deployed to (e.g., monitoring, backups, firewall rules, logrotate, etc.).  Services *about* other services.

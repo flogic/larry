@@ -365,4 +365,68 @@ describe Instance do
       lambda { @instance.destroy }.should change(Instance, :count)    
     end
   end
+  
+  it 'should be able to retrieve the list of parameters needed by our required services' do
+    Instance.new.should respond_to(:needed_parameters)
+  end
+  
+  describe 'when retrieving the list of parameters needed by our required services' do
+    before :each do
+      @instance = Instance.generate!
+    end
+      
+    it 'should work without arguments' do 
+      lambda { @instance.needed_parameters }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @instance.needed_parameters(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    it 'should return the empty list if there are no required services' do
+      @instance.needed_parameters.should == []
+    end
+    
+    it 'should return the empty list if required services have no needed parameters' do
+      @instance.services << Array.new(2) { Service.generate! }
+    end
+    
+    it 'should return the list of parameters needed by required services' do
+      @instance.services << services = Array.new(3) { Service.generate! }
+      services.first.parameters = [ 'field 1', 'field 2' ]
+      services.last.parameters = [ 'field 3', 'field 4' ]
+      services.first.save!
+      services.last.save!
+      @instance.needed_parameters.sort.should == [ 'field 1', 'field 2', 'field 3', 'field 4' ]
+    end
+    
+    it 'should not include duplicates in the list of parameters needed by required services' do
+      @instance.services << services = Array.new(3) { Service.generate! }
+      services.first.parameters = [ 'field 1', 'field 2' ]
+      services.last.parameters = [ 'field 2', 'field 3' ]
+      services.first.save!
+      services.last.save!
+      @instance.needed_parameters.sort.should == [ 'field 1', 'field 2', 'field 3' ]
+    end
+    
+    it 'should not include empty values in the list of parameters needed by required services' do
+      @instance.services << services = Array.new(3) { Service.generate! }
+      services.first.parameters = [ 'field 1', 'field 2' ]
+      services.last.parameters = [ 'field 2', nil ]
+      services.first.save!
+      services.last.save!
+      @instance.needed_parameters.sort.should == [ 'field 1', 'field 2' ]
+    end
+    
+    it 'should include parameters needed by services our required services depend on' do
+      @instance.services << services = Array.new(3) { Service.generate! }
+      services.first.parameters = [ 'field 1', 'field 2' ]
+      services.last.parameters = [ 'field 2', 'field 3' ]
+      services.first.save!
+      services.last.save!
+      kid = Service.generate!(:parameters => [ 'field 4' ])
+      services.last.depends_on << kid
+      @instance.needed_parameters.sort.should == [ 'field 1', 'field 2', 'field 3', 'field 4' ]      
+    end
+  end
 end

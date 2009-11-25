@@ -41,6 +41,10 @@ class Instance < ActiveRecord::Base
     requirements.find_by_service_id(service.id)
   end
   
+  def needed_parameters
+    services.collect(&:needed_parameters).flatten.compact.uniq
+  end
+  
   def safe_to_delete?
     deployment.blank? and requirements.blank?
   end
