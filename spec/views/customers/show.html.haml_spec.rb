@@ -65,4 +65,17 @@ describe '/customers/show' do
     end
     do_render
   end
+  
+  describe 'parameters' do
+    before :each do
+      @customer.parameters = { 'field 1' => 'value 1', 'field 2' => 'value 2' }
+    end
+    
+    it 'should show parameters for this customer' do
+      do_render
+      @customer.parameters.each_pair do |parameter, value|
+        response.should have_text(/#{parameter}.*#{value}/)
+      end
+    end
+  end
 end

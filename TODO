@@ -1,6 +1,4 @@
- - add parameter list to customer show
-
- - update Instance#configuration parameters so that it pulls from customer, then app, then instance
+ - update Instance#configuration_parameters so that it pulls from customer, then app, then instance
 
  ---
  
