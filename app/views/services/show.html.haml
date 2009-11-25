@@ -38,7 +38,10 @@
   - if @service.instances.blank?
     %h3 This service is not a requirement for any instances.
   - else
-    %h3== Instances which require this service: #{list(@service.instances)}
+    %h3== Instances which require this service: 
+    %ul
+      - @service.instances.each do |instance|
+        %li= summarize(instance)
 
 .dependents
   - if @service.root?
