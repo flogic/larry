@@ -26,19 +26,7 @@ class Host < ActiveRecord::Base
   end
   
   def puppet_manifest
-    result = ''
-    instances.each do |instance|
-      result += %Q(class #{instance.configuration_name} {"#{instance.configuration_name}":\n)
-      instance.configuration_parameters.each_pair do |key, value|
-        result += %Q(  $#{key} = "#{value}"\n)
-      end
-      instance.services.each do |service|
-        result += %Q(  include #{service.configuration_name}\n)
-      end
-      result += "}\n"
-      result += "include #{instance.configuration_name}\n"
-    end
-    result
+    instances.inject('') { |buffer, instance| buffer += instance.puppet_manifest }
   end
   
   def safe_to_delete?

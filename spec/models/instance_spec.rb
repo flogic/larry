@@ -607,4 +607,47 @@ describe Instance do
       @instance.can_deploy?.should be_false
     end
   end
+  
+  it 'should be able to generate a puppet manifest file' do
+    Instance.new.should respond_to(:puppet_manifest)
+  end
+  
+  describe 'when generating a puppet manifest file' do
+    before :each do
+      @instance = Instance.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @instance.puppet_manifest }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @instance.puppet_manifest(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    # Question:  do we need to check can_deploy? or deployed?
+    
+    it 'should include a class declaration for this instance' do
+      @instance.puppet_manifest.should match(/^\s*class\s+#{@instance.configuration_name}\s*\{\s*"#{@instance.configuration_name}":/)
+    end
+    
+    it 'should include parameters settings for every configuration parameter' do        
+      result = @instance.puppet_manifest
+      @instance.configuration_parameters.each_pair do |key, value|
+        result.should match(/^\s*\$#{key}\s*=\s*"#{value}"/)
+      end
+    end
+    
+    it 'should include a class include statement for the instance' do
+      @instance.puppet_manifest.should match(/^\s*include\s*#{@instance.configuration_name}/)
+    end
+    
+    it 'should include class include directives for each service' do
+      @instance.services << Array.new(3) { Service.generate! }
+      result = @instance.puppet_manifest
+      @instance.services.each do |service|
+        result.should match(/^\s*include\s*#{service.configuration_name}/)
+      end
+    end
+  end
 end

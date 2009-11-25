@@ -66,4 +66,16 @@ class Instance < ActiveRecord::Base
     return false if services.blank?
     missing_parameters.blank?
   end
+  
+  def puppet_manifest
+    result = %Q(class #{configuration_name} {"#{configuration_name}":\n)
+    configuration_parameters.each_pair do |key, value|
+      result += %Q(  $#{key} = "#{value}"\n)
+    end
+    services.each do |service|
+      result += %Q(  include #{service.configuration_name}\n)
+    end
+    result += "}\n"
+    result += "include #{configuration_name}\n"
+  end
 end
