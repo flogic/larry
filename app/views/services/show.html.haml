@@ -10,6 +10,24 @@
 - if @service.safe_to_delete?
   %h4= link_to 'delete this service', service_path(@service), :method => 'delete', :confirm => "Are you sure you wish to delete the service '#{@service.name}'?"
 
+.parameters
+  - if @service.parameters.blank?
+    %h3 This service has no required parameters
+  - else
+    %h3 This service requires the following parameters:
+    %ul
+      - @service.parameters.sort.each do |parameter|
+        %li= parameter
+        
+.dependent_parameters
+  - if @service.depends_on_additional_parameters.blank?
+    %h3 No additional parameters are required by the services we depend on.
+  - else
+    %h3 The services we depend on require the following additional parameters:
+    %ul
+      - @service.depends_on_additional_parameters.sort.each do |parameter|
+        %li= parameter
+
 .hosts
   - if @service.hosts.blank?
     %h3 This service is not deployed to any hosts.

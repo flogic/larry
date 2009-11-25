@@ -115,6 +115,10 @@ class Service < ActiveRecord::Base
     ((parameters || []) + depends_on.collect(&:needed_parameters)).flatten.compact.uniq
   end
   
+  def depends_on_additional_parameters
+    depends_on.collect(&:needed_parameters).flatten.compact.uniq - (parameters || [])
+  end
+  
   def safe_to_delete?
     dependents.blank? and depends_on.blank? and requirements.blank?
   end

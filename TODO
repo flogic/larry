@@ -1,11 +1,11 @@
 
- -> should be able to see service parameter requirements from service view
- -> should be able to edit service parameter requirements from service view
- 
  -> instance view should be able to show parameter settings in one of three states:
    - service requires parameter but instance has no setting
    - service requires parameter and instance has a setting
    - instance has a setting but no service requires parameter
+
+ -> should be able to edit service parameter requirements from service view
+ 
  -> should be able to edit parameters from instance view
  -> should be able to see service parameter assignments for an instance from some instance detail view (i.e., here's how the services will be / were deployed)
 

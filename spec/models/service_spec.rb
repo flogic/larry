@@ -681,4 +681,77 @@ describe Service do
       @service.needed_parameters.sort.should == [ 'field 1', 'field 2', 'field 3', 'field 4' ]                  
     end
   end
+
+  it 'should be able to return a list of all the parameter names needed by only our dependencies' do
+    Service.new.should respond_to(:depends_on_additional_parameters)
+  end
+  
+  describe 'when returning a list of all the parameter names needed by only our dependencies' do
+    before :each do
+      @service = Service.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @service.depends_on_additional_parameters }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @service.depends_on_additional_parameters(:foo) }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should return the empty list if we have no parameters and we depend on no other services' do
+      @service.parameters = nil
+      @service.depends_on_additional_parameters.should == []
+    end
+    
+    it 'should return the empty list if our parameters are empty and we depend on no other services' do
+      @service.parameters = []
+      @service.depends_on_additional_parameters.should == []
+    end
+    
+    it 'should return the empty list if we depend on no other services' do
+      @service.parameters = [ 'field 1', 'field 2' ]
+      @service.depends_on_additional_parameters.sort.should == []
+    end
+    
+    it 'should return the union of the parameter lists of the services we depend on' do
+      @service.parameters = [ 'field 1', 'field 2' ]
+      @service.depends_on << kids = Array.new(3) { Service.generate! }
+      kids.first.parameters = [ 'field 3', 'field 4' ]
+      kids.last.parameters = [ 'field 5', 'field 6' ]
+      kids.first.save!
+      kids.last.save!
+      @service.depends_on_additional_parameters.sort.should == [ 'field 3', 'field 4', 'field 5', 'field 6' ]      
+    end
+    
+    it 'should not include duplicate parameters' do
+      @service.parameters = [ 'field 1', 'field 2' ]
+      @service.depends_on << kids = Array.new(3) { Service.generate! }
+      kids.first.parameters = [ 'field 3', 'field 4' ]
+      kids.last.parameters = [ 'field 4', 'field 5' ]
+      kids.first.save!
+      kids.last.save!
+      @service.depends_on_additional_parameters.sort.should == [ 'field 3', 'field 4', 'field 5' ]            
+    end
+    
+    it 'should not include empty parameters' do
+      @service.parameters = [ 'field 1', 'field 2' ]
+      @service.depends_on << kids = Array.new(3) { Service.generate! }
+      kids.first.parameters = [ 'field 3', 'field 4' ]
+      kids.last.parameters = [ 'field 4', nil]
+      kids.first.save!
+      kids.last.save!
+      @service.depends_on_additional_parameters.sort.should == [ 'field 3', 'field 4' ]                  
+    end
+    
+    it 'should not include parameters from services we depend on that we already require' do
+      @service.parameters = [ 'field 1', 'field 2' ]
+      @service.depends_on << kids = Array.new(3) { Service.generate! }
+      kids.first.parameters = [ 'field 2', 'field 4' ]
+      kids.last.parameters = [ 'field 5', 'field 6' ]
+      kids.first.save!
+      kids.last.save!
+      @service.depends_on_additional_parameters.sort.should == [ 'field 4', 'field 5', 'field 6' ]      
+    end
+  end
 end

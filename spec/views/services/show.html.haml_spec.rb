@@ -35,6 +35,25 @@ describe '/services/show' do
     do_render
     response.should_not have_tag('a[href=?]', service_path(@service), :text => /[Dd]elete/)    
   end
+  
+  it 'should list the parameters this service needs' do
+    @service.parameters = [ 'field 1', 'field 2', 'field 3' ]
+    do_render
+    @service.parameters.each do |parameter|
+      response.should have_text(Regexp.new(parameter))
+    end
+  end
+  
+  it 'should list the parameters services we depend on need' do
+    kid = Service.generate!(:parameters => ['kid field 1', 'kid field 2'])
+    grandkid = Service.generate!(:parameters => ['grandkid field 1', 'grandkid field 2'])
+    @service.depends_on << kid
+    kid.depends_on << grandkid
+    do_render
+    (kid.parameters + grandkid.parameters).each do |parameter|
+      response.should have_text(Regexp.new(parameter))
+    end
+  end
 
   it 'should show the services which depends on this service' do
     others = Array.new(3) { Service.generate! }
