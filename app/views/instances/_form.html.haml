@@ -1,6 +1,20 @@
+= javascript_include_tag 'instance'
 .form
   - semantic_form_for [@app, @instance].compact do |form|
     - form.inputs do
       = form.input :name
       = form.input :description, :input_html => { :class => 'inline' }
+      .instance_parameters
+        %label Parameters
+        %br
+        %ul#parameters
+          - if @instance.parameters.blank?
+            = render :partial => 'parameter_input', :object => []
+          - else
+            = render :partial => 'parameter_input', :collection => @instance.parameters.to_a
+        %br
+        = link_to_function('Add Another Parameter', :id => 'add_parameter_link') { |page|  page.insert_html :bottom, 'parameters', :partial => 'parameter_input', :object => [] }
+        %br
+        %br
+      
     = form.buttons
