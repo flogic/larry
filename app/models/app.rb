@@ -8,6 +8,8 @@ class App < ActiveRecord::Base
 
   default_scope :order => :name
   
+  serialize :parameters
+  
   before_destroy :safe_to_delete?
   
   def deployments

@@ -5,6 +5,8 @@ class Customer < ActiveRecord::Base
   has_many :apps
 
   default_scope :order => :name
+
+  serialize :parameters
   
   before_destroy :safe_to_delete?
   

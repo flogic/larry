@@ -23,6 +23,20 @@ describe Customer do
       @customer.description = 'test description'
       @customer.description.should == 'test description'
     end
+    
+    it 'should have a set of parameters' do
+      @customer.should respond_to(:parameters)
+    end
+    
+    it 'should allow setting and retrieving parameter values' do
+      @customer.parameters = { :foo => 'bar' }
+      @customer.parameters[:foo].should == 'bar'
+    end
+    
+    it 'should preserve parameters as a hash across saving' do
+      @customer = Customer.generate!(:parameters => { :foo => 'bar'})
+      Customer.find(@customer.id).parameters[:foo].should == 'bar'
+    end
   end
 
   describe 'validations' do

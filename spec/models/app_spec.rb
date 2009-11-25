@@ -32,6 +32,20 @@ describe App do
       @app.customer_id = 1
       @app.customer_id.should == 1
     end
+    
+    it 'should have a set of parameters' do
+      @app.should respond_to(:parameters)
+    end
+    
+    it 'should allow setting and retrieving parameter values' do
+      @app.parameters = { :foo => 'bar' }
+      @app.parameters[:foo].should == 'bar'
+    end
+    
+    it 'should preserve parameters as a hash across saving' do
+      @app = App.generate!(:parameters => { :foo => 'bar'})
+      App.find(@app.id).parameters[:foo].should == 'bar'
+    end
   end
 
   describe 'validations' do

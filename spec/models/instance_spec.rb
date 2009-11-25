@@ -625,8 +625,6 @@ describe Instance do
       lambda { @instance.puppet_manifest(:foo) }.should raise_error(ArgumentError)
     end
     
-    # Question:  do we need to check can_deploy? or deployed?
-    
     it 'should include a class declaration for this instance' do
       @instance.puppet_manifest.should match(/^\s*class\s+#{@instance.configuration_name}\s*\{\s*"#{@instance.configuration_name}":/)
     end
