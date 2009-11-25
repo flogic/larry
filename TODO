@@ -6,6 +6,8 @@
 
  - change parameter computation in Instance (recently moved from host) so that it pulls parameter values from the Instance
 
+ Q: should a "blank" parameter value be considered "set"?
+
  ---
 
  ??? should be able to see service parameter assignments for an instance from some instance detail view (i.e., here's how the services will be / were deployed).  That is, here's service detail, and when these services were deployed (will be deployed) they got assignments like this.  I feel like this might be a hidden model emerging -- the deployment set, or deployment event.
@@ -13,9 +15,6 @@
  ??? parameters could be computed from host (e.g., ip addresses, etc.) ... does this imply bad design of the manifest/recipe that enforces them?  (maybe) ... what about multiple IP addresses for, say, multiple SSL domain names for a web app?
  
  ---
-
- -> start implementing Destination stuff (see below) so we can make Instance#can_deploy? more meaningful
-
  -> deploy.  This may imply that we have a state machine associated with deployments (associated with instances/services).  This would also imply that getting deployment feedback (e.g., the puppet-reporter "report" data closing the loop, if that's possible; or monitoring information being able to be fed back in; both are tricky but at least one of them would be highly useful, imo)
 
  - Q: is the difference between a service that's required by many instances on a host (e.g., postgres) but which only really causes one installation to happen, vs. services that have the same name but differ in parameters and cause multiple things to happen (e.g., setting up a postgres *database* for an app) ... is this something larry needs to concern itself with, or do we just leverage the underlying management tool?  If we're using puppet, puppet can sort things out, but it's not clear that something like chef, e.g., can.
@@ -24,6 +23,8 @@
 
  *** -> brainstorming:  we could aggregate a set of Deployments by a Time Period, which reflects an interval in time when this deployment was true, is & will be true, or will be true in the future.  We could also archive off a deployment set (even if we do nothing else with it) to generate a deployment history.  This could make reversion to a prior state possible.
 ---
+
+-> start implementing Destination stuff (see below) so we can make Instance#can_deploy? more meaningful
 
  "Audits":  aka, Service linkages that use Destinations to compute which Hosts they are to be deployed to (e.g., monitoring, backups, firewall rules, logrotate, etc.).  Services *about* other services.
   
