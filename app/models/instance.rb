@@ -29,7 +29,7 @@ class Instance < ActiveRecord::Base
   end
   
   def configuration_parameters
-    parameters || {}
+    (customer.parameters || {}).merge(app.parameters || {}).merge(parameters || {})
   end
   
   def unrelated_services
@@ -50,7 +50,7 @@ class Instance < ActiveRecord::Base
   end
   
   def missing_parameters
-    needed_parameters.select {|p| !(parameters || {}).has_key?(p) }
+    needed_parameters.select {|p| !(configuration_parameters || {}).has_key?(p) }
   end
   
   def unknown_parameters

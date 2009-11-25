@@ -1,5 +1,5 @@
- - update Instance#configuration_parameters so that it pulls from customer, then app, then instance
-
+ - show when instance parameter settings are coming from upstream(app, customer)
+ 
  ---
  
  Q: should a "blank" parameter value be considered "set"?  If so, it becomes easy to get "deployable" instances that will fail; if not, do we miss the ability not to set a blank parameter value?

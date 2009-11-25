@@ -292,7 +292,7 @@ describe Instance do
   
   describe 'when generating a set of configuration parameters' do
     before :each do
-      @instance = Instance.new
+      @instance = Instance.generate!(:parameters => {:foo => :bar, :baz => :xyzzy })
     end
     
     it 'should work without arguments' do
@@ -313,8 +313,35 @@ describe Instance do
     end
     
     it "should return the instance's parameters when the parameters are not empty" do
-      @instance.parameters = { :foo => :bar, :baz => :xyzzy }
       @instance.configuration_parameters.should == @instance.parameters
+    end
+    
+    it 'should use app parameters as defaults when available' do
+      @instance.app.parameters = { :missing => :value }
+      @instance.configuration_parameters[:missing].should == :value
+    end
+    
+    it 'should always override app parameters with our parameters' do
+      @instance.app.parameters = { :missing => :value }
+      @instance.parameters[:missing] = :ours
+      @instance.configuration_parameters[:missing].should == :ours
+    end
+    
+    it 'should use customer parameters as defaults when available' do
+      @instance.customer.parameters = { :missing => :value }
+      @instance.configuration_parameters[:missing].should == :value
+    end
+    
+    it 'should always override customer parameters with app parameters' do
+      @instance.customer.parameters = { :missing => :value }
+      @instance.app.parameters = { :missing => :app }
+      @instance.configuration_parameters[:missing].should == :app
+    end
+
+    it 'should always override customer parameters with our parameters' do
+      @instance.customer.parameters = { :missing => :value }
+      @instance.parameters = { :missing => :our }
+      @instance.configuration_parameters[:missing].should == :our
     end
   end
   
@@ -595,6 +622,28 @@ describe Instance do
         'field 3' => 'value 3', 'field 4' => 'value 4',
       }
       @instance.can_deploy?.should be_true
+    end
+    
+    it 'should return true if an app parameter settings fulfill missing service-required parameter values' do
+      @instance.services << services = Array.new(3) { Service.generate! }
+      services.first.parameters = [ 'field 1', 'field 2' ]
+      services.last.parameters = [ 'field 3', 'field 4' ]
+      services.first.save!
+      services.last.save!
+      @instance.parameters = { 'field 1' => 'value 1', 'field 2' => 'value 2', 'field 3' => 'value 3' }
+      @instance.app.parameters = { 'field 4' => 'value 4' }
+      @instance.can_deploy?.should be_true      
+    end
+    
+    it 'should return true if a customer parameter settings fulfill missing service-required parameter values' do
+      @instance.services << services = Array.new(3) { Service.generate! }
+      services.first.parameters = [ 'field 1', 'field 2' ]
+      services.last.parameters = [ 'field 3', 'field 4' ]
+      services.first.save!
+      services.last.save!
+      @instance.parameters = { 'field 1' => 'value 1', 'field 2' => 'value 2', 'field 3' => 'value 3' }
+      @instance.customer.parameters = { 'field 4' => 'value 4' }
+      @instance.can_deploy?.should be_true      
     end
     
     it 'should return false if some service-required parameters are without values' do
