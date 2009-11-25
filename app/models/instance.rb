@@ -17,6 +17,7 @@ class Instance < ActiveRecord::Base
   before_destroy :safe_to_delete?
   
   def customer
+    return nil unless app
     app.customer
   end
 
@@ -29,7 +30,7 @@ class Instance < ActiveRecord::Base
   end
   
   def configuration_parameters
-    (customer.parameters || {}).merge(app.parameters || {}).merge(parameters || {})
+    (customer && customer.parameters || {}).merge(app && app.parameters || {}).merge(parameters || {})
   end
   
   def unrelated_services
@@ -46,16 +47,15 @@ class Instance < ActiveRecord::Base
   end
   
   def matching_parameters
-    (parameters || {}).slice(*needed_parameters)
+    configuration_parameters.slice(*needed_parameters)
   end
   
   def missing_parameters
-    needed_parameters.select {|p| !(configuration_parameters || {}).has_key?(p) }
+    needed_parameters.select {|p| !configuration_parameters.has_key?(p) }
   end
   
   def unknown_parameters
-    params = (parameters || {})
-    params.slice(*(params.keys - needed_parameters))
+    configuration_parameters.slice(*(configuration_parameters.keys - needed_parameters))
   end
   
   def safe_to_delete?

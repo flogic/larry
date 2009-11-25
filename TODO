@@ -1,4 +1,4 @@
- - show when instance parameter settings are coming from upstream(app, customer)
+ - should we show default settings from customer / app on instance edit page (to reduce confusion?)
  
  ---
  

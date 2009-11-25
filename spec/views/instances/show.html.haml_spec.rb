@@ -67,6 +67,24 @@ describe '/instances/show' do
       end
     end
     
+    it 'should indicate if a parameter setting is from the app' do
+      @instance.parameters.delete('matching 1')
+      @instance.app.parameters = { 'matching 1' => 'app' }
+      do_render
+      response.should have_tag('span[class=?]', 'default_parameter') do
+        with_tag('a[href=?]', app_path(@instance.app))
+      end
+    end
+    
+    it 'should indicate if a parameter setting is from the customer' do
+      @instance.parameters.delete('matching 1')
+      @instance.customer.parameters = { 'matching 1' => 'customer' }
+      do_render
+      response.should have_tag('span[class=?]', 'default_parameter') do
+        with_tag('a[href=?]', customer_path(@instance.customer))
+      end      
+    end
+    
     it 'should show service parameters which have no value in this instance' do
       do_render
       response.should have_tag('div[class=?]', 'missing_parameters', :text => /missing 3/)
