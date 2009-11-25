@@ -2,13 +2,11 @@
 
 %div
   %span= brief(@customer)
+  %span== | #{link_to 'edit this customer', edit_customer_path(@customer)}
+  - if @customer.safe_to_delete?
+    %span== | #{link_to 'delete this customer', customer_path(@customer), :method => 'delete', :confirm => "Are you sure you wish to delete the customer '#{@customer.name}'?"}
   - unless @customer.description.blank?
     .description= @customer.description
-
-%h4= link_to 'edit this customer', edit_customer_path(@customer)
-
-- if @customer.safe_to_delete?
-  %h4= link_to 'delete this customer', customer_path(@customer), :method => 'delete', :confirm => "Are you sure you wish to delete the customer '#{@customer.name}'?"
 
 %h4= link_to 'add a new app for this customer', new_customer_app_path(@customer)
 

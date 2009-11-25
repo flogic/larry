@@ -1,14 +1,14 @@
 %h1 Service details
 
 %div
-  %span== Name: #{brief(@service)}
+  %span== #{brief(@service)}
+  %span== | #{link_to 'edit this service', edit_service_path(@service)}
+  - if @service.safe_to_delete?
+    %span== | #{link_to 'delete this service', service_path(@service), :method => 'delete', :confirm => "Are you sure you wish to delete the service '#{@service.name}'?"}
   - unless @service.description.blank?
     .description= @service.description
 
-%h4= link_to 'edit this service', edit_service_path(@service)
 
-- if @service.safe_to_delete?
-  %h4= link_to 'delete this service', service_path(@service), :method => 'delete', :confirm => "Are you sure you wish to delete the service '#{@service.name}'?"
 
 .parameters
   - if @service.parameters.blank?
