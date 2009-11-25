@@ -1,8 +1,13 @@
  - should we show default settings from customer / app on instance edit page (to reduce confusion?)
  
- ---
+ - make blank parameters not persist (see before filter on customer, app, instance)
  
- Q: should a "blank" parameter value be considered "set"?  If so, it becomes easy to get "deployable" instances that will fail; if not, do we miss the ability not to set a blank parameter value?
+ - deployments, 
+ - the puppet wedge for class + variable stuff from lak's email
+ - deployment periods,
+ - audits
+
+ ---
  
  Q: are there parameters for services that would be accepted but are not required (i.e., they should auto-fill in our instance parameter list, but not display as "required", and a can_deploy? call would ignore them)?
   
@@ -10,8 +15,6 @@
 
  *** should be able to see service parameter assignments for an instance from some instance detail view (i.e., here's how the services will be / were deployed).  That is, here's service detail, and when these services were deployed (will be deployed) they got assignments like this.  I feel like this might be a hidden model emerging -- the deployment set, or deployment event.
 
- ??? parameters could be computed from host (e.g., ip addresses, etc.) ... does this imply bad design of the manifest/recipe that enforces them?  (maybe) ... what about multiple IP addresses for, say, multiple SSL domain names for a web app?
- 
  ---
  
  -> deploy.  This may imply that we have a state machine associated with deployments (associated with instances/services).  This would also imply that getting deployment feedback (e.g., the puppet-reporter "report" data closing the loop, if that's possible; or monitoring information being able to be fed back in; both are tricky but at least one of them would be highly useful, imo)
@@ -40,14 +43,11 @@
  -> operations:  un-deploy, deploy, shut down, start host, provision new host, etc. (what impact do these have out in the world?)
 
  -> we should enforce that only top-level services are linked to instances, everything else is computed ... this means that when edges are created, or when services are linked/unlinked from instances that there may be a cascade of changes to the service set for an instance, which may cascade to deployments, which may cascade out to various hosts -- this would work best if we live in a do/undo world of host deployment (e.g., the way stahnma is setting up puppet manifests)
- 
- -> looks like services controller doesn't have specs for the alternate formats being delivered
 
- -> could have indexes identify strange situations:  customers with undeployed apps, hosts with no deployments, apps which are not deployed, etc.
 
- -> I think the puppet-classifer "class"/"service" modeling did a disservice to what I'm trying to do.  Need to unwind this.
+ -> could have indexes highligh strange situations:  customers with undeployed apps, hosts with no deployments, apps which are not deployed, etc.
 
- -> there should be a services method for hosts, so that we can easily see what services are supposed to be on the host.  The deployments are, in a sense, the detailed "Actually deployed on the host" services.  So, in a sense, the services are being linked via destinations to deployments on hosts (if the destination is a same-host destination then destination is almost a no-op way to get from service to deployment, which belongs_to host)
+ ??? there should be a services method for hosts, so that we can easily see what services are supposed to be on the host.  The deployments are, in a sense, the detailed "Actually deployed on the host" services.  So, in a sense, the services are being linked via destinations to deployments on hosts (if the destination is a same-host destination then destination is almost a no-op way to get from service to deployment, which belongs_to host)
 
  -> generate some sort of YAML dump
  -> import data from YAML dump
