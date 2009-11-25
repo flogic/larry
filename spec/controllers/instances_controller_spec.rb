@@ -106,7 +106,6 @@ describe InstancesController, 'when integrating' do
     before :each do
       @instance = Instance.generate!
       @params = { :id => @instance.id.to_s, :instance => @instance.attributes }
-      
     end
     
     def do_request

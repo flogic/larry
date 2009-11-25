@@ -61,6 +61,59 @@ describe '/apps/new' do
       end            
     end
     
+    describe 'when the app has parameters' do
+      before :each do
+        @parameters = { 'a' => 'b', 'c' => 'd', 'e' => 'f' }
+        @app.parameters = @parameters
+      end
+      
+      it 'should have an input for each parameter name' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_app') do
+          @parameters.each_pair do |key, value|
+            with_tag('input[type=?][name=?][value=?]', 'text', 'app[parameters][key][]', key)
+          end
+        end
+      end
+      
+      it 'should have an input for each parameter value' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_app') do
+          @parameters.each_pair do |key, value|
+            with_tag('input[type=?][name=?][value=?]', 'text', 'app[parameters][value][]', value)
+          end
+        end
+      end
+      
+      it 'should not have a blank input for parameter name' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_app') do
+          with_tag('input[type=?][name=?]:not(value)', 'text', 'app[parameters][key][]')
+        end
+      end
+      
+      it 'should not have a blank input for parameter value' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_app') do
+          with_tag('input[type=?][name=?]:not(value)', 'text', 'app[parameters][value][]')
+        end
+      end
+      
+      it 'should have a link to delete an existing parameter' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_app') do
+          with_tag('a[class=?]', 'delete_parameter_link', :count => @app.parameters.size)
+        end
+      end
+    end
+    
+    it 'should have a link to add a new parameter' do
+      do_render
+      response.should have_tag('form[id=?]', 'new_app') do
+        with_tag('a[id=?]', 'add_parameter_link')
+      end
+    end
+    
     it 'should have a submit button' do
       do_render
       response.should have_tag('form[id=?]', 'new_app') do

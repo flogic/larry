@@ -54,10 +54,11 @@ describe AppsController, 'when integrating' do
   describe 'create' do
     before :each do
       @app = App.spawn
+      @params = { :app => @app.attributes }
     end
 
     def do_request
-      post :create, :app => @app.attributes
+      post :create, @params
     end
 
     it_should_behave_like "a redirecting action"
@@ -73,14 +74,71 @@ describe AppsController, 'when integrating' do
         customer.apps.should include(assigns[:app])
       end
     end
+    
+    describe 'when parameters are provided' do
+      it 'should set the new app parameters to an empty hash when the data provides no empty parameters list' do
+        @params[:app].delete('parameters')
+        do_request
+        App.find_by_name(@app.name).parameters.should == {}
+      end
+      
+      it 'should set the new app parameters to an empty hash when the data provides an empty parameters list' do
+        @params[:app]['parameters'] = {}
+        do_request
+        App.find_by_name(@app.name).parameters.should == {}
+      end
+      
+      it 'should set the new app parameters to an empty hash when the data provides no non-blank parameter names' do
+        @params[:app]['parameters'] = { 'key' => ['', '', ''], 'value' => ['1', '2', '3'] }
+        do_request
+        App.find_by_name(@app.name).parameters.should == {}          
+      end
+      
+      it 'should set the new app parameters to a hash based on the data keys and values' do
+        @params[:app]['parameters'] = { 'key' => ['a', '', 'c'], 'value' => ['b', 'x', 'd'] }
+        do_request
+        App.find_by_name(@app.name).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
+      end
+    end
   end
 
   describe 'update' do
+    before :each do
+      @app = App.generate!
+      @params = { :id => @app.id.to_s, :app => @app.attributes }
+    end
+    
     def do_request
-      put :update, :id => @app.id.to_s, :app => @app.attributes
+      put :update, @params
     end
 
     it_should_behave_like "a redirecting action"
+    
+    describe 'when parameters are provided' do
+      it 'should set the app parameters to an empty hash when the data provides no empty parameters list' do
+        @params[:app].delete('parameters')
+        do_request
+        App.find(@app.id).parameters.should == {}
+      end
+      
+      it 'should set the app parameters to an empty hash when the data provides an empty parameters list' do
+        @params[:app]['parameters'] = {}
+        do_request
+        App.find(@app.id).parameters.should == {}
+      end
+      
+      it 'should set the app parameters to an empty hash when the data provides no non-blank parameter names' do
+        @params[:app]['parameters'] = { 'key' => ['', '', ''], 'value' => ['1', '2', '3'] }
+        do_request
+        App.find(@app.id).parameters.should == {}          
+      end
+      
+      it 'should set the app parameters to a hash based on the data keys and values' do
+        @params[:app]['parameters'] = { 'key' => ['a', '', 'c'], 'value' => ['b', 'x', 'd'] }
+        do_request
+        App.find(@app.id).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
+      end
+    end
   end
 
   describe 'destroy' do
@@ -93,5 +151,8 @@ describe AppsController, 'when integrating' do
 end
 
 describe AppsController, 'when not integrating' do
-  it_should_behave_like 'a RESTful controller'
-end
+  it_should_behave_like 'a RESTful controller with an index action'
+  it_should_behave_like 'a RESTful controller with a show action'
+  it_should_behave_like 'a RESTful controller with a new action'
+  it_should_behave_like 'a RESTful controller with an edit action'
+  it_should_behave_like 'a RESTful controller with a destroy action'end
