@@ -557,4 +557,54 @@ describe Instance do
       @instance.unknown_parameters.should == { 'unknown 3' => 'value 3' }
     end
   end
+  
+  it 'should have an indicator for whether or not it can be deployed' do
+    Instance.new.should respond_to(:can_deploy?)
+  end
+  
+  describe 'when checking whether the instance can be deployed' do
+    before :each do
+      @instance = Instance.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @instance.can_deploy? }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @instance.can_deploy?(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    it 'should return false if it has no services' do
+      @instance.can_deploy?.should be_false
+    end
+    
+    it 'should return false if it has services but no service-required parameters' do
+      @instance.services << Service.generate!
+      @instance.can_deploy?.should be_true
+    end
+    
+    it 'should return true if all service-required parameters have values' do
+      @instance.services << services = Array.new(3) { Service.generate! }
+      services.first.parameters = [ 'field 1', 'field 2' ]
+      services.last.parameters = [ 'field 3', 'field 4' ]
+      services.first.save!
+      services.last.save!
+      @instance.parameters = { 
+        'field 1' => 'value 1', 'field 2' => 'value 2',
+        'field 3' => 'value 3', 'field 4' => 'value 4',
+      }
+      @instance.can_deploy?.should be_true
+    end
+    
+    it 'should return false if some service-required parameters are without values' do
+      @instance.services << services = Array.new(3) { Service.generate! }
+      services.first.parameters = [ 'field 1', 'field 2' ]
+      services.last.parameters = [ 'field 3', 'field 4' ]
+      services.first.save!
+      services.last.save!
+      @instance.parameters = { 'field 1' => 'value 1', 'field 2' => 'value 2', 'field 3' => 'value 3' }
+      @instance.can_deploy?.should be_false
+    end
+  end
 end

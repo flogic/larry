@@ -1,7 +1,3 @@
- - computation of "possible to deploy" would be dependent upon parameter assignments being met, so, write Instance#can_deploy? with just this conditional so far
-
- - refactor that index _form view ugliness
-
  - move computation of manifest and/or configuration into Instance -- Host methods should just be wrappers
 
  - change parameter computation in Instance (recently moved from host) so that it pulls parameter values from the Instance (actually, this may properly reside in Service, but we'll see)

@@ -61,4 +61,9 @@ class Instance < ActiveRecord::Base
   def safe_to_delete?
     deployment.blank? and requirements.blank?
   end
+  
+  def can_deploy?
+    return false if services.blank?
+    missing_parameters.blank?
+  end
 end
