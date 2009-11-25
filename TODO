@@ -1,5 +1,8 @@
+ - add parameter views to edit/new (_form) customers
+ 
  - add parameter list to app show
- - add parameter views, to customers (no service linkage) - edit/new (_form), then on show
+ - add parameter list to customer show
+
  - update Instance#configuration parameters so that it pulls from customer, then app, then instance
 
  Q: should a "blank" parameter value be considered "set"?  If so, it becomes easy to get "deployable" instances that will fail; if not, do we miss the ability not to set a blank parameter value?

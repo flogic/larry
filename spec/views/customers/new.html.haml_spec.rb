@@ -55,6 +55,59 @@ describe '/customers/new' do
       end            
     end
     
+    describe 'when the customer has parameters' do
+      before :each do
+        @parameters = { 'a' => 'b', 'c' => 'd', 'e' => 'f' }
+        @customer.parameters = @parameters
+      end
+      
+      it 'should have an input for each parameter name' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_customer') do
+          @parameters.each_pair do |key, value|
+            with_tag('input[type=?][name=?][value=?]', 'text', 'customer[parameters][key][]', key)
+          end
+        end
+      end
+      
+      it 'should have an input for each parameter value' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_customer') do
+          @parameters.each_pair do |key, value|
+            with_tag('input[type=?][name=?][value=?]', 'text', 'customer[parameters][value][]', value)
+          end
+        end
+      end
+      
+      it 'should not have a blank input for parameter name' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_customer') do
+          with_tag('input[type=?][name=?]:not(value)', 'text', 'customer[parameters][key][]')
+        end
+      end
+      
+      it 'should not have a blank input for parameter value' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_customer') do
+          with_tag('input[type=?][name=?]:not(value)', 'text', 'customer[parameters][value][]')
+        end
+      end
+      
+      it 'should have a link to delete an existing parameter' do
+        do_render
+        response.should have_tag('form[id=?]', 'new_customer') do
+          with_tag('a[class=?]', 'delete_parameter_link', :count => @customer.parameters.size)
+        end
+      end
+    end
+    
+    it 'should have a link to add a new parameter' do
+      do_render
+      response.should have_tag('form[id=?]', 'new_customer') do
+        with_tag('a[id=?]', 'add_parameter_link')
+      end
+    end
+    
     it 'should have a submit button' do
       do_render
       response.should have_tag('form[id=?]', 'new_customer') do

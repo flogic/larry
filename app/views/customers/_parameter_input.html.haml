@@ -1,0 +1,5 @@
+- parameter = parameter_input  # change silly partial-based variable name
+%li 
+  = text_field_tag 'customer[parameters][key][]', parameter.first
+  = text_field_tag 'customer[parameters][value][]', parameter.last
+  %a.delete_parameter_link{ :href => '#'} (delete)

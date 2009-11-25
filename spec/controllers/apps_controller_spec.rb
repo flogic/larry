@@ -155,4 +155,5 @@ describe AppsController, 'when not integrating' do
   it_should_behave_like 'a RESTful controller with a show action'
   it_should_behave_like 'a RESTful controller with a new action'
   it_should_behave_like 'a RESTful controller with an edit action'
-  it_should_behave_like 'a RESTful controller with a destroy action'end
+  it_should_behave_like 'a RESTful controller with a destroy action'
+end
