@@ -1,0 +1,138 @@
+#!/usr/bin/ruby -w
+# = Synopsis
+#
+# Turn a simple data class into yaml.
+#
+# = Usage
+#
+#   pp2yaml [-h|--help] [-v|--version] [-d|--detail] [directory=pwd]
+#
+# = Description
+#
+# This script parses the Red Hat-specific datasources manifest, producing a bunch
+# of yaml files.
+#
+# = Options
+#
+# help::
+#   Print this help message
+#
+# = Example
+#
+#   pp2yaml modules/datasources/manifests/init.pp
+#
+# = Author
+#
+# Luke Kanies
+#
+# = Copyright
+#
+# Copyright (c) 2009 Reductive Labs, LLC
+
+require 'optparse'
+
+options = {}
+
+OptionParser.new do |opts|
+    opts.banner = "Convert a maminest to yaml."
+    opts.separator ""
+    opts.separator "Usage: pp2yaml [options] <file>"
+
+    opts.on("-h", "--help", "Print this help document") do
+        puts opts
+        exit
+    end
+end.parse!
+
+file = "modules/datasources/manifests/init.pp"
+raise "Could not find manifest file %s; you must be in the root of the repository" % file unless FileTest.exist?(file)
+
+#class Value
+#    attr_accessor :scope, :level, :name, :default
+#
+#    @values = []
+#
+#    def self.values
+#        @values
+#    end
+#
+#    def initialize(scope, level, name, default)
+#
+#        find_right_scope(scope, level)
+#        @name, @default = name, default
+#
+#        self.class.values << self
+#    end
+#
+#    def find_right_scope(scope, level)
+#        self.class.values.reverse.each do |
+#    end
+#end
+Value = Struct.new(:scope, :name, :default)
+
+Value.send(:define_method, :to_s) do
+    "%s: %s => %s" % [self.scope, self.name, self.default]
+end
+
+variable = nil
+path = []
+
+count = 0
+
+values = []
+File.readlines(file).each do |line|
+    count += 1
+    case line
+    when /(\s*)class (\w+)/
+        level = $1.length / 4
+        klass = $2
+        case path.length <=> level
+        when -1; # shorter than the current level
+            # no-op
+        when 0; # same length
+            path.pop # remove one
+        when +1; # longer
+            2.times { path.pop } # remove two
+        end
+        path << klass
+    when /\$(\w+)\s+=\s+\$(\w+)/
+        unless $1 == $2
+            puts "Got mismatched variables on line %d: %s vs %s" % [count, $1, $2]
+            variable = :skip
+            next
+        end
+        variable = $1
+    when /''\s+=>\s+"(.+)"/
+        next if variable == :skip
+        value = $1
+
+        if values.length > 0 and values[-1].name == variable
+            raise "Got second value for %s at line %d" % [variable.inspect, count]
+        end
+
+        values << Value.new(path.join("::"), variable, value)
+    end
+end
+
+data = Hash.new { |hash, key| hash[key] = {} }
+
+values.each do |value|
+    #puts value
+    data[value.scope][value.name] = value.default
+end
+
+data_dir = "data"
+require 'fileutils'
+
+FileUtils.mkdir_p(data_dir)
+
+require 'yaml'
+data.each do |scope, params|
+    puts scope
+    dir = (["data"] + scope.split("::"))
+    klass = dir.pop
+    dir = dir.join("/")
+    FileUtils.mkdir_p(dir)
+    yaml = File.join(dir, klass + ".yaml")
+    File.open(yaml, "w") { |y| y.print YAML.dump(params) }
+end

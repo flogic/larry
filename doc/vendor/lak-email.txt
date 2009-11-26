@@ -1,0 +1,47 @@
+I think you're really going to like this.
+
+I've attached two files:
+
+pp2yaml, which reads in your datasources init.pp file and produces a data/ directory.  You have to run this from the root of the repository (i.e., it looks for $PWD/modules/datasources/manifests/init.pp), but it wouldn't be hard to fix this.
+
+load_data.rb, which is a function that reads in these data files.  You'll need to modify it to point to your data directory.  There should probably be a way to not hard-code it, but for this, it's good enough.  The function accepts zero or one argument; if an argument is specified, then it loads the data for the that class, and if no argument is specified, then it loads the data for the current class.  Here's the key:  It loads the parameters in that file as local variables in the current class.
+
+So, here's the usage:
+
+1) Make the data dir by running pp2yaml
+2) Remove the 'include datasources::*' from your test class
+3) Completely unqualify all datasources variables in your test class
+4) Add a call to 'load_data' at the *top* of your test class
+
+This will load the newly-created data file's attributes as local variables.
+
+Here's my test manifest:
+
+class wiki {
+   load_data()
+   notice $clearspace_vhost
+}
+
+class testing {
+   load_data(gsa)
+   notice $gsa_host
+}
+
+include wiki, testing
+
+And here's the output:
+
+notice: Scope(Class[wiki]): docspace.corp.redhat.com
+notice: Scope(Class[testing]): search.util.phx.redhat.com
+
+Really, other than the issues below I think this does *exactly* what you want, including converting all of the existing data (although, admittedly, not converting all of the existing classes), and it's both more maintainable and more awesome.
+
+Let me know what you think, and whether you'd like to pursue it.  In the meantime, I think I'm going to post it to the list.
+
+Issues:
+
+* Currently throws one warning: Got mismatched variables on line 656: rh_urls_env vs distribution_short.  Meaning that that line doesn't follow the convention.  Should be easy enough to either work around or not put in the data dir.
+
+* Doesn't currently check to see if the value is already set.  This one's nearly trivial to fix.
+
+* Doesn't handle variable interpolation within strings.  Should be easy to fix.
