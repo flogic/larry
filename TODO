@@ -1,59 +1,84 @@
+["D" -> deployment milestone]
+["P" -> provisioning milestone]
 
- - there are pools of hosts, so that we can target deployments to different pools
- - we can provision hosts that don't exist
- - we can provision hosts into a pool
- - we can ask a pool to provision hosts
- - hosts can have capacities, so that we can estimate whether we have enough capacity for deploying instances
- - instances can have costs, so that we can determine if we have sufficient host resources to deploy instances
- - should be able to determine if a pool has sufficient capacity to deploy instance(s)
- - should be able to recommend hosts to provision
- - [ provision would be via rubycloud, etc. ]
+ deploys:
+ D instance show view should include a "Deploy this" link for an instance which #can_deploy?  Goes to instances/#{id}/deployments/new
+ D deployments/new can accept a start time (default now), and end time (default nil); start time nor end time can be in the past; end time is > start time
+ D Q: if there is already an active Deployment for this Instance on that Host, presumably we want to truncate its end time if there is overlap
+ D deployments has a Reason field (mandatory) which explains why this deployment happened
+ D choose a host on which to deploy the instance (this is where Requirements, Pools, and Provisioning smarts come in later)
+ D Deployment creation with nil Deployable also creates a new Deployable, and associates with this Deployment
+   - Deployable stores service list, parameters, instance (meaning we're free from then on out to change services, instances, parameters, etc.)
+ D Host manifest generation functionality needs to be updated so that it checks currently active Deployments for the host and uses them to generate manifests (active means start time <= now, and end_time > now)
+ D deployments/new front-end should include an option to choose from old Deployables, otherwise we're creating a new Deployable
+ D deployments/new would only allow choosing old Deployables for this Instance
+ D Instance show view should show Deployables
+ D Instance show view should show current deployments
+ D Instance show view should show future deployments
+ D Instance show view should show past deployments
+ D Deployments show view, index view
+ D Deployables show view, index view
+ D Deployments can be edited so long as they are in the future, ditto deleted
+ D Deployables 
+ D stop a deployment
+ D link from deployables/show (maybe also deployables/index) to make a new deployment from that deployable
+ D deployed services are created which show how services got put on hosts (via deployments)
+ D should be able to see services deployed to a Host
+ D also, should be able to generate a history of a Host wrt services
+ D at some point, deal with audits and audit deployments
+ D so a rollback is an attempt to cancel a Deployment and make another Deployment current.  This seems like copying a Deployment from the past, setting the start time to now.
+ 
+ pools:
+ D create pool (name, description)
+ D validate pool name presence, uniqueness
+ D hosts many:many with pool (:through model: PoolMembership)
+ D pool menu links
+ D pool index view
+ D pool new view, pool edit view
+ D pool show view (includes hosts)
+ D hosts show view includes pool memberships
+ D pool show view should allow adding host, removing hosts
+ D host show view should allow adding to pool, removing from pool
+ D deployments/new has a Pool chooser (requires a Pool)
+ 
+ ---
 
- - when deploying an instance we specify a pool, so that capacity measurement and provisioning can work (also so shit gets on the right machines, duh)
- - we can deploy instances multiple times, even concurrently, so that we can do testing of instances, etc.
- - when we deploy an instance we create a record of that deployment with sufficient information to deploy to a pool, so that we can rollback a deployment, test a deployment in different places, deploy concurrently, etc.
- - when we deploy an instance we create a log of the deployment, which notes which actual hosts we deployed which services to, so that we can actually get the instances running on real systems
- - we can create a start/end time window for deployments, so that we can schedule future deployments, terminate deployments, and see which deployments are actually current
- - we can generate a manifest for a host by looking at all the deployed services for deployments which are within the current time window
+ P we can provision hosts that don't exist
+ P we can provision hosts into a pool
+ P we can ask a pool to provision hosts
+ P hosts can have capacities, so that we can estimate whether we have enough capacity for deploying instances
+ P instances can have costs, so that we can determine if we have sufficient host resources to deploy instances
+ P should be able to determine if a pool has sufficient capacity to deploy instance(s)
+ P should be able to recommend hosts to provision
+ P [ provision would be via rubycloud, etc. ]
+ P when deploying, should recommend hosts for instances, but provide a way to choose another host, or to provision a new host.
+ P provisioning is based on capacity/cost, fwiw
+ P could presumably associate a floor capacity w/ a Role
+
+ thoughts:
+ 
  - we can mark various things (instance, app, customer, host, ?) as "dirty" on changes, and save them up for a deployment, so that we can know if our planned changes have been put into action, know when we need to make a deployment, can batch up changes, and keep the process of creating deployments separate from the data which is used to do current production deployments
+ - should be able to specify that certain instances not reside on the same host
+ - should be able to specify that certain instances should reside on the same host
+ - should be able to specify that a service (or at least, an audit) should be on the same host as another (think log rotation, e.g.)
+ - may want to be able to specify that a services (or at least, an audit) should not be on the same host as another ... or maybe it's that audits have their own Requirements for deployment?
+ - could have indexes highligh strange situations:  customers with undeployed apps, hosts with no deployments, apps which are not deployed, etc.
+ - we can snapshot an instance (i.e., use it as a template); if we make a new instance we basically make the instance, set snapshot_id (or whatever) to the template instance, then delegate things to the template; we make the template instance's parameter values be defaults (behind customer, app, instance).
+ - presumably we could also snapshot an app; we could either go the same route (have a template pointer to the template app), or we could just instantiate new instances using the old app's instances as template.
+ - general facility to associate remote resources with a concept (maybe w/ a parser, and we can generate an RSS feed)
+   -> add linkages to nagios details for a host, service, etc.
+   -> add linkages from customers to invoicing, e.g.
+   -> is it possible to link from apps (or instances) to github pages?
+   -> is it possible to link apps / customer to trouble ticket pages?
+   -> what about linking to PT, e.g.
+ - favicon.ico, heh
+ 
  - since deployment records are captured we can do rollbacks
  - since deployment records are captured we can run a tool like puppet consistently over them without fear of introducing changes
  - since deployment manifests can only change when a deployment is created or on the time-interval boundaries of the deployments, we don't have to continuously poll for changes (i.e., we could schedule and/or notify instead).
- - when making a deployment, should be able to choose a set of instances to deploy (1 or many), so that we can deploy a suite of things all at once
- - when making a deployment, probably need to require the whole deployment goes to the same pool, otherwise it gets hard to ask and record (and replay) how to do the deployment across pools
- 
- - should be able to specify that certain instances not reside on the same host
- - should be able to specify that certain instances should reside on the same host
- 
- - should be able to specify that a service (or at least, an audit) should be on the same host as another (think log rotation, e.g.)
- - may want to be able to specify that a services (or at least, an audit) should not be on the same host as another ... or maybe it's that audits have their own Requirements for deployment?
-
- - when deploying, should recommend hosts for instances, but provide a way to choose another host, or to provision a new host.
- 
- - provisioning is based on capacity/cost, fwiw
-
- - could presumably associate a floor capacity w/ a Role
-
- -> could have indexes highligh strange situations:  customers with undeployed apps, hosts with no deployments, apps which are not deployed, etc.
-
- - we can snapshot an instance (i.e., use it as a template); if we make a new instance we basically make the instance, set snapshot_id (or whatever) to the template instance, then delegate things to the template; we make the template instance's parameter values be defaults (behind customer, app, instance).
- 
- - presumably we could also snapshot an app; we could either go the same route (have a template pointer to the template app), or we could just instantiate new instances using the old app's instances as template.
-
- -> add linkages to nagios details for a host, service, etc.
- -> add linkages from customers to invoicing, e.g.
- -> is it possible to link from apps (or instances) to github pages?
- -> is it possible to link apps / customer to trouble ticket pages?
- -> what about linking to PT, e.g.
- 
- : this probably speaks to a general facility to associate an URL with a class (customer, app, instance, deployment, host, etc.); in which case it might well be possible to have parsers for the data at the end of those URLs so that we could aggregate data; if we push out RSS, e.g., from larry then it would be possible for larry to be a central dashboard.
-
- -> favicon.ico, heh
 
 --- Questions
 
  Q: are there parameters for services that would be accepted but are not required (i.e., they should auto-fill in our instance parameter list, but not display as "required", and a can_deploy? call would ignore them)?
   
- Q: do we need to check can_deploy? when generating a manifest from Instance?
-
  Q: is the difference between a service that's required by many instances on a host (e.g., postgres) but which only really causes one installation to happen, vs. services that have the same name but differ in parameters and cause multiple things to happen (e.g., setting up a postgres *database* for an app) ... is this something larry needs to concern itself with, or do we just leverage the underlying management tool?  If we're using puppet, puppet can sort things out, but it's not clear that something like chef, e.g., can.
