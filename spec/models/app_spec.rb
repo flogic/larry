@@ -46,6 +46,11 @@ describe App do
       @app = App.generate!(:parameters => { :foo => 'bar'})
       App.find(@app.id).parameters[:foo].should == 'bar'
     end
+    
+    it 'should return an empty hash for parameters when parameters are blank' do
+      @app.parameters = nil
+      @app.parameters.should == {}
+    end
   end
 
   describe 'validations' do

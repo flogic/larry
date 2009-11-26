@@ -12,6 +12,10 @@ class App < ActiveRecord::Base
   
   before_destroy :safe_to_delete?
   
+  def parameters
+    self[:parameters] || {}
+  end
+  
   def deployments
     instances.collect(&:deployment).compact
   end

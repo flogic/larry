@@ -5,10 +5,9 @@
       = form.input :name
       = form.input :description, :input_html => { :class => 'inline' }
       .app_parameters
-        - parameters = (@app.parameters || {})
         %label Parameters
         %ul#parameters
-          - parameters.keys.sort.each do |key|
-            = render :partial => 'parameter_input', :object => [ key, parameters[key] ]
+          - @app.parameters.keys.sort.each do |key|
+            = render :partial => 'parameter_input', :object => [ key, @app.parameters[key] ]
         = link_to_function('Add a parameter', :id => 'add_parameter_link') { |page|  page.insert_html :bottom, 'parameters', :partial => 'parameter_input', :object => [] }
     = form.buttons

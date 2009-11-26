@@ -16,6 +16,10 @@ class Instance < ActiveRecord::Base
   
   before_destroy :safe_to_delete?
   
+  def parameters
+    self[:parameters] || {}
+  end
+  
   def customer
     return nil unless app
     app.customer
@@ -30,7 +34,7 @@ class Instance < ActiveRecord::Base
   end
   
   def configuration_parameters
-    (customer && customer.parameters || {}).merge(app && app.parameters || {}).merge(parameters || {})
+    (customer && customer.parameters || {}).merge(app && app.parameters || {}).merge(parameters)
   end
   
   def unrelated_services
@@ -81,8 +85,8 @@ class Instance < ActiveRecord::Base
   
   def parameter_whence(parameter)
     return nil unless configuration_parameters[parameter]
-    return nil if (parameters || {}).has_key?(parameter)
-    return app if (app.parameters || {}).has_key?(parameter)
-    return customer if (customer.parameters || {}).has_key?(parameter)
+    return nil if parameters.has_key?(parameter)
+    return app if app.parameters.has_key?(parameter)
+    return customer if customer.parameters.has_key?(parameter)
   end
 end

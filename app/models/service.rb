@@ -25,6 +25,10 @@ class Service < ActiveRecord::Base
     all - services.flatten
   end
   
+  def parameters
+    self[:parameters] || []
+  end
+  
   def configuration_name
     normalize_name(name)
   end
@@ -112,11 +116,11 @@ class Service < ActiveRecord::Base
   end
   
   def needed_parameters
-    ((parameters || []) + depends_on.collect(&:needed_parameters)).flatten.compact.uniq
+    (parameters + depends_on.collect(&:needed_parameters)).flatten.compact.uniq
   end
   
   def depends_on_additional_parameters
-    depends_on.collect(&:needed_parameters).flatten.compact.uniq - (parameters || [])
+    depends_on.collect(&:needed_parameters).flatten.compact.uniq - parameters
   end
   
   def safe_to_delete?

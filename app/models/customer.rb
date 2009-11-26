@@ -10,6 +10,10 @@ class Customer < ActiveRecord::Base
   
   before_destroy :safe_to_delete?
   
+  def parameters
+    self[:parameters] || {}
+  end
+  
   def instances
     apps.collect(&:instances).flatten
   end

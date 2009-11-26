@@ -1,4 +1,5 @@
- - should we show default settings from customer / app on instance edit page (to reduce confusion?)
+
+ - should we show default settings from customer / app on instance edit page (to reduce confusion?) ... (just a pair of conditionals, but may want a wrapper or helper)
  
  - make blank parameters not persist (see before filter on customer, app, instance)
  

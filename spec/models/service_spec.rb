@@ -37,6 +37,11 @@ describe Service do
       @service = Service.generate!(:parameters => [ 'VHost name', 'SSL_required' ])
       Service.find(@service.id).parameters.first.should == 'VHost name'    
     end
+    
+    it 'should return an empty list for parameters when parameters are empty' do
+      @service.parameters = nil
+      @service.parameters.should == []
+    end
   end
 
   describe 'validations' do

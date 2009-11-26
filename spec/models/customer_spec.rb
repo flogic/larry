@@ -37,6 +37,11 @@ describe Customer do
       @customer = Customer.generate!(:parameters => { :foo => 'bar'})
       Customer.find(@customer.id).parameters[:foo].should == 'bar'
     end
+    
+    it 'should return an empty hash for parameters when parameters are empty' do
+      @customer.parameters = nil
+      @customer.parameters.should == {}
+    end
   end
 
   describe 'validations' do

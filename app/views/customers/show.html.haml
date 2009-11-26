@@ -9,14 +9,13 @@
     .description= @customer.description
 
 .parameters
-  - parameters = @customer.parameters || {}
-  - if parameters.blank?
+  - if @customer.parameters.blank?
     %h3 This customer has no parameters set.
   - else
     %h3 The following parameters are set for this customer:
     %ul
-      - parameters.keys.sort.each do |key|
-        %li== "#{key}": "#{parameters[key]}"
+      - @customer.parameters.keys.sort.each do |key|
+        %li== "#{key}": "#{@customer.parameters[key]}"
 
 %h4= link_to 'add a new app for this customer', new_customer_app_path(@customer)
 

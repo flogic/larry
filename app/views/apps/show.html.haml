@@ -9,14 +9,13 @@
     .description= @app.description
 
 .parameters
-  - parameters = @app.parameters || {}
-  - if parameters.blank?
+  - if @app.parameters.blank?
     %h3 This app has no parameters set.
   - else
     %h3 The following parameters are set for this app:
     %ul
-      - parameters.keys.sort.each do |key|
-        %li== "#{key}": "#{parameters[key]}"
+      - @app.parameters.keys.sort.each do |key|
+        %li== "#{key}": "#{@app.parameters[key]}"
 
 %h4= link_to 'add a new instance for this app', new_app_instance_path(@app)
 

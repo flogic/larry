@@ -64,6 +64,11 @@ describe Instance do
       @instance = Instance.generate!(:parameters => { :foo => 'bar'})
       Instance.find(@instance.id).parameters[:foo].should == 'bar'
     end
+    
+    it 'should return an empty hash for parameters when parameters is empty' do
+      @instance.parameters = nil
+      @instance.parameters.should == {}
+    end
   end
   
   describe 'validations' do
