@@ -27,7 +27,9 @@
  
  - provisioning is based on capacity/cost, fwiw
 
- 
+ (later)
+ - we can snapshot an instance (i.e., use it as a template); if we make a new instance we basically make the instance, set snapshot_id (or whatever) to the template instance, then delegate things to the template; we make the template instance's parameter values be defaults (behind customer, app, instance).
+ - presumably we could also snapshot an app; we could either go the same route (have a template pointer to the template app), or we could just instantiate new instances using the old app's instances as template.
 
 ---
 
