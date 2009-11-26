@@ -1,4 +1,7 @@
+["D" -> deployment milestone]
+["P" -> provisioning milestone]
 
+<<<<<<< HEAD:TODO
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
@@ -53,6 +56,76 @@
  P provisioning is based on capacity/cost, fwiw
  P could presumably associate a floor capacity w/ a Role
 
+=======
+ D instance show view should include a "Deploy this" link for an instance which #can_deploy?  Goes to instances/#{id}/deployments/new
+ D deployments/new has a Reason field (mandatory) which explains why this deployment happened
+ D deployments/new can accept a start time (default now), and end time (default nil); start time nor end time can be in the past; end time is > start time
+ D choose a host on which to deploy the instance (this is where Requirements, Pools, and Provisioning smarts come in later)
+ D show current deployments of this Instance on deployments/new page 
+ D show historical deployments of this Instance (including which Deployable version they used)
+ D provide warning if the same host is chosen as a current Deployment that we'll be ending that deployment
+ 
+ ---
+ 
+ D Deployment creation with nil Deployable also creates a new Deployable, and associates with this Deployment
+ D if there is already an active Deployment for this Instance on that Host,  we want to truncate its end time if there is overlap
+ D deployed services are created which show how services got put on hosts (via deployments)
+ - Deployable stores service list, parameters, instance (meaning we're free from then on out to change services, instances, parameters, etc.)
+ D Deployments can be edited so long as they are in the future, ditto deleted
+   
+ ---
+ 
+ D Host manifest generation functionality needs to be updated so that it checks currently active Deployments for the host and uses them to generate manifests (active means start time <= now, and end_time > now)
+ 
+ D deployments/new front-end should include an option to choose from old Deployables, otherwise we're creating a new Deployable
+ D deployments/new would only allow choosing old Deployables for this Instance
+ D Instance show view should show Deployables
+
+ D Instance show view should show current deployments
+ D Instance show view should show future deployments
+ D Instance show view should show past deployments
+
+ D Deployments show view, index view
+ D Deployables show view, index view
+ 
+ D stop a deployment (set end_time on deployment) from deployments/show page
+ D link from deployables/show (maybe also deployables/index) to make a new deployment from that deployable
+ D should be able to see services deployed to a Host
+ D also, should be able to generate a history of a Host wrt services
+
+ D at some point, deal with audits and audit deployments
+ D so a rollback is an attempt to cancel a Deployment and make another Deployment current.  This seems like copying a Deployment from the past, setting the start time to now.
+ 
+ ---
+
+ P create pool (name, description)
+ P validate pool name presence, uniqueness
+ P hosts many:many with pool (:through model: PoolMembership)
+ P pool menu links
+ P pool index view
+ P pool new view, pool edit view
+ P pool show view (includes hosts)
+ P hosts show view includes pool memberships
+ P pool show view should allow adding host, removing hosts
+ P host show view should allow adding to pool, removing from pool
+ P deployments/new has a Pool chooser (requires a Pool)
+
+ ---
+
+ P we can provision hosts that don't exist
+ P we can provision hosts into a pool
+ P we can ask a pool to provision hosts
+ P hosts can have capacities, so that we can estimate whether we have enough capacity for deploying instances
+ P instances can have costs, so that we can determine if we have sufficient host resources to deploy instances
+ P should be able to determine if a pool has sufficient capacity to deploy instance(s)
+ P should be able to recommend hosts to provision
+ P [ provision would be via rubycloud, etc. ]
+ P when deploying, should recommend hosts for instances, but provide a way to choose another host, or to provision a new host.
+ P provisioning is based on capacity/cost, fwiw
+ P could presumably associate a floor capacity w/ a Role
+ P Requirement model specifies which capacities, roles, etc., will satisfy a deployment attempt
+
+>>>>>>> customers:TODO
  thoughts:
  
  - we can mark various things (instance, app, customer, host, ?) as "dirty" on changes, and save them up for a deployment, so that we can know if our planned changes have been put into action, know when we need to make a deployment, can batch up changes, and keep the process of creating deployments separate from the data which is used to do current production deployments
@@ -74,6 +147,11 @@
  - since deployment records are captured we can do rollbacks
  - since deployment records are captured we can run a tool like puppet consistently over them without fear of introducing changes
  - since deployment manifests can only change when a deployment is created or on the time-interval boundaries of the deployments, we don't have to continuously poll for changes (i.e., we could schedule and/or notify instead).
+<<<<<<< HEAD:TODO
+=======
+
+ - if we associate some sort of service category with an instance (e.g., "Database hosting", "Production Web Server, Smegme", etc.) we can apply rates to service categories, use the deployment history for the Instance(s) as a log of billable service, and invoice straight from this motherfucker.  Not only that, but it could be billable at the service level.
+>>>>>>> customers:TODO
 
 --- Questions
 
