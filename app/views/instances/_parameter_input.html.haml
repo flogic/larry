@@ -1,5 +1,12 @@
-- parameter = parameter_input  # change silly partial-based variable name
 %li 
   = text_field_tag 'instance[parameters][key][]', parameter.first
   = text_field_tag 'instance[parameters][value][]', parameter.last
+  - if instance.customer and !instance.customer.parameters[parameter.first].blank?
+    %span.default_value== (customer #{brief(instance.customer)} defines "#{parameter.first}": "#{instance.customer.parameters[parameter.first]}")
+  - elsif app and app.customer and !app.customer.parameters[parameter.first].blank?
+    %span.default_value== (customer #{brief(app.customer)} defines "#{parameter.first}": "#{app.customer.parameters[parameter.first]}")
+  - if instance.app and !instance.app.parameters[parameter.first].blank?
+    %span.default_value== (app #{brief(instance.app)} defines "#{parameter.first}": "#{instance.app.parameters[parameter.first]}")
+  - elsif app and !app.parameters[parameter.first].blank?
+    %span.default_value== (app #{brief(app)} defines "#{parameter.first}": "#{app.parameters[parameter.first]}")
   %a.delete_parameter_link{ :href => '#'} (delete)

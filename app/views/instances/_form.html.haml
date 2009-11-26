@@ -11,16 +11,16 @@
           %ul
             - updated = @instance.needed_parameters.inject(@instance.parameters) {|h,p| h[p] ||= nil; h }
             - @instance.needed_parameters.sort.each do |required|        
-              = render :partial => 'parameter_input', :object => [ required, updated[required] ]
+              = render :partial => 'parameter_input', :locals => { :parameter => [ required, updated[required] ], :instance => @instance, :app => @app }
           %br
         - unless @instance.unknown_parameters.blank?
           %label Non-required parameters
           %br
           %ul
             - @instance.unknown_parameters.keys.sort.each do |key|
-              = render :partial => 'parameter_input', :object => [ key, @instance.unknown_parameters[key] ]            
+              = render :partial => 'parameter_input', :locals => { :parameter => [ key, @instance.parameters[key] ], :instance => @instance, :app => @app }
         %ul#parameters
-        = link_to_function('Add a non-required parameter', :id => 'add_parameter_link') { |page|  page.insert_html :bottom, 'parameters', :partial => 'parameter_input', :object => [] }
+        = link_to_function('Add a non-required parameter', :id => 'add_parameter_link') { |page|  page.insert_html :bottom, 'parameters', :partial => 'parameter_input', :locals => { :parameter => [], :instance => @instance, :app => @app } }
         %br
         %br
       

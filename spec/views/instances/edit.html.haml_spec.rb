@@ -70,6 +70,26 @@ describe '/instances/edit' do
       end
     end
     
+    it 'should highlight when the app defines a value for a service-required parameter' do
+      @instance.services << service = Service.generate!(:parameters => ['value 1', 'value 2'])
+      @instance.app.parameters = { 'value 1' => 'app default' }
+      @instance.app.save!
+      do_render
+      response.should have_tag('form[id=?]', "edit_instance_#{@instance.id}") do
+        with_tag('span[class=?]', 'default_value', :text => /app default/)
+      end
+    end
+    
+    it 'should highlight when the customer defines a value for a service-required parameter' do
+      @instance.services << service = Service.generate!(:parameters => ['value 1', 'value 2'])
+      @instance.customer.parameters = { 'value 1' => 'app default' }
+      @instance.customer.save!
+      do_render
+      response.should have_tag('form[id=?]', "edit_instance_#{@instance.id}") do
+        with_tag('span[class=?]', 'default_value', :text => /app default/)
+      end
+    end
+    
     describe 'when the instance has parameters' do
       before :each do
         @parameters = { 'a' => 'b', 'c' => 'd', 'e' => 'f' }

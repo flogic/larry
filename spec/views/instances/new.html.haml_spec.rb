@@ -71,6 +71,26 @@ describe '/instances/new' do
       end
     end
 
+    it 'should highlight when nesting app defines a value for a service-required parameter' do
+      @instance.services << service = Service.generate!(:parameters => ['value 1', 'value 2'])
+      assigns[:app] = app = App.generate!(:parameters => { 'value 1' => 'app default' })
+      do_render
+      response.should have_tag('form[id=?]', 'new_instance') do
+        with_tag('span[class=?]', 'default_value', :text => /app default/)
+      end
+    end
+    
+    it 'should highlight when the customer of the nesting app defines a value for a service-required parameter' do
+      @instance.services << service = Service.generate!(:parameters => ['value 1', 'value 2'])
+      assigns[:app] = app = App.generate!
+      app.customer.parameters = { 'value 1' => 'app default' }
+      app.customer.save!
+      do_render
+      response.should have_tag('form[id=?]', 'new_instance') do
+        with_tag('span[class=?]', 'default_value', :text => /app default/)
+      end
+    end
+
     describe 'when the instance has parameters' do
       before :each do
         @parameters = { 'a' => 'b', 'c' => 'd', 'e' => 'f' }
