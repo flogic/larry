@@ -19,6 +19,13 @@
  - since deployment records are captured we can do rollbacks
  - since deployment records are captured we can run a tool like puppet consistently over them without fear of introducing changes
  - since deployment manifests can only change when a deployment is created or on the time-interval boundaries of the deployments, we don't have to continuously poll for changes (i.e., we could schedule and/or notify instead).
+ - when making a deployment, should be able to choose a set of instances to deploy (1 or many), so that we can deploy a suite of things all at once
+ - when making a deployment, probably need to require the whole deployment goes to the same pool, otherwise it gets hard to ask and record (and replay) how to do the deployment across pools
+ - should be able to specify that certain instances not reside on the same host
+ - should be able to specify that certain instances should reside on the same host
+ - when deploying, should recommend hosts for instances, but provide a way to choose another host, or to provision a new host.
+ 
+ - provisioning is based on capacity/cost, fwiw
 
  
 
