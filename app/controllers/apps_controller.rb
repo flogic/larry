@@ -8,7 +8,7 @@ class AppsController < ApplicationController
   def unserialize_parameters_data
     if params[:app]['parameters'] and params[:app]['parameters']['key'] and params[:app]['parameters']['value']
       params[:app]['parameters'] = params[:app]['parameters']['key'].zip(params[:app]['parameters']['value']).inject({}) do |h, pair|
-        h[pair.first] = pair.last unless pair.first.blank?
+        h[pair.first] = pair.last unless pair.first.blank? or pair.last.blank?
         h
       end
     else

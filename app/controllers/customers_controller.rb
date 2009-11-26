@@ -7,7 +7,7 @@ class CustomersController < ApplicationController
   def unserialize_parameters_data
     if params[:customer]['parameters'] and params[:customer]['parameters']['key'] and params[:customer]['parameters']['value']
       params[:customer]['parameters'] = params[:customer]['parameters']['key'].zip(params[:customer]['parameters']['value']).inject({}) do |h, pair|
-        h[pair.first] = pair.last unless pair.first.blank?
+        h[pair.first] = pair.last unless pair.first.blank? or pair.last.blank?
         h
       end
     else

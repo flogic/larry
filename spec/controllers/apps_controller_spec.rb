@@ -99,6 +99,12 @@ describe AppsController, 'when integrating' do
         do_request
         App.find_by_name(@app.name).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
       end
+      
+      it 'should omit any parameter settings which have blank values' do
+        @params[:app]['parameters'] = { 'key' => ['a', 'j', 'c'], 'value' => ['b', '', 'd'] }
+        do_request
+        App.find_by_name(@app.name).parameters.should == { 'a' => 'b', 'c' => 'd' }        
+      end
     end
   end
 
@@ -135,6 +141,12 @@ describe AppsController, 'when integrating' do
       
       it 'should set the app parameters to a hash based on the data keys and values' do
         @params[:app]['parameters'] = { 'key' => ['a', '', 'c'], 'value' => ['b', 'x', 'd'] }
+        do_request
+        App.find(@app.id).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
+      end
+      
+      it 'should set the app parameters to a hash based on the data keys and values' do
+        @params[:app]['parameters'] = { 'key' => ['a', 'j', 'c'], 'value' => ['b', '', 'd'] }
         do_request
         App.find(@app.id).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
       end

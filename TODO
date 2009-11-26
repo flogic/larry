@@ -1,5 +1,3 @@
-
- - make blank parameters not persist (see before filter on customer, app, instance)
  
  - deployments, 
  - the puppet wedge for class + variable stuff from lak's email

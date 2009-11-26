@@ -8,7 +8,7 @@ class InstancesController < ApplicationController
   def unserialize_parameters_data
     if params[:instance]['parameters'] and params[:instance]['parameters']['key'] and params[:instance]['parameters']['value']
       params[:instance]['parameters'] = params[:instance]['parameters']['key'].zip(params[:instance]['parameters']['value']).inject({}) do |h, pair|
-        h[pair.first] = pair.last unless pair.first.blank?
+        h[pair.first] = pair.last unless pair.first.blank? or pair.last.blank?
         h
       end
     else

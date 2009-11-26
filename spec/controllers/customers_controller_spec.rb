@@ -75,6 +75,12 @@ describe CustomersController, 'when integrating' do
         do_request
         Customer.find_by_name(@customer.name).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
       end
+      
+      it 'should omit any parameter settings which have blank values' do
+        @params[:customer]['parameters'] = { 'key' => ['a', 'j', 'c'], 'value' => ['b', '', 'd'] }
+        do_request
+        Customer.find_by_name(@customer.name).parameters.should == { 'a' => 'b', 'c' => 'd' }        
+      end
     end
   end
 
@@ -111,6 +117,12 @@ describe CustomersController, 'when integrating' do
       
       it 'should set the customer parameters to a hash based on the data keys and values' do
         @params[:customer]['parameters'] = { 'key' => ['a', '', 'c'], 'value' => ['b', 'x', 'd'] }
+        do_request
+        Customer.find(@customer.id).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
+      end
+      
+      it 'should set the customer parameters to a hash based on the data keys and values' do
+        @params[:customer]['parameters'] = { 'key' => ['a', 'j', 'c'], 'value' => ['b', '', 'd'] }
         do_request
         Customer.find(@customer.id).parameters.should == { 'a' => 'b', 'c' => 'd' }                    
       end
