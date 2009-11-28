@@ -5,8 +5,10 @@
    x need route specs for new_instance_deployment_path(@instance)
    x routes update
    x make sure there's a deployments controller
-   - need controller spec to create a new deployment for an instance
-   - add the resources_controller line to the deployments_controller
+   x need controller spec to create a new deployment for an instance
+   x add the resources_controller line to the deployments_controller
+   - fix:  make sure deployment model has right attributes and associations
+     -> this means fixing the instance:deployment 1:1 situation (which always felt wrong anyway) ... also, putting deployable between instance and deployments
  
  
  D deployments/new has a Reason field (mandatory) which explains why this deployment happened
