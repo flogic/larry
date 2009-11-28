@@ -1,63 +1,14 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
-<<<<<<< HEAD:TODO
-["D" -> deployment milestone]
-["P" -> provisioning milestone]
-
- D create pool (name, description)
- D validate pool name presence, uniqueness
- D hosts many:many with pool (:through model: PoolMembership)
- D pool menu links
- D pool index view
- D pool new view, pool edit view
- D pool show view (includes hosts)
- D hosts show view includes pool memberships
- D pool show view should allow adding host, removing hosts
- D host show view should allow adding to pool, removing from pool
-
- ---
- 
- D instance show view would include a "Deploy this" link for an instance which #can_deploy?  Goes to deployments/new, providing this instance as a member of instance list
- D deployments/new view can accept a list of instances (add another instance, w/ dropdown to choose)
- D deployments/new can accept a start time (default now), and end time (default nil)
- D deployments/new has a Pool chooser (requires a Pool)
- D deployments has a Reason field (mandatory) which explains why this deployment happened
- D creates a new Deployable, as well as a Deployment when done
-   - Deployable stores service list, parameters, instances, and this new deployment
- D Host manifest generation functionality needs to be updated so that it checks currently active Deployments for the host and uses them to generate manifests
- D deployments/new front-end should include an option to choose from old Deployables, otherwise we're creating a new Deployable
- D ideally deployments/new can limit old deployments by instance
- D Instance show view should show current deployments
- D Instance show view should show future deployments
- D Instance show view should show past deployments
- D Deployments show view, index view
- D Deployables show view, index view
- D I don't think it makes sense to edit a deployment or a deployable, does it?
- D stop a deployment
- D link from deployables/show (maybe also deployables/index) to make a new deployment from that deployable
- 
- D deployed services are created which show how services got put on hosts (via deployments)
- D should be able to see services deployed to a Host
- D also, should be able to generate a history of a Host wrt services
- D at some point, deal with audits and audit deployments
- 
- ---
-
- P we can provision hosts that don't exist
- P we can provision hosts into a pool
- P we can ask a pool to provision hosts
- P hosts can have capacities, so that we can estimate whether we have enough capacity for deploying instances
- P instances can have costs, so that we can determine if we have sufficient host resources to deploy instances
- P should be able to determine if a pool has sufficient capacity to deploy instance(s)
- P should be able to recommend hosts to provision
- P [ provision would be via rubycloud, etc. ]
- P when deploying, should recommend hosts for instances, but provide a way to choose another host, or to provision a new host.
- P provisioning is based on capacity/cost, fwiw
- P could presumably associate a floor capacity w/ a Role
-
-=======
  D instance show view should include a "Deploy this" link for an instance which #can_deploy?  Goes to instances/#{id}/deployments/new
+   x need route specs for new_instance_deployment_path(@instance)
+   x routes update
+   x make sure there's a deployments controller
+   - need controller spec to create a new deployment for an instance
+   - add the resources_controller line to the deployments_controller
+ 
+ 
  D deployments/new has a Reason field (mandatory) which explains why this deployment happened
  D deployments/new can accept a start time (default now), and end time (default nil); start time nor end time can be in the past; end time is > start time
  D choose a host on which to deploy the instance (this is where Requirements, Pools, and Provisioning smarts come in later)
@@ -125,7 +76,6 @@
  P could presumably associate a floor capacity w/ a Role
  P Requirement model specifies which capacities, roles, etc., will satisfy a deployment attempt
 
->>>>>>> customers:TODO
  thoughts:
  
  - we can mark various things (instance, app, customer, host, ?) as "dirty" on changes, and save them up for a deployment, so that we can know if our planned changes have been put into action, know when we need to make a deployment, can batch up changes, and keep the process of creating deployments separate from the data which is used to do current production deployments
@@ -147,11 +97,8 @@
  - since deployment records are captured we can do rollbacks
  - since deployment records are captured we can run a tool like puppet consistently over them without fear of introducing changes
  - since deployment manifests can only change when a deployment is created or on the time-interval boundaries of the deployments, we don't have to continuously poll for changes (i.e., we could schedule and/or notify instead).
-<<<<<<< HEAD:TODO
-=======
 
  - if we associate some sort of service category with an instance (e.g., "Database hosting", "Production Web Server, Smegme", etc.) we can apply rates to service categories, use the deployment history for the Instance(s) as a log of billable service, and invoice straight from this motherfucker.  Not only that, but it could be billable at the service level.
->>>>>>> customers:TODO
 
 --- Questions
 

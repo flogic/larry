@@ -1,3 +1,4 @@
+
 require File.expand_path(File.join(File.dirname(__FILE__), *%w[.. .. spec_helper]))
 
 describe '/instances/show' do
@@ -34,6 +35,18 @@ describe '/instances/show' do
     @instance.stubs(:safe_to_delete?).returns(false)
     do_render
     response.should_not have_tag('a[href=?]', instance_path(@instance), :text => /[Dd]elete/)    
+  end
+  
+  it 'should include a link to deploy the instance if the instance can be deployed' do
+    @instance.stubs(:can_deploy?).returns(true)
+    do_render
+    response.should have_tag('a[href=?]', new_instance_deployment_path(@instance))
+  end
+  
+  it 'should not include a link to deploy the instance if the instance cannot be deployed' do
+    @instance.stubs(:can_deploy?).returns(false)
+    do_render
+    response.should_not have_tag('a[href=?]', new_instance_deployment_path(@instance))
   end
 
   it 'should display the app which this instance belongs to' do

@@ -1,8 +1,9 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :deployments, :destinations, :hosts, :instances, :services
+  map.resources :deployments, :destinations, :hosts, :services
 
   map.resources :customers,    :has_many => :apps
   map.resources :apps,         :has_many => :instances
+  map.resources :instances,    :has_many => :deployments
   map.resources :edges,        :only => [ :create, :destroy ]
   map.resources :requirements, :only => [ :create, :destroy ]
 
