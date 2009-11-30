@@ -54,45 +54,59 @@ describe Host do
     before :each do
       @host = Host.new
     end
-
+    
+    it 'should have many deployed services' do
+      @host.should respond_to(:deployed_services)
+    end
+        
+    it 'should allow setting and retrieving deployed services' do
+      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      @host.deployed_services.sort_by(&:id).should == deployed_services.sort_by(&:id)
+    end
+    
     it 'should have many deployments' do
       @host.should respond_to(:deployments)
     end
-
-    it 'should allow assigning deployments' do
-      @deployment = Deployment.generate!
-      @host.deployments << @deployment
-      @host.deployments.should include(@deployment)
+   
+    it "should return deployed services' deployments" do
+      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      @host.deployments.sort_by(&:id).should == deployed_services.collect(&:deployment).sort_by(&:id)
+    end
+        
+    it 'should have many deployables' do
+      @host.should respond_to(:deployments)
+    end
+    
+    it "should return deployed services' deployables" do
+      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      @host.deployables.sort_by(&:id).should == deployed_services.collect(&:deployable).sort_by(&:id)      
     end
     
     it 'should have many instances' do
       @host.should respond_to(:instances)
     end
     
-    it 'should allow assigning instances' do
-      @instance = Instance.generate!
-      @host.instances << @instance
-      @host.instances.should include(@instance)
+    it "should return deployed services' instances" do
+      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      @host.instances.sort_by(&:id).should == deployed_services.collect(&:instance).sort_by(&:id)
     end
     
     it 'should have many apps' do
       @host.should respond_to(:apps)
     end
     
-    it 'should include apps from all deployments' do
-      @deployments = Array.new(2) { Deployment.generate! }
-      @host.deployments << @deployments
-      @host.apps.sort_by(&:id).should == @deployments.collect(&:app).sort_by(&:id)
+    it "should return deployed services' apps" do
+      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      @host.apps.sort_by(&:id).should == deployed_services.collect(&:app).sort_by(&:id)
     end
     
     it 'should have many customers' do
-      @host.should respond_to(:customers)
+      @host.should respond_to(:customers)      
     end
-
-    it 'should include customers from all deployments' do
-      @deployments = Array.new(2) { Deployment.generate! }
-      @host.deployments << @deployments
-      @host.customers.sort_by(&:id).should == @deployments.collect(&:customer).flatten.sort_by(&:id)      
+    
+    it "should return deployed services' customers" do
+      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      @host.customers.sort_by(&:id).should == deployed_services.collect(&:customer).sort_by(&:id)
     end
   end
   
@@ -113,7 +127,7 @@ describe Host do
       lambda { @host.configuration(:foo) }.should raise_error(ArgumentError)
     end
     
-    describe 'and the host has no instances deployed' do
+    describe 'and the host has no deployed services' do
       it 'should return a hash of results' do
         @host.configuration.should respond_to(:keys)
       end
@@ -127,27 +141,26 @@ describe Host do
       end
     end
     
-    describe 'and the host has instances deployed' do
+    describe 'and the host has deployed services' do
       before :each do
-        @instances = Array.new(3) { Instance.generate! }
-        @host.instances << @instances
+        @host.deployed_services << @deployed_services = Array.new(3) { DeployedService.generate! }
       end
       
-      it 'should include a class for each deployed instance in the returned class list' do
-        @host.configuration['classes'].size.should == @instances.size
+      it 'should include a class for each instance in the returned class list' do
+        @host.configuration['classes'].size.should == @host.instances.size
       end
       
       it 'should include no additional classes' do
-        @host.configuration['classes'].size.should == @instances.size
+        @host.configuration['classes'].size.should == @host.instances.size
       end
       
       it 'should use an unique class name for the deployed instance classes in the returned class list' do
-        @host.configuration['classes'].sort.should == @instances.collect(&:configuration_name).sort
+        @host.configuration['classes'].sort.should == @host.instances.collect(&:configuration_name).sort
       end
 
       it "should include each instance's parameters, indexed by the unique class name for that instance" do
         result = @host.configuration
-        @instances.each do |instance|
+        @host.instances.each do |instance|
           result['parameters'][instance.configuration_name].should == instance.configuration_parameters
         end
       end
@@ -176,8 +189,8 @@ describe Host do
     describe 'and there are instances deployed to this host' do
       it 'should include the puppet manifest data for each instance' do
         @host = Host.generate!
-        @host.instances << @instances = Array.new(3) { Instance.generate! }
-        @instances.each do |instance| 
+        @host.deployed_services << deployed_services = Array.new(3) { DeployedService.generate! }
+        @host.instances.each do |instance| 
           @host.puppet_manifest.should match(Regexp.new(instance.puppet_manifest))
         end
       end      
@@ -201,12 +214,12 @@ describe Host do
       lambda { @host.safe_to_delete?(:foo) }.should raise_error(ArgumentError)      
     end
     
-    it 'should return false if the host has deployments' do
-      @host.deployments.generate!
+    it 'should return false if the host has deployed services' do
+      @host.deployed_services.generate!
       @host.safe_to_delete?.should be_false
     end
     
-    it 'should return true if the host has no deployements' do
+    it 'should return true if the host has no deployed services' do
       @host.safe_to_delete?.should be_true
     end
   end

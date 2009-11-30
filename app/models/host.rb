@@ -1,6 +1,5 @@
 class Host < ActiveRecord::Base
-  has_many :deployments
-  has_many :instances, :through => :deployments
+  has_many :deployed_services
 
   validates_presence_of :name
   validates_uniqueness_of :name
@@ -8,13 +7,25 @@ class Host < ActiveRecord::Base
   default_scope :order => :name
   
   before_destroy :safe_to_delete?
+
+  def deployments
+    deployed_services.collect(&:deployment).uniq
+  end
   
+  def deployables
+    deployed_services.collect(&:deployable).uniq
+  end
+  
+  def instances
+    deployed_services.collect(&:instance).uniq
+  end
+
   def apps
-    deployments.collect(&:app)
+    deployed_services.collect(&:app).uniq
   end
   
   def customers
-    deployments.collect(&:customer).flatten
+    deployed_services.collect(&:customer).uniq
   end
   
   def configuration
@@ -30,6 +41,6 @@ class Host < ActiveRecord::Base
   end
   
   def safe_to_delete?
-    deployments.blank?
+    deployed_services.blank?
   end
 end

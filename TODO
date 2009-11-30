@@ -1,9 +1,6 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
-  service: 
-    - double-check, yo
-    
   customer:
     - deployables
     - deployed_services
@@ -13,10 +10,6 @@
     - deployables
     - deployed_services
     
-  host: 
-    - fix whatever is broken
-    - look at what else might be needed
-
   deployable:
     - should have a text serialized snapshot field (Hash) which will capture the information about how to deploy the instance in question
     - snapshot should never be nil
