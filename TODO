@@ -3,12 +3,7 @@
 
  D deployments/new has a Reason field (mandatory) which explains why this deployment happened
  D deployments/new can accept a start time (default now), and end time (default nil); start time nor end time can be in the past; end time is > start time
-
- D deployable:
-   - should have a text serialized snapshot field (Hash) which will capture the information about how to deploy the instance in question
-   - snapshot should never be nil
-   - before_saving, snapshot the service + parameters data so that we can do a deployment
-   
+ D deployable - before_saving, snapshot the service + parameters data so that we can do a deployment
  D - deployment time range means that instance -> hosts may be time-dependent (or introduce the notion of current hosts, or hosts at a time)
  D - also hosts -> deployments is time-dependent, and hosts -> deployed_services is time-dependent
  D choose a host on which to deploy the instance (this is where Requirements, Pools, and Provisioning smarts come in later)

@@ -3,6 +3,12 @@ class Deployable < ActiveRecord::Base
   has_many :deployments
   
   validates_presence_of :instance
+
+  serialize :snapshot
+  
+  def snapshot
+    self[:snapshot] || {}
+  end
   
   def deployed_services
     deployments.collect(&:deployed_services).flatten.uniq

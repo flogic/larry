@@ -3,7 +3,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), *%w[.. spec_helper]))
 describe Deployable do
   describe 'attributes' do
     before :each do
-      @deployable = Deployable.new
+      @deployable = Deployable.spawn
     end
 
     it 'should have an instance id' do
@@ -13,6 +13,26 @@ describe Deployable do
     it 'should allow setting and retrieving the instance id' do
       @deployable.instance_id = 1
       @deployable.instance_id.should == 1
+    end
+    
+    it 'should have deployment snapshot data' do
+      @deployable.should respond_to(:snapshot)
+    end
+    
+    it 'should allow setting and retrieving snapshot data' do
+      @deployable.snapshot = { 'foo' => 'bar' }
+      @deployable.snapshot.should == { 'foo' => 'bar' }
+    end
+    
+    it 'should preserve snapshot data as a hash over saving' do
+      @deployable.snapshot = { 'foo' => 'bar' }
+      @deployable.save!
+      Deployable.find(@deployable.id).snapshot.should == { 'foo' => 'bar' }
+    end
+    
+    it 'should return an empty hash when snapshot data is empty' do
+      @deployable.snapshot = nil
+      @deployable.snapshot.should == {}
     end
   end
   
