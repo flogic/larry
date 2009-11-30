@@ -115,44 +115,59 @@ describe App do
     end
 
     it 'should allow assigning customer' do
-      @customer = Customer.generate!
-      @app.customer = @customer
-      @app.customer.should == @customer
+      customer = Customer.generate!
+      @app.customer = customer
+      @app.customer.should == customer
     end
     
-    it 'should have many deployable instances' do
+    it 'should have many instances' do
       @app.should respond_to(:instances)
     end
     
-    it 'should allow assigning deployable instances' do
-      @instance = Instance.generate!
-      @app.instances << @instance
-      @app.instances.should include(@instance)
+    it 'should allow assigning instances' do
+      instance = Instance.generate!
+      @app.instances << instance
+      @app.instances.should include(instance)
     end
     
     it 'should have many deployments' do
       @app.should respond_to(:deployments)
     end
     
-    it 'should allow return deployments from all instances' do
-      @deployments = Array.new(2) { Deployment.generate! }
-      @app.instances << @deployments.collect(&:instance)
-      @app.deployments.sort_by(&:id).should == @deployments.sort_by(&:id)
+    it "should allow return instances' deployments" do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @app.instances << deployed_services.collect(&:instance)
+      @app.deployments.sort_by(&:id).should == @app.instances.collect(&:deployments).flatten.sort_by(&:id)
     end
     
-    it 'should return an empty list when there are no deployments' do
-      Array.new(2) { Instance.generate!(:app => @app) }
-      @app.deployments.should == []
+    it 'should have many deployables' do
+      @app.should respond_to(:deployables)
+    end
+    
+    it "should allow return instances' deployables" do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @app.instances << deployed_services.collect(&:instance)
+      @app.deployables.sort_by(&:id).should == @app.instances.collect(&:deployables).flatten.sort_by(&:id)
+    end
+    
+    it 'should have many deployed services' do
+      @app.should respond_to(:deployments)
+    end
+    
+    it "should allow return instances' deployed services" do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @app.instances << deployed_services.collect(&:instance)
+      @app.deployed_services.sort_by(&:id).should == @app.instances.collect(&:deployed_services).flatten.sort_by(&:id)
     end
     
     it 'should have many hosts' do
       @app.should respond_to(:hosts)
     end
     
-    it 'should return instance hosts' do
+    it "should return instances' hosts" do
       deployed_services = Array.new(2) { DeployedService.generate! }
       @app.instances << deployed_services.collect(&:instance)
-      @app.hosts.sort_by(&:id).should == deployed_services.collect(&:host).sort_by(&:id)
+      @app.hosts.sort_by(&:id).should == @app.instances.collect(&:hosts).flatten.sort_by(&:id)
     end
     
     it 'should have services' do

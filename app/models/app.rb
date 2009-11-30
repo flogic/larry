@@ -16,16 +16,24 @@ class App < ActiveRecord::Base
     self[:parameters] || {}
   end
   
+  def services
+    instances.collect(&:services).flatten.uniq
+  end
+  
+  def deployables
+    instances.collect(&:deployables).flatten.uniq
+  end
+  
   def deployments
-    instances.collect(&:deployments).flatten.compact
+    instances.collect(&:deployments).flatten.uniq
+  end
+  
+  def deployed_services
+    instances.collect(&:deployed_services).flatten.uniq
   end
   
   def hosts
-    instances.collect(&:hosts).flatten
-  end
-  
-  def services
-    instances.collect(&:services).flatten
+    instances.collect(&:hosts).flatten.uniq
   end
   
   def safe_to_delete?
