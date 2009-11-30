@@ -45,4 +45,11 @@ class Deployment < ActiveRecord::Base
     return nil unless deployable
     deployable.services
   end
+  
+  def active?
+    return false unless start_time
+    return false if start_time > Time.now
+    return false if end_time and end_time <= Time.now
+    true
+  end
 end

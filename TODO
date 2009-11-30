@@ -2,7 +2,6 @@
 ["P" -> provisioning milestone]
 
  - Deployment / Deployable model:   
-   D Deployment#active?(time = Time.now()) true when the deployment time range is active
    D Host#deployed_services, #deployments, #deployables, #instances, #apps, #customers, #services should all be based upon *current* deployments
    D { Customer, App, Instance, Deployable }#{ deployments, deployed_services, hosts } - should be based on *current* deployments
    D we can add:

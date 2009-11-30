@@ -192,4 +192,81 @@ describe Deployment do
       @deployment.services.should == @deployment.deployable.services
     end
   end
+  
+  it 'should be able to determine if it is currently active' do
+    Deployment.new.should respond_to(:active?)
+  end
+  
+  describe 'when determining if it is currently active' do
+    before :each do
+      @deployment = Deployment.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @deployment.active? }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @deployment.active?(:foo) }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should not be active if the start time is not set' do
+      @deployment.start_time = nil
+      @deployment.should_not be_active
+    end
+    
+    it 'should not be active if the start time is in the future' do
+      @deployment.start_time = 1.day.from_now
+      @deployment.should_not be_active
+    end
+    
+    it 'should not be active if the end time is in the past' do
+      @deployment.end_time = 1.day.ago
+      @deployment.should_not be_active
+    end
+    
+    it 'should not be active if the start time is in the past and the end time is now' do
+      t = Time.now
+      Time.stubs(:now).returns(t)
+      @deployment.start_time = 1.day.ago
+      @deployment.end_time = t
+      @deployment.should_not be_active
+    end
+    
+    it 'should not be active if the start time is now and the end time is now' do
+      t = Time.now
+      Time.stubs(:now).returns(t)
+      @deployment.start_time = t
+      @deployment.end_time = t
+      @deployment.should_not be_active      
+    end
+    
+    it 'should be active if the start time is in the past and the end time is in the future' do
+      @deployment.start_time = 1.day.ago
+      @deployment.end_time = 1.day.from_now
+      @deployment.should be_active      
+    end
+    
+    it 'should be active if the start time is in the past and the end time is nil' do
+      @deployment.start_time = 1.day.ago
+      @deployment.end_time = nil
+      @deployment.should be_active            
+    end
+    
+    it 'should be active if the start time is now and the end time is in the future' do
+      t = Time.now
+      Time.stubs(:now).returns(t)
+      @deployment.start_time = t
+      @deployment.end_time = 1.day.from_now
+      @deployment.should be_active                  
+    end
+    
+    it 'should be active if the start time is now and the end time is nil' do
+      t = Time.now
+      Time.stubs(:now).returns(t)
+      @deployment.start_time = t
+      @deployment.end_time = nil
+      @deployment.should be_active                        
+    end
+  end
 end
