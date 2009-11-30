@@ -1,6 +1,7 @@
 class Host < ActiveRecord::Base
-  has_many :deployed_services
-
+  has_many :all_deployed_services, :class_name => 'DeployedService', :foreign_key => 'host_id'
+  has_many :all_deployments, :class_name => 'Deployment', :through => :all_deployed_services, :source => 'deployment'
+  
   validates_presence_of :name
   validates_uniqueness_of :name
   
@@ -9,23 +10,27 @@ class Host < ActiveRecord::Base
   before_destroy :safe_to_delete?
 
   def deployments
-    deployed_services.collect(&:deployment).uniq
+    all_deployments.active
   end
   
+  def deployed_services
+    deployments.collect(&:deployed_services).flatten
+  end
+
   def deployables
-    deployed_services.collect(&:deployable).uniq
+    deployments.collect(&:deployable).uniq
   end
   
   def instances
-    deployed_services.collect(&:instance).uniq
+    deployments.collect(&:instance).uniq
   end
 
   def apps
-    deployed_services.collect(&:app).uniq
+    deployments.collect(&:app).uniq
   end
   
   def customers
-    deployed_services.collect(&:customer).uniq
+    deployments.collect(&:customer).uniq
   end
   
   def configuration

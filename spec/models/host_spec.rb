@@ -60,7 +60,7 @@ describe Host do
     end
         
     it 'should allow setting and retrieving deployed services' do
-      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      deployed_services = Array.new(2) { DeployedService.generate!(:host => @host) }
       @host.deployed_services.sort_by(&:id).should == deployed_services.sort_by(&:id)
     end
     
@@ -69,44 +69,74 @@ describe Host do
     end
    
     it "should return deployed services' deployments" do
-      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      deployed_services = Array.new(2) { DeployedService.generate!(:host => @host) }
       @host.deployments.sort_by(&:id).should == deployed_services.collect(&:deployment).sort_by(&:id)
     end
-        
+            
+    it "should not return deployments which are not active" do
+      deployed_service = DeployedService.generate!(:host => @host)
+      deployed_service.deployment.update_attribute(:start_time, 1.day.from_now)
+      @host.deployments.should == []
+    end
+
     it 'should have many deployables' do
       @host.should respond_to(:deployments)
     end
     
     it "should return deployed services' deployables" do
-      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      deployed_services = Array.new(2) { DeployedService.generate!(:host => @host) }
       @host.deployables.sort_by(&:id).should == deployed_services.collect(&:deployable).sort_by(&:id)      
     end
     
+    it "should not return deployed services' deployables for deployments which are not active" do
+      deployed_service = DeployedService.generate!(:host => @host)
+      deployed_service.deployment.update_attribute(:start_time, 1.day.from_now)
+      @host.deployables.should == []
+    end
+
     it 'should have many instances' do
       @host.should respond_to(:instances)
     end
     
     it "should return deployed services' instances" do
-      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      deployed_services = Array.new(2) { DeployedService.generate!(:host => @host) }
       @host.instances.sort_by(&:id).should == deployed_services.collect(&:instance).sort_by(&:id)
     end
-    
+
+    it "should not return deployed services' instances for deployments which are not active" do
+      deployed_service = DeployedService.generate!(:host => @host)
+      deployed_service.deployment.update_attribute(:start_time, 1.day.from_now)
+      @host.instances.should == []
+    end
+
     it 'should have many apps' do
       @host.should respond_to(:apps)
     end
     
     it "should return deployed services' apps" do
-      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      deployed_services = Array.new(2) { DeployedService.generate!(:host => @host) }
       @host.apps.sort_by(&:id).should == deployed_services.collect(&:app).sort_by(&:id)
     end
-    
+        
+    it "should not return deployed services' apps for deployments which are not active" do
+      deployed_service = DeployedService.generate!(:host => @host)
+      deployed_service.deployment.update_attribute(:start_time, 1.day.from_now)
+      @host.apps.should == []
+    end
+
     it 'should have many customers' do
       @host.should respond_to(:customers)      
     end
     
     it "should return deployed services' customers" do
-      @host.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      deployed_services = Array.new(2) { DeployedService.generate!(:host => @host) }
       @host.customers.sort_by(&:id).should == deployed_services.collect(&:customer).sort_by(&:id)
+    end
+    
+    it "should not return deployed services' customers for deployments which are not active" do
+      deployed_service = DeployedService.generate!(:host => @host)
+      deployed_service.deployment.update_attribute(:start_time, 1.day.from_now)
+      @host.customers.should == []
     end
   end
   
@@ -215,7 +245,7 @@ describe Host do
     end
     
     it 'should return false if the host has deployed services' do
-      @host.deployed_services.generate!
+      DeployedService.generate!(:host => @host)
       @host.safe_to_delete?.should be_false
     end
     

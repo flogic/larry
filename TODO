@@ -1,13 +1,14 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
- - Deployment / Deployable model:   
-   D Host#deployed_services, #deployments, #deployables, #instances, #apps, #customers, #services should all be based upon *current* deployments
+ - Deployment / Deployable model:
+
    D { Customer, App, Instance, Deployable }#{ deployments, deployed_services, hosts } - should be based on *current* deployments
    D we can add:
      - { Customer, App, Instance, Deployable }#historical_{deployments, deployed_services, hosts } which takes a time range (:start, :end)
      - { Host }#historical_{ deployed_services, deployments, deployables, instances, apps, customers} similarly takes a time range
-   D Deployment creation with nil Deployable also creates a new Deployable, and associates with this Deployment
+
+   D Deployment creation with nil Deployable also creates a new Deployable, and associates with this Deployment (can this be done at the model level?  it requires knowing an instance, which is probably not available )
    
  - new deployment interface
    D show instance information on deployments/new form
