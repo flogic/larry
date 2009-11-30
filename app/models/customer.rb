@@ -30,10 +30,6 @@ class Customer < ActiveRecord::Base
     instances.collect(&:services).flatten
   end
   
-  def required_services
-    instances.collect(&:required_services).flatten
-  end
-  
   def safe_to_delete?
     apps.blank?
   end

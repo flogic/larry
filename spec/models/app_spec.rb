@@ -169,33 +169,6 @@ describe App do
       @app.instances << @instances
       @app.services.sort_by(&:id).should == @instances.collect(&:services).flatten.sort_by(&:id)
     end
-    
-    it 'should have required services' do
-      @instances = Array.new(2) { Instance.generate! }
-      @app.instances << @instances
-      @app.services.sort_by(&:id).should == @instances.collect(&:services).flatten.sort_by(&:id)      
-    end
-    
-    it 'should return the required services from all its instances' do
-      @service     = Service.generate!(:name => 'service')
-      @parent      = Service.generate!(:name => 'parent')
-      @grandparent = Service.generate!(:name => 'grandparent')
-      @child       = Service.generate!(:name => 'child')
-      @grandchild  = Service.generate!(:name => 'grandchild')
-      @service.dependents << @parent
-      @parent.dependents  << @grandparent
-      @service.depends_on << @child
-      @child.depends_on   << @grandchild
-      
-      @instance1 = Instance.generate!
-      @instance1.services << @service
-      @instance2 = Instance.generate!
-      @instance2.services << @child
-      
-      @app.instances << [ @instance1, @instance2 ]
-      
-      @app.required_services.sort_by(&:id).should == [ @service, @child, @grandchild ].sort_by(&:id)
-    end
   end
   
   it 'should have a means to determine if it is safe to delete this app' do

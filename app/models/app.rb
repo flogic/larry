@@ -28,10 +28,6 @@ class App < ActiveRecord::Base
     instances.collect(&:services).flatten
   end
   
-  def required_services
-    instances.collect(&:required_services).flatten.uniq
-  end
-  
   def safe_to_delete?
     instances.blank?
   end
