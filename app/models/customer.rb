@@ -15,19 +15,27 @@ class Customer < ActiveRecord::Base
   end
   
   def instances
-    apps.collect(&:instances).flatten
+    apps.collect(&:instances).flatten.uniq
+  end
+  
+  def deployables
+    apps.collect(&:deployables).flatten.uniq
   end
   
   def deployments
-    apps.collect(&:deployments).flatten
+    apps.collect(&:deployments).flatten.uniq
+  end
+  
+  def deployed_services
+    apps.collect(&:deployed_services).flatten.uniq
   end
   
   def hosts
-    apps.collect(&:hosts).flatten
+    apps.collect(&:hosts).flatten.uniq
   end
   
   def services
-    instances.collect(&:services).flatten
+    apps.collect(&:services).flatten.uniq
   end
   
   def safe_to_delete?

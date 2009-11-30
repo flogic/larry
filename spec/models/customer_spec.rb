@@ -71,54 +71,83 @@ describe Customer do
   
   describe 'relationships' do
     before :each do
-      @customer = Customer.new
+      @customer = Customer.generate!
     end
     
     it 'should have many apps' do
       @customer.should respond_to(:apps)
     end
 
-    it 'should allow assigning apps' do
-      @customer = Customer.generate!
-      @customer.apps.generate!
-      @customer.apps.should_not be_empty
+    it 'should allow setting and retrieving apps' do
+      @customer.apps = apps = Array.new(2) { App.generate! }
+      @customer.apps.sort_by(&:id).should == apps.sort_by(&:id)
     end
     
     it 'should have many hosts' do
       @customer.should respond_to(:hosts)
     end
 
-    it 'should include hosts from all customer apps' do
-      @deployments = Array.new(2) { Deployment.generate! }
-      @customer.apps << @deployments.collect(&:app)
-      @customer.hosts.sort_by(&:id).should == @deployments.collect(&:hosts).flatten.sort_by(&:id)
+    it "should return apps' hosts" do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @customer.apps << deployed_services.collect(&:app)
+      @customer.hosts.sort_by(&:id).should == @customer.apps.collect(&:hosts).flatten.sort_by(&:id)
     end
     
     it 'should have many instances' do
       @customer.should respond_to(:instances)
     end
     
-    it 'should include instances for all customers apps' do
-      @instances = Array.new(2) { Instance.generate! }
-      @customer.apps << @instances.collect(&:app)
-      @customer.instances.sort_by(&:id).should == @instances.sort_by(&:id)      
+    it "should return apps' instances" do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @customer.apps << deployed_services.collect(&:app)
+      @customer.instances.sort_by(&:id).should == @customer.apps.collect(&:instances).flatten.sort_by(&:id)
     end
     
+    it "should return apps' deployables" do
+      @customer.should respond_to(:deployables)
+    end
+    
+    it 'should include deployables for all customer apps' do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @customer.apps << deployed_services.collect(&:app)
+      @customer.deployables.sort_by(&:id).should == @customer.apps.collect(&:deployables).flatten.sort_by(&:id)
+    end
+
     it 'should have many deployments' do
       @customer.should respond_to(:deployments)
     end
     
-    it 'should include deployments for all customer apps' do
-      @deployments = Array.new(2) { Deployment.generate! }
-      @customer.apps << @deployments.collect(&:app)
-      @customer.deployments.sort_by(&:id).should == @deployments.sort_by(&:id)      
+    it "should return apps' deployments" do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @customer.apps << deployed_services.collect(&:app)
+      @customer.deployments.sort_by(&:id).should == @customer.apps.collect(&:deployments).flatten.sort_by(&:id)
     end
     
+    it 'should have many deployed services' do
+      @customer.should respond_to(:deployments)
+    end
+    
+    it "should return apps' deployed services" do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @customer.apps << deployed_services.collect(&:app)
+      @customer.deployed_services.sort_by(&:id).should == @customer.apps.collect(&:deployed_services).flatten.sort_by(&:id)
+    end
+
+    it 'should have many hosts' do
+      @customer.should respond_to(:deployments)
+    end
+    
+    it "should return apps' hosts" do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @customer.apps << deployed_services.collect(&:app)
+      @customer.hosts.sort_by(&:id).should == @customer.apps.collect(&:hosts).flatten.sort_by(&:id)
+    end
+
     it 'should have many services' do
       @customer.should respond_to(:services)
     end
     
-    it 'should return services for all customer apps' do
+    it "should return apps' services" do
       @instances = Array.new(2) { Instance.generate! }
       @customer.apps << @instances.collect(&:app)
       @customer.services.sort_by(&:id).should == @instances.collect(&:services).flatten.sort_by(&:id)
