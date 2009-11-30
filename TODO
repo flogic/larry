@@ -1,10 +1,7 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
- - Deployment / Deployable model:
-   D Deployment#start_time, #end_time
-   D Deployment#start_time cannot be nil, cannot be < Time.now, defaults to Time.now
-   D Deployment#end_time cannot be < start_time, cannot be < Time.now, defaults to nil
+ - Deployment / Deployable model:   
    D Deployment#active?(time = Time.now()) true when the deployment time range is active
    D Host#deployed_services, #deployments, #deployables, #instances, #apps, #customers, #services should all be based upon *current* deployments
    D { Customer, App, Instance, Deployable }#{ deployments, deployed_services, hosts } - should be based on *current* deployments

@@ -23,6 +23,24 @@ describe Deployment do
       @deployment.reason = 'initial deployment'
       @deployment.reason.should == 'initial deployment'
     end
+    
+    it 'should have a start time' do
+      @deployment.should respond_to(:start_time)
+    end
+    
+    it 'should allow setting and retrieving the start time' do
+      @deployment.start_time = time = Time.now
+      @deployment.start_time.should == time
+    end
+    
+    it 'should have an end time' do
+      @deployment.should respond_to(:end_time)
+    end
+    
+    it 'should allow setting and retrieving the end time' do
+      @deployment.end_time = time = 1.day.from_now
+      @deployment.end_time.should == time
+    end
   end
   
   describe 'validations' do
@@ -58,6 +76,50 @@ describe Deployment do
       @deployment.reason = 'test deployment'
       @deployment.valid?
       @deployment.errors.should_not be_invalid(:reason)
+    end
+    
+    it 'should not allow start time to be nil' do
+      @deployment.start_time = nil
+      @deployment.valid?
+      @deployment.errors.should be_invalid(:start_time)
+    end
+    
+    it 'should not allow start time to be in the past' do
+      @deployment.start_time = 2.minutes.ago
+      @deployment.valid?
+      @deployment.errors.should be_invalid(:start_time)
+    end
+    
+    it 'should not allow end time to be in the past' do
+      @deployment.end_time = 2.minutes.ago
+      @deployment.valid?
+      @deployment.errors.should be_invalid(:end_time)      
+    end
+    
+    it 'should not allow end time to be before start time' do
+      @deployment.end_time = 10.minutes.from_now
+      @deployment.start_time = 15.minutes.from_now
+      @deployment.valid?
+      @deployment.errors.should be_invalid(:end_time)            
+    end
+    
+    it 'should be valid with a start time in the future' do
+      @deployment.start_time = 5.minutes.from_now
+      @deployment.valid?
+      @deployment.errors.should_not be_invalid(:start_time)            
+    end
+  
+    it 'should be valid with a nil end time' do
+      @deployment.end_time = nil
+      @deployment.valid?
+      @deployment.errors.should_not be_invalid(:end_time)            
+    end
+    
+    it 'should be valid with an end time in the future and later than the start time' do
+      @deployment.start_time = 10.minutes.from_now
+      @deployment.end_time = nil
+      @deployment.valid?
+      @deployment.errors.should_not be_invalid(:end_time)
     end
   end
   
