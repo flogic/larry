@@ -149,15 +149,10 @@ describe App do
       @app.should respond_to(:hosts)
     end
     
-    it 'should include hosts for all deployed instances' do
-      @deployments = Array.new(2) { Deployment.generate! }
-      @app.instances << @deployments.collect(&:instance)
-      @app.hosts.sort_by(&:id).should == @deployments.collect(&:host).flatten.sort_by(&:id)
-    end
-    
-    it 'should return an empty hosts list when there are no deployments' do
-      Array.new(2) { Instance.generate!(:app => @app) }
-      @app.hosts.should == []
+    it 'should return instance hosts' do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @app.instances << deployed_services.collect(&:instance)
+      @app.hosts.sort_by(&:id).should == deployed_services.collect(&:host).sort_by(&:id)
     end
     
     it 'should have services' do

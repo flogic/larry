@@ -17,11 +17,11 @@ class App < ActiveRecord::Base
   end
   
   def deployments
-    instances.collect(&:deployment).compact
+    instances.collect(&:deployments).flatten.compact
   end
   
   def hosts
-    deployments.collect(&:host)
+    instances.collect(&:hosts).flatten
   end
   
   def services
