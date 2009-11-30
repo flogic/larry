@@ -249,7 +249,14 @@ describe Host do
       @host.safe_to_delete?.should be_false
     end
     
-    it 'should return true if the host has no deployed services' do
+    it 'should return false if the host has deployed services from past inactive deployments' do
+      deployed_service = DeployedService.generate!(:host => @host)
+      deployed_service.deployment.update_attribute(:start_time, 5.days.ago)
+      deployed_service.deployment.update_attribute(:end_time, 4.days.ago)
+      @host.safe_to_delete?.should be_false
+    end
+    
+    it 'should return true if the host has never had any deployed services' do
       @host.safe_to_delete?.should be_true
     end
   end

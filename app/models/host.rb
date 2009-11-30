@@ -46,6 +46,6 @@ class Host < ActiveRecord::Base
   end
   
   def safe_to_delete?
-    deployed_services.blank?
+    all_deployed_services.blank?
   end
 end
