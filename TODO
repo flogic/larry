@@ -1,23 +1,35 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
- D deployments/new has a Reason field (mandatory) which explains why this deployment happened
- D deployments/new can accept a start time (default now), and end time (default nil); start time nor end time can be in the past; end time is > start time
+ - Deployment / Deployable model:
+   D Deployment#start_time, #end_time
+   D Deployment#start_time cannot be nil, cannot be < Time.now, defaults to Time.now
+   D Deployment#end_time cannot be < start_time, cannot be < Time.now, defaults to nil
+   D Deployment#active?(time = Time.now()) true when the deployment time range is active
+   D Host#deployed_services, #deployments, #deployables, #instances, #apps, #customers, #services should all be based upon *current* deployments
+   D { Customer, App, Instance, Deployable }#{ deployments, deployed_services, hosts } - should be based on *current* deployments
+   D we can add:
+     - { Customer, App, Instance, Deployable }#historical_{deployments, deployed_services, hosts } which takes a time range (:start, :end)
+     - { Host }#historical_{ deployed_services, deployments, deployables, instances, apps, customers} similarly takes a time range
+   D Deployment creation with nil Deployable also creates a new Deployable, and associates with this Deployment
+   
+ - new deployment interface
+   D show instance information on deployments/new form
+   D deployments/new should have a Reason field (mandatory) which explains why this deployment happened
+   D deployments/new can accept a start time (default now), and end time (default nil)
+   D choose a host on which to deploy the instance (this is where Requirements, Pools, and Provisioning smarts come in later)
+   D show current deployments of this Instance on deployments/new page 
+   D show historical deployments of this Instance (including which Deployable version they used)
+   D deployments/new front-end should include an option to choose from old Deployables, otherwise we're creating a new Deployable
+   D deployments/new would only allow choosing old Deployables for this Instance
+ 
  D deployable - before_saving, snapshot the service + parameters data so that we can do a deployment
- D - deployment time range means that instance -> hosts may be time-dependent (or introduce the notion of current hosts, or hosts at a time)
- D - also hosts -> deployments is time-dependent, and hosts -> deployed_services is time-dependent
- D choose a host on which to deploy the instance (this is where Requirements, Pools, and Provisioning smarts come in later)
- D show current deployments of this Instance on deployments/new page 
- D show historical deployments of this Instance (including which Deployable version they used)
  D provide warning if the same host is chosen as a current Deployment that we'll be ending that deployment
- D Deployment creation with nil Deployable also creates a new Deployable, and associates with this Deployment
  D if there is already an active Deployment for this Instance on that Host,  we want to truncate its end time if there is overlap
- D deployed services are created which show how services got put on hosts (via deployments)
+ D deployed services are created which show how services got put on hosts (via deployments) 
  - Deployable stores service list, parameters, instance (meaning we're free from then on out to change services, instances, parameters, etc.)
  D Deployments can be edited so long as they are in the future, ditto deleted
  D Host manifest generation functionality needs to be updated so that it checks currently active Deployments for the host and uses them to generate manifests (active means start time <= now, and end_time > now)
- D deployments/new front-end should include an option to choose from old Deployables, otherwise we're creating a new Deployable
- D deployments/new would only allow choosing old Deployables for this Instance
  D Instance show view should show Deployables
  D Instance show view should show current deployments
  D Instance show view should show future deployments
@@ -62,14 +74,15 @@
 
  thoughts:
  
+
+ P should be able to specify that certain instances not reside on the same host
+ P should be able to specify that certain instances should reside on the same host
+ P should be able to specify that a service (or at least, an audit) should be on the same host as another (think log rotation, e.g.)
+ P may want to be able to specify that a services (or at least, an audit) should not be on the same host as another ... or maybe it's that audits have their own Requirements for deployment?
  - we can mark various things (instance, app, customer, host, ?) as "dirty" on changes, and save them up for a deployment, so that we can know if our planned changes have been put into action, know when we need to make a deployment, can batch up changes, and keep the process of creating deployments separate from the data which is used to do current production deployments
- - should be able to specify that certain instances not reside on the same host
- - should be able to specify that certain instances should reside on the same host
- - should be able to specify that a service (or at least, an audit) should be on the same host as another (think log rotation, e.g.)
- - may want to be able to specify that a services (or at least, an audit) should not be on the same host as another ... or maybe it's that audits have their own Requirements for deployment?
- - could have indexes highligh strange situations:  customers with undeployed apps, hosts with no deployments, apps which are not deployed, etc.
- - we can snapshot an instance (i.e., use it as a template); if we make a new instance we basically make the instance, set snapshot_id (or whatever) to the template instance, then delegate things to the template; we make the template instance's parameter values be defaults (behind customer, app, instance).
- - presumably we could also snapshot an app; we could either go the same route (have a template pointer to the template app), or we could just instantiate new instances using the old app's instances as template.
+ - could have indexes highlight strange situations:  customers with undeployed apps, hosts with no deployments, apps which are not deployed, etc.
+ - we can use an instance as a template; if we make a new instance we basically make the instance, set template_id (or whatever) to the template instance, then delegate things to the template; we make the template instance's parameter values be defaults (behind customer, app, instance).
+ - presumably we could also template an app; we could either go the same route (have a template pointer to the template app), or we could just instantiate new instances using the old app's instances as template.
  - general facility to associate remote resources with a concept (maybe w/ a parser, and we can generate an RSS feed)
    -> add linkages to nagios details for a host, service, etc.
    -> add linkages from customers to invoicing, e.g.
@@ -77,8 +90,6 @@
    -> is it possible to link apps / customer to trouble ticket pages?
    -> what about linking to PT, e.g.
  - favicon.ico, heh
- 
- - since deployment records are captured we can do rollbacks
  - since deployment records are captured we can run a tool like puppet consistently over them without fear of introducing changes
  - since deployment manifests can only change when a deployment is created or on the time-interval boundaries of the deployments, we don't have to continuously poll for changes (i.e., we could schedule and/or notify instead).
 

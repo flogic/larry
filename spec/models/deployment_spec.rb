@@ -14,6 +14,15 @@ describe Deployment do
       @deployment.deployable_id = 1
       @deployment.deployable_id.should == 1
     end
+    
+    it 'should have a reason' do
+      @deployment.should respond_to(:reason)
+    end
+    
+    it 'should allow setting and retrieving the reason' do
+      @deployment.reason = 'initial deployment'
+      @deployment.reason.should == 'initial deployment'
+    end
   end
   
   describe 'validations' do
@@ -31,6 +40,24 @@ describe Deployment do
       @deployment.deployable = Deployable.generate!
       @deployment.valid?
       @deployment.errors.should_not be_invalid(:deployable)
+    end
+    
+    it 'should not be valid without a reason' do
+      @deployment.reason = nil
+      @deployment.valid?
+      @deployment.errors.should be_invalid(:reason)
+    end
+
+    it 'should not be valid without a non-blank reason' do
+      @deployment.reason = ''
+      @deployment.valid?
+      @deployment.errors.should be_invalid(:reason)
+    end
+    
+    it 'should be valid with a reason' do
+      @deployment.reason = 'test deployment'
+      @deployment.valid?
+      @deployment.errors.should_not be_invalid(:reason)
     end
   end
   
