@@ -10,17 +10,9 @@ class Deployment < ActiveRecord::Base
   validate :end_time_must_not_be_in_past
   validate :non_nil_end_time_must_follow_start_time
   
-  def start_time_must_not_be_in_past
-    errors.add(:start_time, "must not be in the past") if start_time and (Time.now - start_time > 60)
-  end
-  
-  def end_time_must_not_be_in_past
-    errors.add(:end_time, "must not be in the past") if end_time and (Time.now - end_time > 60)
-  end
-  
-  def non_nil_end_time_must_follow_start_time
-    errors.add(:end_time, "must come after start time") if end_time and start_time and (end_time < start_time)
-  end
+  named_scope :active, lambda {
+    { :conditions => [ 'start_time <= ? and (end_time is null or end_time > ?)', Time.now, Time.now ] }
+  }
   
   def hosts
     deployed_services.collect(&:host).uniq
@@ -51,5 +43,19 @@ class Deployment < ActiveRecord::Base
     return false if start_time > Time.now
     return false if end_time and end_time <= Time.now
     true
+  end
+  
+  protected
+  
+  def start_time_must_not_be_in_past
+    errors.add(:start_time, "must not be in the past") if start_time and (Time.now - start_time > 60)
+  end
+  
+  def end_time_must_not_be_in_past
+    errors.add(:end_time, "must not be in the past") if end_time and (Time.now - end_time > 60)
+  end
+  
+  def non_nil_end_time_must_follow_start_time
+    errors.add(:end_time, "must come after start time") if end_time and start_time and (end_time < start_time)
   end
 end

@@ -193,6 +193,58 @@ describe Deployment do
     end
   end
   
+  describe 'as a class' do
+    it 'should be able to find active deployments' do
+      Deployment.should respond_to(:active)
+    end
+    
+    describe 'when finding active deployments' do
+      before :each do
+        @past = Deployment.generate!
+        @past.update_attribute(:start_time,  2.days.ago)
+        @past.update_attribute(:end_time, 1.day.ago)
+        
+        @current_closed = Deployment.generate!(:start_time => Time.now, :end_time => 1.day.from_now)
+        @current_closed.update_attribute(:start_time, 2.days.ago)
+
+        @current_open = Deployment.generate!(:start_time => Time.now, :end_time => nil)
+        @current_open.update_attribute(:start_time, 2.days.ago)
+
+        @future = Deployment.generate!(:start_time => 1.day.from_now, :end_time => 2.days.from_now)
+      end
+      
+      it 'should work without arguments' do
+        lambda { Deployment.active }.should_not raise_error(ArgumentError)
+      end
+      
+      it 'should not complain about arguments' do
+        # this is a side-effect of this being a named scope, evidently
+        lambda { Deployment.active(:foo) }.should_not raise_error(ArgumentError)
+      end
+      
+      it 'should return the empty list if there are no deployments' do
+        Deployment.delete_all
+        Deployment.active.should == []
+      end
+      
+      it 'should not include past deployments in the returned list' do
+        Deployment.active.should_not include(@past)
+      end
+      
+      it 'should not include future deployments in the returned list' do
+        Deployment.active.should_not include(@future)
+      end
+      
+      it 'should include deployments with start times in the past and end times in the future' do
+        Deployment.active.should include(@current_closed)
+      end
+      
+      it 'should include deployments with start times in the past and nil end times' do
+        Deployment.active.should include(@current_open)
+      end
+    end
+  end
+  
   it 'should be able to determine if it is currently active' do
     Deployment.new.should respond_to(:active?)
   end
