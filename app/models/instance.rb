@@ -2,9 +2,7 @@ class Instance < ActiveRecord::Base
   include NormalizeNames
   
   belongs_to :app
-  has_one   :deployment
-  has_one   :host, :through => :deployment
-  
+  has_many   :deployables  
   has_many :requirements
   has_many :services, :through => :requirements
   
@@ -24,11 +22,19 @@ class Instance < ActiveRecord::Base
     return nil unless app
     app.customer
   end
-
-  def required_services
-    (services + services.collect(&:depends_on)).flatten
+  
+  def deployments
+    deployables.collect(&:deployments).flatten.uniq
   end
   
+  def deployed_services
+    deployables.collect(&:deployed_services).flatten.uniq
+  end
+  
+  def hosts
+    deployables.collect(&:hosts).flatten.uniq
+  end
+
   def configuration_name
     [customer.name, app.name, name].collect {|str| normalize_name(str) }.join('__')
   end
@@ -63,7 +69,7 @@ class Instance < ActiveRecord::Base
   end
   
   def safe_to_delete?
-    deployment.blank? and requirements.blank?
+    deployables.blank? and requirements.blank?
   end
   
   def can_deploy?

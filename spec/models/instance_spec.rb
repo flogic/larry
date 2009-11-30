@@ -24,15 +24,6 @@ describe Instance do
       @instance.description.should == 'Test Instance Description'
     end
      
-    it 'can be active' do
-      @instance.should respond_to(:is_active)
-    end
-    
-    it 'should allow setting and retrieving the active status' do
-      @instance.is_active = true
-      @instance.is_active.should be_true
-    end
-    
     it 'should have an app id' do
       @instance.should respond_to(:app_id)
     end
@@ -42,15 +33,6 @@ describe Instance do
       @instance.app_id.should == 1
     end
 
-    it 'should have a service id' do
-      @instance.should respond_to(:service_id)
-    end
-    
-    it 'should allow setting and retrieving the service id' do
-      @instance.service_id = 1
-      @instance.service_id.should == 1
-    end
-    
     it 'should have a set of parameters' do
       @instance.should respond_to(:parameters)
     end
@@ -145,44 +127,34 @@ describe Instance do
       @instance.customer.should == @instance.app.customer
     end
     
-    it 'should have a deployment' do
-      @instance.should respond_to(:deployment)
+    it 'should have deployables' do
+      @instance.should respond_to(:deployables)
     end
     
-    it 'should allow assigning deployment' do
-      @deployment = Deployment.generate!
-      @instance.deployment = @deployment
-      @instance.deployment.should == @deployment
+    it 'should allow setting and retrieving deployables' do
+      @deployables = Array.new(2) { Deployable.generate! }
+      @instance.deployables << @deployables
+      @instance.deployables.should == @deployables
     end
     
-    it 'should have a host' do
-      @instance.should respond_to(:host)
+    it 'should have deployments' do
+      @instance.should respond_to(:deployments)
     end
     
-    it 'should return the host for the deployment' do
-      @instance = Instance.generate!
-      @instance.host = @host = Host.generate!
-      @instance.host.should == @host 
+    it 'should return the deployments from our deployables' do
+      deployments = Array.new(2) { Deployment.generate! }
+      @instance.deployables << deployments.collect(&:deployable)
+      @instance.deployments.sort_by(&:id).should == deployments.sort_by(&:id)
     end
     
-    it 'should have a set of required services' do
-      @instance.should respond_to(:required_services)
+    it 'should have hosts' do
+      @instance.should respond_to(:hosts)
     end
     
-    it 'should return its services when computing required services' do
-      @service = Service.generate!
-      @child = Service.generate!
-      @service.depends_on << @child
-      @instance.services << @service
-      @instance.required_services.should include(@service)
-    end
-    
-    it 'should return all services that its service depends on when computing required services' do
-      @service = Service.generate!
-      @child = Service.generate!
-      @service.depends_on << @child
-      @instance.services << @service
-      @instance.required_services.should include(@child)
+    it 'should return the hosts from our deployments' do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @instance.deployables << deployed_services.collect(&:deployable)
+      @instance.hosts.sort_by(&:id).should == deployed_services.collect(&:host).sort_by(&:id)
     end
   end
   
@@ -367,8 +339,8 @@ describe Instance do
       lambda { @instance.safe_to_delete?(:foo) }.should raise_error(ArgumentError)      
     end
 
-    it 'should return false if the instance has no deployment' do
-      Deployment.generate!(:instance => @instance)
+    it 'should return false if the instance has deployables' do
+      Deployable.generate!(:instance => @instance)
       @instance.safe_to_delete?.should be_false
     end
     
@@ -377,7 +349,7 @@ describe Instance do
       @instance.safe_to_delete?.should be_false
     end
 
-    it 'should return true if the instance has no deployement nor service requirements' do
+    it 'should return true if the instance has no deployables nor service requirements' do
       @instance.safe_to_delete?.should be_true
     end
   end
