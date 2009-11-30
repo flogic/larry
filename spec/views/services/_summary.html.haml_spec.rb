@@ -44,18 +44,13 @@ describe '/services/summary' do
     instances = Array.new(4) { Instance.generate! }
     instances.each do |i| 
       i.services << @service
-      Deployment.generate!(:instance => i)
     end
     do_render
     response.should have_text(/\s+#{@service.apps.size}\b/)    
   end
   
   it 'should show a list of the hosts which have this service deployed' do
-    instances = Array.new(5) { Instance.generate! }
-    instances.each do |i| 
-      i.services << @service
-      Deployment.generate!(:instance => i)
-    end
+    @service.deployed_services << Array.new(2) { DeployedService.generate! }
     do_render
     @service.hosts.each do |host|
       response.should have_text(Regexp.new(host.name))

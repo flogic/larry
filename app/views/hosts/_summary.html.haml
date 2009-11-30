@@ -2,7 +2,7 @@
   = brief(host)
   - unless host.description.blank?
     .description= host.description
-  - unless host.apps.blank?
+  - unless host.instances.blank?
     %ul
       - host.instances.each do |instance|
         %li= summarize(instance)

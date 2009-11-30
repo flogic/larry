@@ -103,11 +103,7 @@ describe '/services/show' do
   end
   
   it 'should show the list of hosts on which the service is deployed' do
-    instances = Array.new(5) { Instance.generate! }
-    instances.each do |i| 
-      i.services << @service
-      Deployment.generate!(:instance => i)
-    end
+    @service.deployed_services << Array.new(3) { DeployedService.generate! }
     do_render
     @service.hosts.each do |host|
       response.should have_text(Regexp.new(host.name))

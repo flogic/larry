@@ -37,7 +37,7 @@ describe '/hosts/show' do
   end
   
   it 'should list the apps the host has deployed' do
-    deployments = Array.new(3) { Deployment.generate!(:host => @host) }
+    deployed_services = Array.new(3) { DeployedService.generate!(:host => @host) }
     do_render
     @host.apps.each do |app|
       response.should have_text(Regexp.new(app.name))

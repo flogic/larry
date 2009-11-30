@@ -1,16 +1,10 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
-  customer:
-    - deployables
-    - deployed_services
-    - also, instances.services -> apps.services
-    
   deployable:
     - should have a text serialized snapshot field (Hash) which will capture the information about how to deploy the instance in question
     - snapshot should never be nil
 
- D fix various instance/deployment view/controller problems
  D instance show view should include a "Deploy this" link for an instance which #can_deploy?  Goes to instances/#{id}/deployments/new
  D also, nuke :destinations code (model, specs, controllers, views, routes) as this will be replaced by something once we get to that point (BDUF, ftw)
  D deployments/new has a Reason field (mandatory) which explains why this deployment happened
@@ -96,7 +90,7 @@
  - if we associate some sort of service category with an instance (e.g., "Database hosting", "Production Web Server, Smegme", etc.) we can apply rates to service categories, use the deployment history for the Instance(s) as a log of billable service, and invoice straight from this motherfucker.  Not only that, but it could be billable at the service level.
 
 --- Questions
-
- Q: are there parameters for services that would be accepted but are not required (i.e., they should auto-fill in our instance parameter list, but not display as "required", and a can_deploy? call would ignore them)?
   
  Q: is the difference between a service that's required by many instances on a host (e.g., postgres) but which only really causes one installation to happen, vs. services that have the same name but differ in parameters and cause multiple things to happen (e.g., setting up a postgres *database* for an app) ... is this something larry needs to concern itself with, or do we just leverage the underlying management tool?  If we're using puppet, puppet can sort things out, but it's not clear that something like chef, e.g., can.
+
+ Q - when we talk about customers and apps for a service, we can be talking about two different things:  apps which are referencing this service currently via an Instance<->Requirement<->Service relationship (whether deployed or not); or apps referencing this service because there's a Service -> DeployedService -> Deployment -> Deployable -> Instance -> App relationship, even if it's no longer configured that way for new deployments (i.e., that's the "old way").  Which would we want to really show?

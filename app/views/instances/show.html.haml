@@ -11,10 +11,10 @@
     .description= @instance.description
 
 .hosts
-  - if @instance.host.blank?
+  - if @instance.hosts.blank?
     %h3 This instance is not currently deployed.
   - else
-    %h3== This instance is deployed on host: #{list(@instance.host)}
+    %h3== This instance is deployed on hosts: #{list(@instance.hosts)}
 
 .parameters
   - matching = @instance.matching_parameters

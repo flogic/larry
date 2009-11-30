@@ -55,9 +55,12 @@ describe '/instances/show' do
   end
 
   it 'should show any host on which the instance is deployed' do
-    Deployment.generate!(:instance => @instance)
+    deployed_service = DeployedService.generate!
+    @instance.deployables << deployed_service.deployable
     do_render
-    response.should have_text(Regexp.new(@instance.host.name))
+    @instance.hosts.each do |host|
+      response.should have_text(Regexp.new(host))
+    end
   end
   
   describe 'parameters' do

@@ -38,9 +38,8 @@ describe '/customers/show' do
   end
   
   it 'should list the hosts the customer has deployments on' do
-    app = @apps.first
-    instance = Instance.generate!(:app => app)
-    deployments = Array.new(3) { Deployment.generate!(:instance => instance) }
+    deployed_services = Array.new(2) { DeployedService.generate! }
+    @customer.apps << deployed_services.collect(&:app).flatten.uniq
     do_render
     @customer.hosts.each do |host|
       response.should have_text(Regexp.new(host.name))
