@@ -16,8 +16,12 @@ describe DeploymentsController, 'when integrating' do
   end
 
   describe 'new' do
+    before :each do
+      @instance = Instance.generate!
+    end
+
     def do_request
-      get :new
+      get :new, :instance_id => @instance.id.to_s
     end
 
     it_should_behave_like "a successful action"
@@ -28,11 +32,9 @@ describe DeploymentsController, 'when integrating' do
       end
       
       it 'should make the instance available to the view' do
-        pending('unfucking the instance...deployments modeling') do
-          instance = Instance.generate!
-          get :new, :instance_id => instance.id.to_s
-          assigns[:instance].should == instance
-        end
+        instance = Instance.generate!
+        get :new, :instance_id => instance.id.to_s
+        assigns[:instance].should == instance
       end
     end
   end
@@ -56,7 +58,8 @@ describe DeploymentsController, 'when integrating' do
   describe 'create' do
     before :each do
       @deployment = Deployment.spawn
-      @params = { :deployment => @deployment.attributes }
+      @instance = Instance.generate
+      @params = { :deployment => @deployment.attributes, :instance_id => @instance.id.to_s }
     end
 
     def do_request
@@ -71,11 +74,8 @@ describe DeploymentsController, 'when integrating' do
       end
       
       it 'should create a new deployment for the specified instance' do
-        pending('unfucking the instance...deployment modeling') do
-          instance = Instance.generate!
-          post :create, :deployment => @deployment.attributes, :instance_id => instance.id.to_s
-          instance.deployments.should include(assigns[:deployment])
-        end
+        do_request
+        Instance.find(@instance.id).deployments.should include(assigns[:deployment])
       end
     end
   end
@@ -103,5 +103,9 @@ describe DeploymentsController, 'when integrating' do
 end
 
 describe DeploymentsController, 'when not integrating' do
-  it_should_behave_like 'a RESTful controller'
+  it_should_behave_like 'a RESTful controller with an index action'
+  it_should_behave_like 'a RESTful controller with an edit action'
+  it_should_behave_like 'a RESTful controller with an update action'
+  it_should_behave_like 'a RESTful controller with a show action'
+  it_should_behave_like 'a RESTful controller with a destroy action'
 end
