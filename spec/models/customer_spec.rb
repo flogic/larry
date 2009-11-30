@@ -91,7 +91,7 @@ describe Customer do
     it 'should include hosts from all customer apps' do
       @deployments = Array.new(2) { Deployment.generate! }
       @customer.apps << @deployments.collect(&:app)
-      @customer.hosts.sort_by(&:id).should == @deployments.collect(&:host).sort_by(&:id)
+      @customer.hosts.sort_by(&:id).should == @deployments.collect(&:hosts).flatten.sort_by(&:id)
     end
     
     it 'should have many instances' do
