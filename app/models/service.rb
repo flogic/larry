@@ -4,6 +4,7 @@ class Service < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
+  has_many :deployed_services
   has_many :requirements  
   has_many :instances, :through => :requirements
   
@@ -41,12 +42,16 @@ class Service < ActiveRecord::Base
     instances.collect(&:app)
   end
   
+  def deployables
+    deployed_services.collect(&:deployable).uniq
+  end
+  
   def deployments
-    instances.collect(&:deployment)
+    deployed_services.collect(&:deployment).uniq
   end
   
   def hosts
-    instances.collect(&:host).compact
+    deployed_services.collect(&:host).uniq
   end
   
   def root?
