@@ -1,23 +1,30 @@
 class Deployment < ActiveRecord::Base
-  belongs_to :instance
-  belongs_to :host
+  belongs_to :deployable
+  has_many :deployed_services
   
-  validates_presence_of :instance
-  validates_presence_of :host
+  validates_presence_of :deployable
+  
+  def hosts
+    deployed_services.collect(&:host).uniq
+  end
+  
+  def instance
+    return nil unless deployable
+    deployable.instance
+  end
   
   def app
-    instance.app
+    return nil unless deployable
+    deployable.app
   end
   
   def customer
-    app.customer
+    return nil unless deployable
+    deployable.customer
   end
   
   def services
-    instance.services
-  end
-  
-  def required_services
-    instance.required_services
+    return nil unless deployable
+    deployable.services
   end
 end

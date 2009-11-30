@@ -6,31 +6,13 @@ describe Deployment do
       @deployment = Deployment.new
     end
     
-    it 'can be active' do
-      @deployment.should respond_to(:is_active)
+    it 'should have a deployable id' do
+      @deployment.should respond_to(:deployable_id)
     end
     
-    it 'should allow setting and retrieving the active status' do
-      @deployment.is_active = true
-      @deployment.is_active.should be_true
-    end
-    
-    it 'should have an instance id' do
-      @deployment.should respond_to(:instance_id)
-    end
-    
-    it 'should allow setting and retrieving the instance id' do
-      @deployment.instance_id = 1
-      @deployment.instance_id.should == 1
-    end
-
-    it 'should have a host id' do
-      @deployment.should respond_to(:host_id)
-    end
-    
-    it 'should allow setting and retrieving the host id' do
-      @deployment.host_id = 1
-      @deployment.host_id.should == 1
+    it 'should allow setting and retrieving the deployable id' do
+      @deployment.deployable_id = 1
+      @deployment.deployable_id.should == 1
     end
   end
   
@@ -39,28 +21,16 @@ describe Deployment do
       @deployment = Deployment.new
     end
     
-    it 'should not be valid without an instance' do
-      @deployment.instance = nil
+    it 'should not be valid without a deployable' do
+      @deployment.deployable = nil
       @deployment.valid?
-      @deployment.errors.should be_invalid(:instance)
+      @deployment.errors.should be_invalid(:deployable)
     end
 
-    it 'should be valid with an instance' do
-      @deployment.instance = Instance.generate!
+    it 'should be valid with a deployable' do
+      @deployment.deployable = Deployable.generate!
       @deployment.valid?
-      @deployment.errors.should_not be_invalid(:instance)
-    end
-
-    it 'should not be valid without a host' do
-      @deployment.host = nil
-      @deployment.valid?
-      @deployment.errors.should be_invalid(:host)
-    end
-
-    it 'should be valid with a host' do
-      @deployment.host = Host.generate!
-      @deployment.valid?
-      @deployment.errors.should_not be_invalid(:host)
+      @deployment.errors.should_not be_invalid(:deployable)
     end
   end
   
@@ -69,60 +39,68 @@ describe Deployment do
       @deployment = Deployment.new
     end
     
-    it 'should belong to an instance' do
+    it 'should have deployed services' do
+      @deployment.should respond_to(:deployed_services)
+    end
+    
+    it 'should allow setting and retrieving deployed services' do
+      @deployment.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      @deployment.deployed_services.sort_by(&:id).should == deployed_services.sort_by(&:id)
+    end
+    
+    it 'should belong to a deployable' do
+      @deployment.should respond_to(:deployable)      
+    end
+    
+    it 'should allow assigning the deployable' do
+      @deployable = Deployable.generate!
+      @deployment.deployable = @deployable
+      @deployment.deployable.should == @deployable
+    end
+
+    it 'should have hosts' do
+      @deployment.should respond_to(:hosts)
+    end
+
+    it 'should return the hosts from deployed services' do
+      @deployment.deployed_services << deployed_services = Array.new(2) { DeployedService.generate! }
+      @deployment.hosts.sort_by(&:id).should == deployed_services.collect(&:host).flatten.sort_by(&:id)
+    end
+
+    it 'should have an instance' do
       @deployment.should respond_to(:instance)
     end
 
-    it 'should allow assigning the instance' do
-      @instance = Instance.generate!
-      @deployment.instance = @instance
-      @deployment.instance.should == @instance
-    end
-    
-    it 'should belong to a host' do
-      @deployment.should respond_to(:host)
-    end
-
-    it 'should allow assigning the host' do
-      @host = Host.generate!
-      @deployment.host = @host
-      @deployment.host.should == @host
+    it "should return the deployment's instance" do
+      @deployment.deployable = Deployable.generate!
+      @deployment.instance.should == @deployment.deployable.instance
     end
     
     it 'should have an app' do
       @deployment.should respond_to(:app)
     end
     
-    it "should return the instance's app" do
+    it "should return the deployable's app" do
       @deployment = Deployment.generate!
-      @deployment.app.should == @deployment.instance.app
+      @deployment.app.should == @deployment.deployable.app
     end
     
     it 'should have a customer' do
       @deployment.should respond_to(:customer)
     end
     
-    it "should return the app's customer" do
+    it "should return the deployable's customer" do
       @deployment = Deployment.generate!
-      @deployment.customer.should == @deployment.app.customer
+      @deployment.customer.should == @deployment.deployable.customer
     end
     
     it 'should have services' do
       @deployment.should respond_to(:services)
     end
     
-    it "should return the instance's services when looking up the service" do
+    it "should return the deployable's services" do
       @deployment = Deployment.generate!
-      @deployment.services.should == @deployment.instance.services
-    end
-    
-    it 'should have required services' do
-      @deployment.should respond_to(:required_services)
-    end
-    
-    it 'should return the required services for the instance when looking up the service' do
-      @deployment = Deployment.generate!
-      @deployment.required_services.should == @deployment.instance.required_services
+      @deployment.services.should == @deployment.deployable.services
     end
   end
 end
