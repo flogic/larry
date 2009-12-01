@@ -3,26 +3,26 @@
 
  - Deployment / Deployable model:
 
-   D { Customer, App, Instance, Deployable }#{ deployments, deployed_services, hosts } - should be based on *current* deployments
-   D we can add:
-     - { Customer, App, Instance, Deployable }#historical_{deployments, deployed_services, hosts } which takes a time range (:start, :end)
-     - { Host }#historical_{ deployed_services, deployments, deployables, instances, apps, customers} similarly takes a time range
-
-   D Deployment creation with nil Deployable also creates a new Deployable, and associates with this Deployment (can this be done at the model level?  it requires knowing an instance, which is probably not available )
+   D { Customer, App, Instance, Deployable }#{ deployments, deployed_services, hosts } - should be based on *current* deployments - basically, throttle at Deployable
+   D add { Customer, App, Instance, Deployable }#all_{deployments, deployed_services, hosts } which return records regardless of whether they are current
+     
+  (... maybe we just make an instance/deploy controller method that tries to integrate the other two models; or we look at doing a presenter)
    
  - new deployment interface
-   D show instance information on deployments/new form
    D deployments/new should have a Reason field (mandatory) which explains why this deployment happened
    D deployments/new can accept a start time (default now), and end time (default nil)
    D choose a host on which to deploy the instance (this is where Requirements, Pools, and Provisioning smarts come in later)
+   D show instance information on deployments/new form
    D show current deployments of this Instance on deployments/new page 
    D show historical deployments of this Instance (including which Deployable version they used)
    D deployments/new front-end should include an option to choose from old Deployables, otherwise we're creating a new Deployable
    D deployments/new would only allow choosing old Deployables for this Instance
+
+ ---
  
  D deployable - before_saving, snapshot the service + parameters data so that we can do a deployment
- D provide warning if the same host is chosen as a current Deployment that we'll be ending that deployment
  D if there is already an active Deployment for this Instance on that Host,  we want to truncate its end time if there is overlap
+ D provide warning if the same host is chosen as a current Deployment that we'll be ending that deployment
  D deployed services are created which show how services got put on hosts (via deployments) 
  - Deployable stores service list, parameters, instance (meaning we're free from then on out to change services, instances, parameters, etc.)
  D Deployments can be edited so long as they are in the future, ditto deleted
@@ -40,10 +40,15 @@
  D at some point, deal with audits and audit deployments
  D so a rollback is an attempt to cancel a Deployment and make another Deployment current.  This seems like copying a Deployment from the past, setting the start time to now.
  
+ D be able to look at puppet manifest for a Host on the website
+ - be able to specify what processor manages a host (puppet, chef, shell scripts, none of the above, etc.)
+ 
+ - deployment config for the larry app; host this shit somewhere
+ 
  ---
 
  P create pool (name, description)
- P validate pool name presence, uniqueness
+  P validate pool name presence, uniqueness
  P hosts many:many with pool (:through model: PoolMembership)
  P pool menu links
  P pool index view

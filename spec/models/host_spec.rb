@@ -261,6 +261,59 @@ describe Host do
     end
   end
   
+  describe 'providing access to non-current data' do
+    before :each do
+      @host = Host.generate!
+      
+      @way_early = 5.days.ago
+      @early = 1.day.ago
+      @late = 1.day.from_now
+      @way_late = 5.days.from_now
+
+      @past = DeployedService.generate!(:host => @host)
+      @past.deployment.update_attribute(:start_time, @way_early)
+      @past.deployment.update_attribute(:end_time, @early)
+      
+      @current_open = DeployedService.generate!(:host => @host)
+      @current_open.deployment.update_attribute(:start_time, @early)
+      @current_open.deployment.update_attribute(:end_time, nil)
+      
+      @current_closed = DeployedService.generate!(:host => @host)
+      @current_closed.deployment.update_attribute(:start_time, @early)
+      @current_closed.deployment.update_attribute(:end_time, @late)
+      
+      @future = DeployedService.generate!(:host => @host)
+      @future.deployment.update_attribute(:start_time, @late)
+      @future.deployment.update_attribute(:end_time, @way_late)
+      
+      @all = [ @past, @current_closed, @current_open, @future ]
+    end
+    
+    it 'should be able to find all deployed services for the host' do
+      @host.all_deployed_services.sort_by(&:id).should == @all.sort_by(&:id)        
+    end
+    
+    it 'should be able to find all deployments for the host' do
+      @host.all_deployments.sort_by(&:id).should == @all.collect(&:deployment).sort_by(&:id)        
+    end
+    
+    it 'should be able to find all deployables for the host' do
+      @host.all_deployables.sort_by(&:id).should == @all.collect(&:deployable).sort_by(&:id)        
+    end
+    
+    it 'should be able to find all instances for the host' do
+      @host.all_instances.sort_by(&:id).should == @all.collect(&:instance).sort_by(&:id)        
+    end
+    
+    it 'should be able to find all apps for the host' do
+      @host.all_apps.sort_by(&:id).should == @all.collect(&:app).sort_by(&:id)        
+    end
+    
+    it 'should be able to find all customers for the host' do
+      @host.all_customers.sort_by(&:id).should == @all.collect(&:customer).sort_by(&:id)        
+    end
+  end
+  
   describe 'when deleting' do
     before :each do
       @host = Host.generate!
