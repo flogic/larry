@@ -27,12 +27,24 @@ class Instance < ActiveRecord::Base
     deployables.collect(&:deployments).flatten.uniq
   end
   
+  def all_deployments
+    deployables.collect(&:all_deployments).flatten.uniq
+  end
+  
   def deployed_services
     deployables.collect(&:deployed_services).flatten.uniq
   end
   
+  def all_deployed_services
+    deployables.collect(&:all_deployed_services).flatten.uniq
+  end
+  
   def hosts
     deployables.collect(&:hosts).flatten.uniq
+  end
+  
+  def all_hosts
+    deployables.collect(&:all_hosts).flatten.uniq
   end
 
   def configuration_name

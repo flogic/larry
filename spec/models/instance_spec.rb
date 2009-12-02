@@ -172,6 +172,35 @@ describe Instance do
     end
   end
   
+  describe 'providing access to non-current data' do
+    before :each do
+      @instance = Instance.new
+
+      @past = DeployedService.generate!
+      @past.deployment.update_attribute(:start_time, 2.days.ago)
+      @past.deployment.update_attribute(:end_time, 1.day.ago)
+      @current = DeployedService.generate!
+      @current.deployment.update_attribute(:start_time, 2.days.ago)
+      @future = DeployedService.generate!
+      @future.deployment.update_attribute(:start_time, 1.day.from_now)
+      @all = [@past, @current, @future]
+      @instance.deployables << @all.collect(&:deployable)
+    end
+    
+    it 'should be able to find all deployments' do
+      @instance.all_deployments.sort_by(&:id).should == @all.collect(&:deployment).sort_by(&:id)        
+    end
+    
+    it 'should be able to find all deployed services' do
+      @instance.all_deployed_services.sort_by(&:id).should == @all.sort_by(&:id)        
+    end
+    
+    it 'should be able to find all hosts' do
+      @instance.all_hosts.sort_by(&:id).should == @all.collect(&:host).sort_by(&:id)        
+    end
+  end
+
+  
   it 'should be able to generate an unique name for use in a configuration' do
     Instance.new.should respond_to(:configuration_name)
   end

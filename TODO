@@ -1,7 +1,9 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
-   D add { Customer, App, Instance }#all_{deployments, deployed_services, hosts } which return records regardless of whether they are current
+   D add { Customer, App }#all_{deployments, deployed_services, hosts } which return records regardless of whether they are current
+   
+  D make sure that the all_* methods for { Customer, App, Instance, Deployable, Host } return their instances in order of deployment start_date
      
   (for creation of deployment/deployable... maybe we just make an instance/deploy controller method that tries to integrate the other two models? or we look at doing a presenter?)
    
