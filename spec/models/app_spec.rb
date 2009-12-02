@@ -130,6 +130,16 @@ describe App do
       @app.instances.should include(instance)
     end
     
+    it 'should have many deployables' do
+      @app.should respond_to(:deployables)
+    end
+    
+    it "should allow return instances' deployables" do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @app.instances << deployed_services.collect(&:instance)
+      @app.deployables.sort_by(&:id).should == @app.instances.collect(&:deployables).flatten.sort_by(&:id)
+    end
+    
     it 'should have many deployments' do
       @app.should respond_to(:deployments)
     end
@@ -140,14 +150,11 @@ describe App do
       @app.deployments.sort_by(&:id).should == @app.instances.collect(&:deployments).flatten.sort_by(&:id)
     end
     
-    it 'should have many deployables' do
-      @app.should respond_to(:deployables)
-    end
-    
-    it "should allow return instances' deployables" do
+    it 'should only return current deployments' do
       deployed_services = Array.new(2) { DeployedService.generate! }
       @app.instances << deployed_services.collect(&:instance)
-      @app.deployables.sort_by(&:id).should == @app.instances.collect(&:deployables).flatten.sort_by(&:id)
+      deployed_services.first.deployment.update_attribute(:start_time, 1.day.from_now)
+      @app.deployments.should == [ deployed_services.last.deployment ]
     end
     
     it 'should have many deployed services' do
@@ -160,6 +167,13 @@ describe App do
       @app.deployed_services.sort_by(&:id).should == @app.instances.collect(&:deployed_services).flatten.sort_by(&:id)
     end
     
+    it 'should only return current deployed services' do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @app.instances << deployed_services.collect(&:instance)
+      deployed_services.first.deployment.update_attribute(:start_time, 1.day.from_now)
+      @app.deployed_services.should == [ deployed_services.last ]
+    end
+    
     it 'should have many hosts' do
       @app.should respond_to(:hosts)
     end
@@ -168,6 +182,13 @@ describe App do
       deployed_services = Array.new(2) { DeployedService.generate! }
       @app.instances << deployed_services.collect(&:instance)
       @app.hosts.sort_by(&:id).should == @app.instances.collect(&:hosts).flatten.sort_by(&:id)
+    end
+    
+    it 'should only return current hosts' do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @app.instances << deployed_services.collect(&:instance)
+      deployed_services.first.deployment.update_attribute(:start_time, 1.day.from_now)
+      @app.hosts.should == [ deployed_services.last.host ]
     end
     
     it 'should have services' do
