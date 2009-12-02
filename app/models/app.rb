@@ -27,13 +27,25 @@ class App < ActiveRecord::Base
   def deployments
     instances.collect(&:deployments).flatten.uniq
   end
+
+  def all_deployments
+    instances.collect(&:all_deployments).flatten.uniq    
+  end
   
   def deployed_services
     instances.collect(&:deployed_services).flatten.uniq
   end
   
+  def all_deployed_services
+    instances.collect(&:all_deployed_services).flatten.uniq
+  end
+  
   def hosts
     instances.collect(&:hosts).flatten.uniq
+  end
+  
+  def all_hosts
+    instances.collect(&:all_hosts).flatten.uniq
   end
   
   def safe_to_delete?

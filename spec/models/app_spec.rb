@@ -202,6 +202,34 @@ describe App do
     end
   end
   
+  describe 'providing access to non-current data' do
+    before :each do
+      @app = App.new
+
+      @past = DeployedService.generate!
+      @past.deployment.update_attribute(:start_time, 2.days.ago)
+      @past.deployment.update_attribute(:end_time, 1.day.ago)
+      @current = DeployedService.generate!
+      @current.deployment.update_attribute(:start_time, 2.days.ago)
+      @future = DeployedService.generate!
+      @future.deployment.update_attribute(:start_time, 1.day.from_now)
+      @all = [@past, @current, @future]
+      @app.instances << @all.collect(&:instance)
+    end
+    
+    it 'should be able to find all deployments' do
+      @app.all_deployments.sort_by(&:id).should == @all.collect(&:deployment).sort_by(&:id)        
+    end
+    
+    it 'should be able to find all deployed services' do
+      @app.all_deployed_services.sort_by(&:id).should == @all.sort_by(&:id)        
+    end
+    
+    it 'should be able to find all hosts' do
+      @app.all_hosts.sort_by(&:id).should == @all.collect(&:host).sort_by(&:id)        
+    end
+  end
+  
   it 'should have a means to determine if it is safe to delete this app' do
     App.new.should respond_to(:safe_to_delete?)
   end
