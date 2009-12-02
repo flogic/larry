@@ -130,4 +130,35 @@ describe Deployable do
       @deployable.services.should == @deployable.instance.services
     end
   end
+  
+  describe 'providing access to non-current data' do
+    before :each do
+      @deployable = Deployable.new
+
+      @past = DeployedService.generate!
+      @past.deployment.update_attribute(:start_time, 2.days.ago)
+      @past.deployment.update_attribute(:end_time, 1.day.ago)
+      @past.deployment.update_attribute(:deployable_id, @deployable.id)
+      @current = DeployedService.generate!
+      @current.deployment.update_attribute(:start_time, 2.days.ago)
+      @current.deployment.update_attribute(:deployable_id, @deployable.id)
+      @future = DeployedService.generate!
+      @future.deployment.update_attribute(:start_time, 1.day.from_now)
+      @future.deployment.update_attribute(:deployable_id, @deployable.id)
+      @all = [@past, @current, @future]
+      @deployable.all_deployments << @all.collect(&:deployment)
+    end
+    
+    it 'should be able to find all deployments' do
+      @deployable.all_deployments.sort_by(&:id).should == @all.collect(&:deployment).sort_by(&:id)        
+    end
+    
+    it 'should be able to find all deployed services' do
+      @deployable.all_deployed_services.sort_by(&:id).should == @all.sort_by(&:id)        
+    end
+    
+    it 'should be able to find all hosts' do
+      @deployable.all_hosts.sort_by(&:id).should == @all.collect(&:host).sort_by(&:id)        
+    end
+  end
 end

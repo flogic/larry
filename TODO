@@ -1,7 +1,7 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
-   D add { Customer, App, Instance, Deployable }#all_{deployments, deployed_services, hosts } which return records regardless of whether they are current
+   D add { Customer, App, Instance }#all_{deployments, deployed_services, hosts } which return records regardless of whether they are current
      
   (for creation of deployment/deployable... maybe we just make an instance/deploy controller method that tries to integrate the other two models? or we look at doing a presenter?)
    
@@ -14,8 +14,6 @@
    D show historical deployments of this Instance (including which Deployable version they used)
    D deployments/new front-end should include an option to choose from old Deployables, otherwise we're creating a new Deployable
    D deployments/new would only allow choosing old Deployables for this Instance
-
- ---
  
  D deployable - before_saving, snapshot the service + parameters data so that we can do a deployment
  D if there is already an active Deployment for this Instance on that Host,  we want to truncate its end time if there is overlap

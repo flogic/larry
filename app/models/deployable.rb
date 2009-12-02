@@ -18,8 +18,16 @@ class Deployable < ActiveRecord::Base
     deployments.collect(&:deployed_services).flatten.uniq
   end
   
+  def all_deployed_services
+    all_deployments.collect(&:deployed_services).flatten.uniq
+  end
+  
   def hosts
     deployments.collect(&:hosts).flatten.uniq
+  end
+  
+  def all_hosts
+    all_deployments.collect(&:hosts).flatten.uniq
   end
   
   def app
