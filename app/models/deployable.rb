@@ -1,6 +1,6 @@
 class Deployable < ActiveRecord::Base
   belongs_to :instance
-  has_many :deployments
+  has_many :all_deployments, :class_name => 'Deployment'
   
   validates_presence_of :instance
 
@@ -8,6 +8,10 @@ class Deployable < ActiveRecord::Base
   
   def snapshot
     self[:snapshot] || {}
+  end
+
+  def deployments
+    all_deployments.active
   end
   
   def deployed_services

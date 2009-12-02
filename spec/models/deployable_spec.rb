@@ -56,7 +56,7 @@ describe Deployable do
   
   describe 'relationships' do
     before :each do
-      @deployable = Deployable.new
+      @deployable = Deployable.generate!
     end
     
     it 'should belong to an instance' do
@@ -73,29 +73,34 @@ describe Deployable do
       @deployable.should respond_to(:deployments)
     end
     
-    it 'should allow setting and retrieving the deployments' do
-      @deployable.deployments << deployments = Array.new(2) { Deployment.generate! }
-      @deployable.deployments.should == deployments
+    it 'should only return current deployments' do
+      deployments = Array.new(2) { Deployment.generate!(:deployable => @deployable ) }
+      deployments.first.update_attribute(:start_time, 1.day.from_now)
+      @deployable.deployments.should == [ deployments.last ]
     end
     
     it 'should have deployed services' do
       @deployable.should respond_to(:deployed_services)
     end
     
-    it "should return the deployments' deployed services" do
-      deployed_services = Array.new(2) { DeployedService.generate! }
-      @deployable.deployments << deployed_services.collect(&:deployment)
-      @deployable.deployed_services.sort_by(&:id).should == deployed_services.sort_by(&:id)
+    it "should return the current deployments' deployed services" do
+      deployments = Array.new(2) { Deployment.generate!(:deployable => @deployable ) }
+      deployments.first.update_attribute(:start_time, 1.day.from_now)
+      non_current_deployed_services = Array.new(2) { DeployedService.generate!(:deployment => deployments.first)}
+      current_deployed_services = Array.new(2) { DeployedService.generate!(:deployment => deployments.last)}
+      @deployable.deployed_services.sort_by(&:id).should == current_deployed_services.sort_by(&:id)
     end
     
     it 'should have hosts' do
       @deployable.should respond_to(:hosts)
     end
     
-    it "should return the deployments' hosts" do
-      deployed_services = Array.new(2) { DeployedService.generate! }
-      @deployable.deployments << deployed_services.collect(&:deployment)
-      @deployable.hosts.sort_by(&:id).should == deployed_services.collect(&:host).sort_by(&:id)      
+    it "should return the current deployments' hosts" do
+      deployments = Array.new(2) { Deployment.generate!(:deployable => @deployable ) }
+      deployments.first.update_attribute(:start_time, 1.day.from_now)
+      non_current_deployed_services = Array.new(2) { DeployedService.generate!(:deployment => deployments.first)}
+      current_deployed_services = Array.new(2) { DeployedService.generate!(:deployment => deployments.last)}
+      @deployable.hosts.sort_by(&:id).should == current_deployed_services.collect(&:host).sort_by(&:id)
     end
     
     it 'should have an app' do
