@@ -26,12 +26,24 @@ class Customer < ActiveRecord::Base
     apps.collect(&:deployments).flatten.uniq
   end
   
+  def all_deployments
+    apps.collect(&:all_deployments).flatten.uniq
+  end
+  
   def deployed_services
     apps.collect(&:deployed_services).flatten.uniq
   end
-  
+    
+  def all_deployed_services
+    apps.collect(&:all_deployed_services).flatten.uniq
+  end
+
   def hosts
     apps.collect(&:hosts).flatten.uniq
+  end
+  
+  def all_hosts
+    apps.collect(&:all_hosts).flatten.uniq
   end
   
   def services
