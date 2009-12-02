@@ -3,11 +3,11 @@ class Instance < ActiveRecord::Base
   
   belongs_to :app
   has_many   :deployables  
-  has_many :requirements
-  has_many :services, :through => :requirements
+  has_many   :requirements
+  has_many   :services, :through => :requirements
   
-  validates_presence_of :app
-  validates_presence_of :name
+  validates_presence_of   :app
+  validates_presence_of   :name
   validates_uniqueness_of :name, :scope => :app_id
   
   serialize :parameters

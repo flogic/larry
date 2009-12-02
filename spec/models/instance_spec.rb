@@ -147,6 +147,13 @@ describe Instance do
       @instance.deployments.sort_by(&:id).should == deployments.sort_by(&:id)
     end
     
+    it 'should return only current deployments' do
+      deployments = Array.new(2) { Deployment.generate! }
+      @instance.deployables << deployments.collect(&:deployable)
+      deployments.first.update_attribute(:start_time, 1.day.from_now)
+      @instance.deployments.should == [ deployments.last ]
+    end
+    
     it 'should have hosts' do
       @instance.should respond_to(:hosts)
     end
@@ -155,6 +162,13 @@ describe Instance do
       deployed_services = Array.new(2) { DeployedService.generate! }
       @instance.deployables << deployed_services.collect(&:deployable)
       @instance.hosts.sort_by(&:id).should == deployed_services.collect(&:host).sort_by(&:id)
+    end
+    
+    it 'should return only current hosts' do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @instance.deployables << deployed_services.collect(&:deployable)
+      deployed_services.first.deployment.update_attribute(:start_time, 1.day.from_now)
+      @instance.hosts.should == [ deployed_services.last.host ]
     end
   end
   

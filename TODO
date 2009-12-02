@@ -3,7 +3,7 @@
 
  - Deployment / Deployable model:
 
-   D { Customer, App, Instance }#{ deployments, deployed_services, hosts } - should be based on *current* deployments - basically, throttle at Deployable
+   D { Customer, App }#{ deployments, deployed_services, hosts } - should be based on *current* deployments - basically, throttle at Deployable
    D add { Customer, App, Instance, Deployable }#all_{deployments, deployed_services, hosts } which return records regardless of whether they are current
      
   (... maybe we just make an instance/deploy controller method that tries to integrate the other two models; or we look at doing a presenter)
