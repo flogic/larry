@@ -25,7 +25,10 @@ class Deployable < ActiveRecord::Base
     return {} unless instance
     snapshot = instance.snapshot
   end
-  
+
+# don't make a services :through; in fact, only do "this service appears ..." via deployed services service name matching; and remove deployed_service <-> service linkage (with all its problems)
+# this implies that the audit relationships would have to be encoded in our snapshot; also, when we get to provisioning, and a service has Preferences that we have to capture that information as well
+
   # Is this a good idea?:
   #  (1) overriding an existing method 
   #  (2) there are issues with snapshotting services (name might change, service deleted, etc.)
