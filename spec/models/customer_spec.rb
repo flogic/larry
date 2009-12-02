@@ -71,7 +71,7 @@ describe Customer do
   
   describe 'relationships' do
     before :each do
-      @customer = Customer.generate!
+      @customer = Customer.new
     end
     
     it 'should have many apps' do
@@ -123,6 +123,13 @@ describe Customer do
       @customer.deployments.sort_by(&:id).should == @customer.apps.collect(&:deployments).flatten.sort_by(&:id)
     end
     
+    it 'should only return current deployments' do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @customer.apps << deployed_services.collect(&:app)
+      deployed_services.first.deployment.update_attribute(:start_time, 1.day.from_now)
+      @customer.deployments.should == [ deployed_services.last.deployment ]  
+    end
+    
     it 'should have many deployed services' do
       @customer.should respond_to(:deployments)
     end
@@ -133,6 +140,13 @@ describe Customer do
       @customer.deployed_services.sort_by(&:id).should == @customer.apps.collect(&:deployed_services).flatten.sort_by(&:id)
     end
 
+    it 'should only return current deployed services' do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @customer.apps << deployed_services.collect(&:app)
+      deployed_services.first.deployment.update_attribute(:start_time, 1.day.from_now)
+      @customer.deployed_services.should == [ deployed_services.last ]      
+    end
+    
     it 'should have many hosts' do
       @customer.should respond_to(:deployments)
     end
@@ -143,6 +157,13 @@ describe Customer do
       @customer.hosts.sort_by(&:id).should == @customer.apps.collect(&:hosts).flatten.sort_by(&:id)
     end
 
+    it 'should only return current hosts' do
+      deployed_services = Array.new(2) { DeployedService.generate! }
+      @customer.apps << deployed_services.collect(&:app)
+      deployed_services.first.deployment.update_attribute(:start_time, 1.day.from_now)
+      @customer.hosts.should == [ deployed_services.last.host ]
+    end
+    
     it 'should have many services' do
       @customer.should respond_to(:services)
     end

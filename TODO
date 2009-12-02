@@ -1,12 +1,9 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
- - Deployment / Deployable model:
-
-   D { Customer }#{ deployments, deployed_services, hosts } - should be based on *current* deployments - basically, throttle at Deployable
    D add { Customer, App, Instance, Deployable }#all_{deployments, deployed_services, hosts } which return records regardless of whether they are current
      
-  (... maybe we just make an instance/deploy controller method that tries to integrate the other two models; or we look at doing a presenter)
+  (for creation of deployment/deployable... maybe we just make an instance/deploy controller method that tries to integrate the other two models? or we look at doing a presenter?)
    
  - new deployment interface
    D deployments/new should have a Reason field (mandatory) which explains why this deployment happened
