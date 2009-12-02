@@ -1,8 +1,6 @@
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
    
-  D make sure that the all_* methods for { Customer, App, Instance, Deployable, Host } return their instances in order of deployment start_date
-     
   (for creation of deployment/deployable... maybe we just make an instance/deploy controller method that tries to integrate the other two models? or we look at doing a presenter?)
    
  - new deployment interface
