@@ -1,8 +1,41 @@
+
+Modeling discussion: 
+
+  - Customer allows us to associated deployed resources with a customer, which ultimately helps us to bill them, know when to cut off services, etc.
+  - App allows us to provide different levels of service on a per-application basis even for the same customer -- some apps will be under different contracts, some will be more important to the customer, etc.
+  - Instance allows us to have different services for the same app, which may be deployed to different places, deployed in multiples (e.g., "4 production app servers"), or only deployed sometimes (e.g., if we deploy a continuous integration server or staging server or load test server only sometimes for a given app).
+  - Service allows us to express what is necessary for a given instance to work.  E.g., for the production instance of this customer's web app we need a web server, ssl certs, the rails stack, a postgres database, and a search engine.  By expressing the services by name, the actual details of the deployment and management of services can be handled by appropriately named classes, manifests, scripts, etc., via some deployment tool.
+  - Services have a DAG (directed acyclic graph) dependency relationship so that:  we can specify just a few instance dependencies and get the remaining service dependencies for free via the graph (i.e., ease of maintenance); also, the DAG implies a topological sort ordering which can be used by shell scripts or non-order-aware tools (I think chef falls into this category, probably cfengine; definitely capistrano and any ad hoc script-your-deployment tools) to get things deployed in the proper order.
+  - Host represents a compute resource which can be managed effectively by a tool like puppet, chef, cfengine, etc.  Typically these are the resources we pay for and need to manage most effectively.
+  - A Deployment is a statement that an instance is live and should have services deployed to some set of Hosts.  Using the deployment information, we can generate deployment descriptions (e.g., puppet manifests, an ordering of chef recipes, etc.) for every host which should have services deployed.
+  - A Deployable represents a snapshot of the information used to deploy an instance at a certain point in time.  Given that the relationships between services may change while an instance is deployed, we either need to snapshot the information so that the deployed instance does not change, or we need to do something more sophisticated with managing the service DAG over time.  I'm not smart enough to know how to do the latter at the moment.
+  - An Audit edge in the Service DAG implies that a certain service always needs the auditing service deployed with it.  This allows us to support services which need to know about other services, common examples include:  firewall rules, log rotation, backups, database backups, monitoring.
+  - A Deployed service allows us to deploy a service for an instance to a host.  Since "audits" imply that one service in the DAG may need to be on a separate host then another service (though maybe regular services) we need a many:many mapping between deployments and hosts.
+  - An auditing edge between deployed services show the operational instance of a deployed service which knows about another deployed service -- mirroring the operational audit edge in the Service graph which represents one service knowing about another.  When doing deployments ideally we would started auditing services after their audited services, and when un-deploying we'd work in the opposite direction (if that is supported by the deployment tool which gets information from larry).
+  - Pools of hosts allow us to deploy instances to specific batches of hosts.  This may be because we have a Pool of hosts for development, testing, production and want to deploy different Deployables to each.  It could be because organizational divisions have different pools of physical hardware or billable VMs.  It could be because we pool our VPS-provided slices based on some cost function, etc.  As we get into capacity-based deployment, we can determine if the pool we're deploying to has sufficient capacity, and otherwise we can deploy more resources into the Pool.
+  - a Preference is a Speficiation-pattern implementation which assists in determining whether a deployment can be successfully pushed out to a set of Hosts, or whether some sort of additional provisioning needs to take place.  Specification composition allows building up more complex rule sets.  Linking preferences to instances allows per-instance deployment rules; similarly for apps and customers (customers getting least priority, apps next, instances next).  Conceivably there could be some sort of per-service or per-service-edge (e.g., two services must reside on the same host, or must not), or some more sophisticated relationships between entities (this app's instances cannot reside on the same hosts as any of the instances for this customer), etc.  Currently this is only being developed to do simple role/grade-based specifications.
+ - A Role is essentially a tag for hosts, specifying what sort of work they're envisioned to do.  Examples might include "web server", "loghost", "firewall", etc.  This might be used to put all continuous integration instances on one type of host, or (with Service Preferences) to say that all firewall rules go on a firewall host, etc.
+ - A Grade is a grouping for hosts based upon some performance or capacity.  This can be purely ad hoc and local, and is designed for administrators to set up to do capacity planning.  So, a rails app requires a medium-sized server, a postgres production database requires a large server, and a build server requires a huge server ("medium-sized", "large", and "huge" being the grades).  This allows us to map our arbitrary capacities to hosting providers' arbitrary capacities so that we can then automatically say things like "well, to deploy this production db we need to bring up another large host, and our options are a linode 1080, a slicehost 1024, an amazon medium node, or craphost's mega or kinda servers, which do you want?"
+ - As discussed with Grade, hosting providers modelled by rubycloud (or presumably any other suitable provisioning library) come in provider-designated capacities or performances.  We call these Flavors here and will map these to our local Grades so that we can determine what our provisioning options are.
+ - A provider is just some hosting organization that offers the ability to turn on hosts of a certain specification on demand.  We presume we'll be using rubycloud or deltacloud or libcloud or some such cloudy provisioning tool to do the legwork there.
+
+---
+
+ordered priorities:
+
+ - should be able to deploy an instance to a host from the model
+ - should be able to deploy an instance to a host from the view
+ - should be to generate a manifest for a host (->deployments)
+ - should be able to un-deploy a deployed instance
+
+ - should be able to deploy an "audit" somewhere -- even if it requires specifying each audit for each host by hand; so this includes monitoring, log rotation, firewall rules, backups, database backups, etc.
+
+---
+
+
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
-   
-  (for creation of deployment/deployable... maybe we just make an instance/deploy controller method that tries to integrate the other two models? or we look at doing a presenter?)
-   
+
  - new deployment interface
    D deployments/new should have a Reason field (mandatory) which explains why this deployment happened
    D deployments/new can accept a start time (default now), and end time (default nil)
