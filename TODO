@@ -33,6 +33,12 @@ ordered priorities:
 
 ---
 
+insights from release of puppet-dashboard:
+ - could definitely make use of their styling, which would force us back to GPL
+ - the activity feed is cool, but we don't need it, yet; would be nice to track deployments
+ - there are a couple of tweaks and fixes that might be useful, mostly it's just the merging of node/report stuff, visual tweaks, ajaxyness and autocompletes
+
+---
 
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
