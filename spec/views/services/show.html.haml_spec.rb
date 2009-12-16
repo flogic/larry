@@ -102,14 +102,6 @@ describe '/services/show' do
     end
   end
   
-  it 'should show the list of hosts on which the service is deployed' do
-    @service.deployed_services << Array.new(3) { DeployedService.generate! }
-    do_render
-    @service.hosts.each do |host|
-      response.should have_text(Regexp.new(host.name))
-    end
-  end
-  
   it 'should show the list of services which are not related to this service' do
     unrelated = Service.generate!
     do_render

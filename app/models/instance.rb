@@ -107,4 +107,14 @@ class Instance < ActiveRecord::Base
     return app if app.parameters.has_key?(parameter)
     return customer if customer.parameters.has_key?(parameter)
   end
+
+  def deploy(params, deployable = nil)
+    return deploy_without_deployable(params) unless deployable
+    raise ArgumentError, "Deployable [#{deployable.inspect}] is not associated with this instance" unless deployables.include?(deployable)
+    deployable.deploy(params)
+  end
+
+  def deploy_without_deployable(params)
+    Deployable.deploy_from_instance(self, params)
+  end  
 end

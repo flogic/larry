@@ -8,8 +8,6 @@
   - unless @service.description.blank?
     .description= @service.description
 
-
-
 .parameters
   - if @service.parameters.blank?
     %h3 This service has no required parameters
@@ -27,12 +25,6 @@
     %ul
       - @service.depends_on_additional_parameters.sort.each do |parameter|
         %li= parameter
-
-.hosts
-  - if @service.hosts.blank?
-    %h3 This service is not deployed to any hosts.
-  - else
-    %h3== This service is deployed on these hosts: #{list(@service.hosts)}
 
 .instances
   - if @service.instances.blank?

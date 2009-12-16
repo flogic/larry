@@ -753,4 +753,65 @@ describe Instance do
       @instance.parameter_whence('customer').should == @instance.customer                  
     end
   end
+  
+  it 'should be able to be deployed' do
+    Instance.new.should respond_to(:deploy)
+  end
+  
+  describe 'deploy' do
+    before :each do
+      @deployable = Deployable.generate!
+      @instance = @deployable.instance
+      @parameters = @deployable.attributes.merge(:start_time => Time.now, :reason => 'Because.')
+    end
+    
+    it 'should allow parameters' do
+      lambda { @instance.deploy(@parameters) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should allow parameters and a deployable' do
+      lambda { @instance.deploy(@parameters, @deployable) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not work without parameters' do
+      lambda { @instance.deploy }.should raise_error(ArgumentError)
+    end
+    
+    describe 'when a deployable is specified' do
+      it 'should fail if the deployable is not associated with the instance' do
+        lambda { @instance.deploy(@params, Deployable.generate!) }.should raise_error(ArgumentError)
+      end
+      
+      it 'should deploy the deployable with the provided params' do
+        @deployable.expects(:deploy).with(@params)
+        @deployable.instance.deploy(@params, @deployable)
+      end
+      
+      it 'should return the result of deploying the deployable' do
+        @deployable.stubs(:deploy).with(@params).returns('result')
+        @deployable.instance.deploy(@params, @deployable).should == 'result' 
+      end
+    end
+    
+    describe 'when no deployable is specified' do
+      it 'should create a new deployable' do
+        lambda { @instance.deploy(@parameters) }.should change(Deployable, :count)
+      end
+      
+      it 'should associate the new deployable with the instance' do
+        @instance.deploy(@parameters)
+        @instance.deployables.should_not be_empty
+      end
+      
+      it 'should deploy the new deployable with the provided params' do
+        Deployable.expects(:deploy_from_instance).with(@instance, @parameters)
+        @instance.deploy(@parameters)
+      end
+      
+      it 'should return the result of deploying the new deployable' do
+        Deployable.stubs(:deploy_from_instance).with(@instance, @parameters).returns('result')
+        @instance.deploy(@parameters).should == 'result'
+      end
+    end
+  end
 end

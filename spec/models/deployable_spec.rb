@@ -131,6 +131,91 @@ describe Deployable do
     end
   end
   
+  describe 'as a class' do
+    it 'should be able to deploy an instance' do
+      Deployable.should respond_to(:deploy_from_instance)
+    end
+    
+    describe 'when deploying an instance' do
+      before :each do
+        @instance = Instance.generate!
+        @parameters = Deployment.generate!.attributes.merge(:start_time => Time.now, :reason => 'Because')
+      end
+      
+      it 'should allow specifying an instance and deployment parameters' do
+        lambda { Deployable.deploy_from_instance(@instance, @parameters) }.should_not raise_error(ArgumentError)
+      end
+      
+      it 'should require both an instance and deployment parameters' do
+        lambda { Deployable.deploy_from_instance(@instance) }.should raise_error(ArgumentError)
+      end
+      
+      it 'should create a new deployable' do
+        lambda { Deployable.deploy_from_instance(@instance, @parameters) }.should change(Deployable, :count)
+      end
+      
+      it 'should associate the instance with the new deployable' do
+        Deployable.delete_all
+        Deployable.deploy_from_instance(@instance, @parameters)
+        Deployable.first.instance.should == @instance
+      end
+      
+      it 'should deploy the newly created deployable with the deployment parameters' do
+        deployable = {}
+        Deployable.stubs(:create!).returns(deployable)
+        deployable.expects(:deploy).with(@parameters)
+        Deployable.deploy_from_instance(@instance, @parameters)
+      end
+      
+      it 'should return the result of deploying' do
+        deployable = {}
+        Deployable.stubs(:create!).returns(deployable)
+        deployable.stubs(:deploy).returns('deployed')
+        Deployable.deploy_from_instance(@instance, @parameters).should == 'deployed'
+      end
+    end
+  end
+  
+  it 'should be able to deploy' do
+    Deployable.new.should respond_to(:deploy)
+  end
+  
+  describe 'when deploying' do
+    before :each do
+      @deployable = Deployable.generate!
+      @deployment = Deployment.generate!
+      @parameters = @deployment.attributes.merge(:start_time => Time.now, :reason => 'Because.')
+    end
+    
+    it 'should allow specifying deployment parameters' do
+      lambda { @deployable.deploy(@parameters) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should require deployment parameters' do
+      lambda { @deployable.deploy }.should raise_error(ArgumentError)
+    end
+    
+    it 'should create a deployment' do
+      lambda { @deployable.deploy(@parameters) }.should change(Deployment, :count)
+    end
+    
+    it 'should associate the new deployment with this deployable' do
+      Deployment.delete_all
+      @deployable.deploy(@parameters)
+      @deployable.deployments.should == [ Deployment.first ]
+    end
+    
+    it 'should deploy the new deployment with the deployment parameters' do
+      Deployment.expects(:deploy_from_deployable).with(@deployable, @parameters)
+      @deployable.deploy(@parameters)
+    end
+    
+    it 'should return the result of deploying the new deployment' do
+      Deployment.stubs(:deploy_from_deployable).returns('deployed')
+      @deployable.deploy(@parameters).should == 'deployed'     
+    end
+  end
+  
   describe 'providing access to non-current data' do
     before :each do
       @deployable = Deployable.new

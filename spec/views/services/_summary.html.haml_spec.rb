@@ -48,12 +48,4 @@ describe '/services/summary' do
     do_render
     response.should have_text(/\s+#{@service.apps.size}\b/)    
   end
-  
-  it 'should show a list of the hosts which have this service deployed' do
-    @service.deployed_services << Array.new(2) { DeployedService.generate! }
-    do_render
-    @service.hosts.each do |host|
-      response.should have_text(Regexp.new(host.name))
-    end
-  end
 end

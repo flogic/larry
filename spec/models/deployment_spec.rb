@@ -194,6 +194,77 @@ describe Deployment do
   end
   
   describe 'as a class' do
+    it 'should be able to deploy from a deployable' do
+      Deployment.should respond_to(:deploy_from_deployable)
+    end
+    
+    describe 'when deploying from a deployable' do
+      before :each do
+        @deployable = Deployable.generate!
+        @parameters = DeployedService.generate!.attributes.merge(:reason => 'Because.', :start_time => Time.now)
+      end
+      
+      it 'should allow a deployable and deployment parameters' do
+        lambda { Deployment.deploy_from_deployable(@deployable, @parameters)}.should_not raise_error(ArgumentError)
+      end
+      
+      it 'should require a deployable and deployment parameters' do
+        lambda { Deployment.deploy_from_deployable(@deployable)}.should raise_error(ArgumentError)
+      end
+      
+      it 'should fail if there is no reason specified in the deployment parameters' do
+        @parameters[:reason] = nil
+        lambda { Deployment.deploy_from_deployable(@deployable, @parameters)}.should raise_error
+      end
+      
+      it 'should fail if there is no start time specified in the deployment parameters' do
+        @parameters[:start_time] = nil
+        lambda { Deployment.deploy_from_deployable(@deployable, @parameters)}.should raise_error
+      end
+      
+      it 'should create a new deployment' do
+        lambda { Deployment.deploy_from_deployable(@deployable, @parameters) }.should change(Deployment, :count)
+      end
+      
+      it 'should set the new deployment reason to the reason from the parameters' do
+        Deployment.delete_all
+        Deployment.deploy_from_deployable(@deployable, @parameters)
+        Deployment.first.start_time.to_i.should == @parameters[:start_time].to_i
+      end
+      
+      it 'should set the new deployment start time to the start time from the parameters' do
+        Deployment.delete_all
+        Deployment.deploy_from_deployable(@deployable, @parameters)
+        Deployment.first.reason.should == @parameters[:reason]        
+      end
+      
+      it 'should set the new deployment end time to the end time from the parameters when it is available' do
+        Deployment.delete_all
+        time = 4.days.from_now
+        Deployment.deploy_from_deployable(@deployable, @parameters.merge(:end_time => time))
+        Deployment.first.end_time.to_i.should == time.to_i
+      end
+      
+      it 'should deploy the new deployment with the deployment parameters, except for reason, start time, and end time' do
+        deployment = {}
+        Deployment.stubs(:create!).returns(deployment)
+        @parameters[:end_time] = 4.days.from_now
+        base_params = @parameters.clone
+        base_params.delete(:start_time)
+        base_params.delete(:reason)
+        base_params.delete(:end_time)
+        deployment.expects(:deploy).with(base_params)
+        Deployment.deploy_from_deployable(@deployable, @parameters)
+      end
+      
+      it 'should return the result of deploying the new deployment' do
+        deployment = {}
+        Deployment.stubs(:create!).returns(deployment)
+        deployment.stubs(:deploy).returns('deployed')
+        Deployment.deploy_from_deployable(@deployable, @parameters).should == 'deployed'     
+      end
+    end
+    
     it 'should be able to find active deployments' do
       Deployment.should respond_to(:active)
     end
@@ -245,6 +316,53 @@ describe Deployment do
     end
   end
   
+  it 'should be able to deploy' do
+    Deployment.new.should respond_to(:deploy)
+  end
+  
+  describe 'when deploying' do
+    before :each do
+      @deployment = Deployment.generate!
+      @deployment.deployable.services << @services = Array.new(2) { Service.generate! }
+      @parameters = DeployedService.generate!.attributes
+      @parameters.delete("id")
+    end
+      
+    it 'should accept deployment parameters' do
+      lambda { @deployment.deploy(@parameters) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should require deployment parameters' do
+      lambda { @deployment.deploy }.should raise_error(ArgumentError)
+    end
+    
+    it 'should create deployed services for each service required by our deployable' do
+      @deployment.deploy(@parameters)
+      @deployment.deployed_services.size.should == @services.size
+    end
+    
+    it 'should use the service names from our deployable when creating the deployed services' do
+      @deployment.deploy(@parameters)
+      @deployment.deployed_services.collect(&:service_name).sort.should == @services.collect(&:name).sort      
+    end
+    
+    it 'should use the deployment parameters when creating the deployed services' do
+      @deployment.deploy(@parameters)
+      @deployment.deployed_services.each do |deployed_service|
+        deployed_service.host_id.should == @parameters["host_id"]  # this is all we're really worried about at the moment and it should work as a reasonable proxy for the assignment in the future
+      end
+    end
+    
+    it 'should fail when required deployment parameters are missing' do
+      @parameters.delete("host_id")
+      lambda { @deployment.deploy(@parameters) }.should raise_error
+    end
+    
+    it 'should return true when successul' do
+      @deployment.deploy(@parameters).should be_true
+    end
+  end
+
   it 'should be able to determine if it is currently active' do
     Deployment.new.should respond_to(:active?)
   end

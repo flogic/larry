@@ -24,18 +24,20 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 
 ordered priorities:
 
- - should be able to deploy an instance to a host from the model
+ - should be to generate a manifest for a host ( via deployments / deployed services )
+ - should snapshot services + parameters into the deployable and read from there
  - should be able to deploy an instance to a host from the view
- - should be to generate a manifest for a host (->deployments)
- - should be able to un-deploy a deployed instance
+   - also, deal with the various error conditions going up the chain of deployment
 
+ - should be able to un-deploy a deployed instance
+ - should automatically un-deploy deployed instances when deploying
  - should be able to deploy an "audit" somewhere -- even if it requires specifying each audit for each host by hand; so this includes monitoring, log rotation, firewall rules, backups, database backups, etc.
 
 ---
 
 insights from release of puppet-dashboard:
  - could definitely make use of their styling, which would force us back to GPL
- - the activity feed is cool, but we don't need it, yet; would be nice to track deployments
+ - the activity feed is cool, but we don't need it, yet; would be nice to track deployments / undeployments, maybe service changes, host additions, etc.
  - there are a couple of tweaks and fixes that might be useful, mostly it's just the merging of node/report stuff, visual tweaks, ajaxyness and autocompletes
 
 ---

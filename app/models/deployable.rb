@@ -6,6 +6,14 @@ class Deployable < ActiveRecord::Base
 
   serialize :snapshot
   
+  def self.deploy_from_instance(instance, params)
+    create!(:instance => instance).deploy(params)
+  end
+  
+  def deploy(params)
+    Deployment.deploy_from_deployable(self, params)
+  end
+  
   def snapshot
     self[:snapshot] || {}
   end

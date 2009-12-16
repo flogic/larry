@@ -14,6 +14,21 @@ class Deployment < ActiveRecord::Base
     { :conditions => [ 'start_time <= ? and (end_time is null or end_time > ?)', Time.now, Time.now ] }
   }
   
+  def self.deploy_from_deployable(deployable, params)
+    deployment = create!(:deployable => deployable, 
+                         :start_time => params[:start_time], 
+                         :reason     => params[:reason], 
+                         :end_time   => params[:end_time])
+    deployment_params = params.clone
+    [ :start_time, :end_time, :reason].each {|key| deployment_params.delete(key) }
+    deployment.deploy(deployment_params)
+  end
+  
+  def deploy(params)
+    deployable.services.collect(&:name).each {|name| deployed_services.create!(params.merge(:service_name => name)) }
+    deployed_services
+  end
+  
   def hosts
     deployed_services.collect(&:host).uniq
   end
