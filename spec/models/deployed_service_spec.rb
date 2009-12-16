@@ -24,13 +24,13 @@ describe DeployedService do
       @deployed_service.host_id.should == 1
     end
     
-    it 'should have a service id' do
-      @deployed_service.should respond_to(:service_id)
+    it 'should have a service name' do
+      @deployed_service.should respond_to(:service_name)
     end
     
-    it 'should allow setting and retrieving the service id' do
-      @deployed_service.service_id = 1
-      @deployed_service.service_id.should == 1      
+    it 'should allow setting and retrieving the service name' do
+      @deployed_service.service_name = 'Larry'
+      @deployed_service.service_name.should == 'Larry'      
     end
   end
   
@@ -64,16 +64,16 @@ describe DeployedService do
     end
 
 
-    it 'should not be valid without a service' do
-      @deployed_service.service = nil
+    it 'should not be valid without a service name' do
+      @deployed_service.service_name = nil
       @deployed_service.valid?
-      @deployed_service.errors.should be_invalid(:service)
+      @deployed_service.errors.should be_invalid(:service_name)
     end
 
-    it 'should be valid with a service' do
-      @deployed_service.service = Service.generate!
+    it 'should be valid with a service name' do
+      @deployed_service.service_name = 'Larry'
       @deployed_service.valid?
-      @deployed_service.errors.should_not be_invalid(:service)
+      @deployed_service.errors.should_not be_invalid(:service_name)
     end
   end
   
@@ -102,16 +102,6 @@ describe DeployedService do
       @deployed_service.host.should == @host
     end
     
-    it 'should belong to a service' do
-      @deployed_service.should respond_to(:service)
-    end
-
-    it 'should allow assigning the service' do
-      @service = Service.generate!
-      @deployed_service.service = @service
-      @deployed_service.service.should == @service
-    end
-
     it 'should have a deployable' do
       @deployed_service.should respond_to(:deployable)
     end

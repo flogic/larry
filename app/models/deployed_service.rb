@@ -1,11 +1,10 @@
 class DeployedService < ActiveRecord::Base
   belongs_to :host
-  belongs_to :service
   belongs_to :deployment
   
   validates_presence_of :host
-  validates_presence_of :service
   validates_presence_of :deployment
+  validates_presence_of :service_name
   
   def deployable
     return nil unless deployment
