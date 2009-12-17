@@ -158,41 +158,59 @@ describe Host do
     end
     
     describe 'and the host has no deployed services' do
-      it 'should return a hash of results' do
-        @host.configuration.should respond_to(:keys)
-      end
-      
-      it 'should include an empty class list in the results' do
-        @host.configuration['classes'].should == []
-      end
-      
-      it 'should include an empty hash of parameters in the results' do
-        @host.configuration['parameters'].should == {}
+      it 'should return an empty list' do
+        @host.configuration.should == []
       end
     end
     
     describe 'and the host has deployed services' do
       before :each do
-        @host.deployed_services << @deployed_services = Array.new(3) { DeployedService.generate! }
-      end
-      
-      it 'should include a class for each instance in the returned class list' do
-        @host.configuration['classes'].size.should == @host.instances.size
-      end
-      
-      it 'should include no additional classes' do
-        @host.configuration['classes'].size.should == @host.instances.size
-      end
-      
-      it 'should use an unique class name for the deployed instance classes in the returned class list' do
-        @host.configuration['classes'].sort.should == @host.instances.collect(&:configuration_name).sort
+        @deployed_services = Array.new(3) {|i| DeployedService.generate!(:host => @host, :parameters => { 'var' => "var #{i}", 'foo' => 'foo #{i}'}) }
+        @instances = @deployed_services.collect(&:instance).uniq
       end
 
-      it "should include each instance's parameters, indexed by the unique class name for that instance" do
-        result = @host.configuration
-        @host.instances.each do |instance|
-          result['parameters'][instance.configuration_name].should == instance.configuration_parameters
+      # [ 
+      #   { :customer => 'bob', :app => 'bob.com', :instance => 'db server', :services => [ { :name => 'mysqldb', :parameters => { 'dbname' => 'bobco_prod' } } ] }
+      # ]
+            
+      it "should include an entry for each unique deployed instance from the host's deployed services" do
+        @host.configuration.size.should == @instances.size
+      end
+      
+      it 'should include the customer name in each instance record' do
+        customers = @host.configuration.collect {|row| row[:customer] }
+        @instances.each do |instance|
+          customers.should include(instance.customer.name)
         end
+      end
+        
+      it 'should include the app name in each instance record' do
+        apps = @host.configuration.collect {|row| row[:app] }
+        @instances.each do |instance|
+          apps.should include(instance.app.name)
+        end
+      end
+      
+      it 'should include the instance name in each instance record' do
+        instances = @host.configuration.collect {|row| row[:instance] }
+        @instances.each do |instance|
+          instances.should include(instance.name)
+        end
+      end
+      
+      it 'should include the list of services for each instance record' do
+        @deployed_services.each do |deployed_service|
+          row = @host.configuration.detect {|r| r[:instance] == deployed_service.instance.name }
+          row[:services].collect {|s| s[:name] }.should include(deployed_service.service_name)
+        end
+      end
+      
+      it 'should include the parameter settings for each service in an instance record' do
+        @deployed_services.each do |deployed_service|
+          row = @host.configuration.detect {|r| r[:instance] == deployed_service.instance.name }
+          service_hash = row[:services].detect {|s| s[:name] == deployed_service.service_name }
+          service_hash[:parameters].should == deployed_service.parameters
+        end        
       end
     end
   end

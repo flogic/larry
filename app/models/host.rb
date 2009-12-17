@@ -50,10 +50,14 @@ class Host < ActiveRecord::Base
   end
 
   def configuration
-    instances.inject({ 'classes' => [], 'parameters' => {} }) do |h, instance|
-      h['classes'] << instance.configuration_name
-      h['parameters'][instance.configuration_name] = instance.configuration_parameters
-      h
+    deployed_services.collect(&:instance).uniq.inject([]) do |config, deployed_instance|
+      config << { 
+        :customer => deployed_instance.customer.name,
+        :app      => deployed_instance.app.name,
+        :instance => deployed_instance.name,
+        :services => deployed_services.select {|ds| ds.instance == deployed_instance }.inject([]) {|l, service| l << { :name => service.service_name, :parameters => service.parameters } ; l },
+      }
+      config
     end
   end
   

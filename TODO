@@ -25,6 +25,9 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ordered priorities:
 
  - should be to generate a manifest for a host ( via deployments / deployed services )
+   - refactor
+   - make sure deploying saves parameters to deployed service
+   - add host#puppet_manifest, as a filter on host#configuration
  - should snapshot services + parameters into the deployable and read from there
  - should be able to deploy an instance to a host from the view
    - also, deal with the various error conditions going up the chain of deployment
@@ -58,9 +61,8 @@ insights from release of puppet-dashboard:
  D deployable - before_saving, snapshot the service + parameters data so that we can do a deployment
  D if there is already an active Deployment for this Instance on that Host,  we want to truncate its end time if there is overlap
  D provide warning if the same host is chosen as a current Deployment that we'll be ending that deployment
- D deployed services are created which show how services got put on hosts (via deployments) 
  - Deployable stores service list, parameters, instance (meaning we're free from then on out to change services, instances, parameters, etc.)
- D Deployments can be edited so long as they are in the future, ditto deleted
+ D Deployments can be edited so long as they are in the future, ditto deleted -- what will this do to deployed services if we edit?
  D Host manifest generation functionality needs to be updated so that it checks currently active Deployments for the host and uses them to generate manifests (active means start time <= now, and end_time > now)
  D Instance show view should show Deployables
  D Instance show view should show current deployments
