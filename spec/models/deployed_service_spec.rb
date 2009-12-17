@@ -32,6 +32,25 @@ describe DeployedService do
       @deployed_service.service_name = 'Larry'
       @deployed_service.service_name.should == 'Larry'      
     end
+    
+    it 'should have a set of parameters' do
+      @deployed_service.should respond_to(:parameters)
+    end
+    
+    it 'should allow setting and retrieving parameter values' do
+      @deployed_service.parameters = { :foo => 'bar' }
+      @deployed_service.parameters[:foo].should == 'bar'
+    end
+    
+    it 'should preserve parameters as a hash across saving' do
+      @deployed_service = DeployedService.generate!(:parameters => { :foo => 'bar'})
+      DeployedService.find(@deployed_service.id).parameters[:foo].should == 'bar'
+    end
+    
+    it 'should return an empty hash for parameters when parameters is empty' do
+      @deployed_service.parameters = nil
+      @deployed_service.parameters.should == {}
+    end
   end
   
   describe 'validations' do

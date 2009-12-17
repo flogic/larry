@@ -6,6 +6,12 @@ class DeployedService < ActiveRecord::Base
   validates_presence_of :deployment
   validates_presence_of :service_name
   
+  serialize :parameters
+  
+  def parameters
+    self[:parameters] || {}
+  end
+  
   def deployable
     return nil unless deployment
     deployment.deployable
