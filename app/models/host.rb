@@ -1,4 +1,6 @@
 class Host < ActiveRecord::Base
+  include NormalizeNames
+  
   has_many :all_deployed_services, :class_name => 'DeployedService', :foreign_key => 'host_id'
   has_many :all_deployments, :class_name => 'Deployment', :through => :all_deployed_services, :source => 'deployment'
   
@@ -61,9 +63,20 @@ class Host < ActiveRecord::Base
       config
     end
   end
-  
+
   def puppet_manifest
-    instances.inject('') { |buffer, instance| buffer += instance.puppet_manifest }
+    result = deployed_services.inject('') do |buffer, deployed_service|
+      clean_name = normalize_name([ deployed_service.customer.name, 
+                                    deployed_service.app.name, 
+                                    deployed_service.instance.name, 
+                                    deployed_service.service_name ].join('_'))
+      buffer += %Q(class #{clean_name} {"#{clean_name}":\n)
+      deployed_service.parameters.each_pair {|k,v| buffer += %Q(  $#{k} = "#{v}"\n) }
+      buffer += "  include #{normalize_name(deployed_service.service_name)}\n"
+      buffer += "}\n"
+      buffer
+    end
+    result += "include #{normalize_name(name)}\n"
   end
   
   def safe_to_delete?

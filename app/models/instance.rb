@@ -1,6 +1,4 @@
-class Instance < ActiveRecord::Base
-  include NormalizeNames
-  
+class Instance < ActiveRecord::Base  
   belongs_to :app
   has_many   :deployables  
   has_many   :requirements
@@ -87,18 +85,6 @@ class Instance < ActiveRecord::Base
   def can_deploy?
     return false if services.blank?
     missing_parameters.blank?
-  end
-  
-  def puppet_manifest
-    result = %Q(class #{configuration_name} {"#{configuration_name}":\n)
-    configuration_parameters.each_pair do |key, value|
-      result += %Q(  $#{key} = "#{value}"\n)
-    end
-    services.each do |service|
-      result += %Q(  include #{service.configuration_name}\n)
-    end
-    result += "}\n"
-    result += "include #{configuration_name}\n"
   end
   
   def parameter_whence(parameter)

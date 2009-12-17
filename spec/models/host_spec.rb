@@ -215,33 +215,75 @@ describe Host do
     end
   end
   
-  it 'should be able to generate a Puppet manifest file' do
+  it 'should be able to generate a puppet manifest file' do
     Host.new.should respond_to(:puppet_manifest)
   end
   
-  describe 'when generating a Puppet manifest file' do
-    it 'should work without arguments' do
-      lambda { Host.new.puppet_manifest }.should_not raise_error(ArgumentError)
-    end
+  describe 'when generating a puppet manifest file' do
+    include NormalizeNames
     
-    it 'should not allow arguments' do
-      lambda { Host.new.puppet_manifest(:foo) }.should raise_error(ArgumentError)
-    end
-    
-    describe 'and there are no instances deployed to this host' do
-      it 'should return the empty string' do
-        Host.generate!.puppet_manifest.should == ''
+    before :each do
+      @host = Host.generate!
+      @deployed_services = Array.new(3) do |i| 
+        DeployedService.generate!(:host => @host, :parameters => { 'foo' => "bar #{i}", 'baz' => "xyzzy #{i}" })
       end
     end
     
-    describe 'and there are instances deployed to this host' do
-      it 'should include the puppet manifest data for each instance' do
-        @host = Host.generate!
-        @host.deployed_services << deployed_services = Array.new(3) { DeployedService.generate! }
-        @host.instances.each do |instance| 
-          @host.puppet_manifest.should match(Regexp.new(instance.puppet_manifest))
+    it 'should work without arguments' do
+      lambda { @host.puppet_manifest }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @host.puppet_manifest(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    it 'should include a sanitized customer name in a class declaration for each deployed service' do
+      manifest = @host.puppet_manifest
+      @deployed_services.each do |deployed_service|
+        manifest.should match(/class.*#{normalize_name(deployed_service.customer.name)}/)
+      end
+    end
+    
+    it 'should include a sanitized app name in a class declaration for each deployed service' do
+      manifest = @host.puppet_manifest
+      @deployed_services.each do |deployed_service|
+        manifest.should match(/class.*#{normalize_name(deployed_service.app.name)}/)
+      end
+    end
+    
+    it 'should include a sanitized instance name in a class declaration for each deployed service' do
+      manifest = @host.puppet_manifest
+      @deployed_services.each do |deployed_service|
+        manifest.should match(/class.*#{normalize_name(deployed_service.instance.name)}/)
+      end
+    end
+    
+    it 'should include a sanitized service name in a class declaration for each deployed service' do
+      manifest = @host.puppet_manifest
+      @deployed_services.each do |deployed_service|
+        manifest.should match(/class.*#{normalize_name(deployed_service.service_name)}/)
+      end
+    end
+    
+    it 'should include parameter settings for every configuration parameter for each deployed service' do
+      manifest = @host.puppet_manifest
+      @deployed_services.each do |deployed_service|
+        deployed_service.parameters.each_pair do |k,v|
+          manifest.should match(/\$#{k}\s*=\s*"#{v}"/)
         end
       end      
+    end
+    
+    it 'should include a class include directive for each deployed service' do
+      manifest = @host.puppet_manifest
+      @deployed_services.each do |deployed_service|
+        manifest.should match(/include.*#{normalize_name(deployed_service.service_name)}/)
+      end
+    end
+    
+    it 'should include a class include directive for the host' do
+      manifest = @host.puppet_manifest
+      manifest.should match(/include #{normalize_name(@host.name)}/)      
     end
   end
     

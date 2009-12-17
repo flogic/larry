@@ -199,54 +199,6 @@ describe Instance do
       @instance.all_hosts.sort_by(&:id).should == @all.collect(&:host).sort_by(&:id)        
     end
   end
-
-  
-  it 'should be able to generate an unique name for use in a configuration' do
-    Instance.new.should respond_to(:configuration_name)
-  end
-  
-  describe 'when generating an unique name for use in a configuration' do
-    before :each do
-      @instance = Instance.generate!
-    end
-    
-    it 'should work without arguments' do
-      lambda { @instance.configuration_name }.should_not raise_error(ArgumentError)
-    end
-    
-    it 'should not allow arguments' do
-      lambda { @instance.configuration_name(:foo) }.should raise_error(ArgumentError)
-    end
-    
-    it 'should not be empty' do
-      @instance.configuration_name.should_not be_blank
-    end
-    
-    it 'should vary the name when its name varies' do
-      original_name = @instance.configuration_name
-      @instance.name = @instance.name.succ
-      @instance.configuration_name.should_not == original_name
-    end
-    
-    it 'should vary the name when its app name varies' do
-      original_name = @instance.configuration_name
-      @instance.app.name = 'Something Random'
-      @instance.configuration_name.should_not == original_name      
-    end
-    
-    it 'should vary the name when its customer name varies' do
-      original_name = @instance.configuration_name
-      @instance.customer.name = 'Something Random'
-      @instance.configuration_name.should_not == original_name      
-    end
-    
-    it 'should include only lowercase alphanumerics and underscores' do
-      @instance.name = 'Some Instance 123:::!!!'
-      @instance.app.name = 'Some App 123:::!!!'
-      @instance.customer.name = 'Some Customer 123:::!!!'
-      @instance.configuration_name.should == 'some_customer_123__some_app_123__some_instance_123'            
-    end
-  end
   
   it 'should be able to locate a requirement for a service' do
     Instance.new.should respond_to(:requirement_for)
@@ -676,48 +628,7 @@ describe Instance do
       @instance.can_deploy?.should be_false
     end
   end
-  
-  it 'should be able to generate a puppet manifest file' do
-    Instance.new.should respond_to(:puppet_manifest)
-  end
-  
-  describe 'when generating a puppet manifest file' do
-    before :each do
-      @instance = Instance.generate!
-    end
-    
-    it 'should work without arguments' do
-      lambda { @instance.puppet_manifest }.should_not raise_error(ArgumentError)
-    end
-    
-    it 'should not allow arguments' do
-      lambda { @instance.puppet_manifest(:foo) }.should raise_error(ArgumentError)
-    end
-    
-    it 'should include a class declaration for this instance' do
-      @instance.puppet_manifest.should match(/^\s*class\s+#{@instance.configuration_name}\s*\{\s*"#{@instance.configuration_name}":/)
-    end
-    
-    it 'should include parameters settings for every configuration parameter' do        
-      result = @instance.puppet_manifest
-      @instance.configuration_parameters.each_pair do |key, value|
-        result.should match(/^\s*\$#{key}\s*=\s*"#{value}"/)
-      end
-    end
-    
-    it 'should include a class include statement for the instance' do
-      @instance.puppet_manifest.should match(/^\s*include\s*#{@instance.configuration_name}/)
-    end
-    
-    it 'should include class include directives for each service' do
-      @instance.services << Array.new(3) { Service.generate! }
-      result = @instance.puppet_manifest
-      @instance.services.each do |service|
-        result.should match(/^\s*include\s*#{service.configuration_name}/)
-      end
-    end
-  end
-  
+
   it 'should be able to tell where a parameter setting comes from' do
     Instance.new.should respond_to(:parameter_whence)
   end

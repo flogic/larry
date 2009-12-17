@@ -1,6 +1,4 @@
 class Service < ActiveRecord::Base
-  include NormalizeNames
-
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -29,10 +27,6 @@ class Service < ActiveRecord::Base
     self[:parameters] || []
   end
   
-  def configuration_name
-    normalize_name(name)
-  end
-
   def customers
     instances.collect(&:customer)
   end
