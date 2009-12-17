@@ -246,4 +246,34 @@ describe Deployable do
       @deployable.all_hosts.sort_by(&:id).should == @all.collect(&:host).sort_by(&:id)        
     end
   end
+  
+  it 'should provide a means of returning the parameter settings for a service' do
+    Deployable.new.should respond_to(:service_parameters)
+  end
+  
+  describe 'when returning the parameter settings for a service' do
+    before :each do
+      @deployable = Deployable.generate!
+      @deployable.instance.requirements.generate!  # create a Service Requirement for our Instance
+      @service = @deployable.services.first
+    end
+    
+    it 'should accept a service name' do
+      lambda { @deployable.service_parameters('foo') }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should require a service name' do
+      lambda { @deployable.service_parameters }.should raise_error(ArgumentError)
+    end
+    
+    it 'should return an empty hash if the service is not known' do
+      @deployable.service_parameters('unknown service').should == {}
+    end
+    
+    it "should return our instance's configuration parameter settings for the service's required parameters" do
+      @deployable.instance.update_attribute(:parameters, {'known 1' => 'val 1', 'known 2' => 'val 2', 'missing 3' => 'val 3'})
+      @service.update_attribute(:parameters, [ 'known 1', 'known 2' ])
+      @deployable.service_parameters(@service.name).should == {'known 1' => 'val 1', 'known 2' => 'val 2' }
+    end
+  end
 end

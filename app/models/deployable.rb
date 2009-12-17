@@ -52,4 +52,9 @@ class Deployable < ActiveRecord::Base
     return nil unless instance
     instance.services
   end
+  
+  def service_parameters(service_name)
+    return {} unless the_service = services.find_by_name(service_name)
+    instance.configuration_parameters.slice(*the_service.parameters)
+  end
 end
