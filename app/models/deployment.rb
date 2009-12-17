@@ -25,7 +25,9 @@ class Deployment < ActiveRecord::Base
   end
   
   def deploy(params)
-    deployable.services.collect(&:name).each {|name| deployed_services.create!(params.merge(:service_name => name)) }
+    deployable.services.collect(&:name).each do |name| 
+      deployed_services.create!(params.merge(:service_name => name, :parameters => deployable.service_parameters(name))) 
+    end
     deployed_services
   end
   

@@ -25,7 +25,6 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ordered priorities:
 
  - should be to generate a manifest for a host ( via deployments / deployed services )
-   - make sure deploying saves parameters to deployed service
    - add host#puppet_manifest, as a filter on host#configuration
    - drop instance configuration name stuff (also look @ app, customer); also puppet_manifest stuff 
  - should snapshot services + parameters into the deployable and read from there

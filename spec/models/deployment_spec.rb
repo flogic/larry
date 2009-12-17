@@ -346,6 +346,17 @@ describe Deployment do
       @deployment.deployed_services.collect(&:service_name).sort.should == @services.collect(&:name).sort      
     end
     
+    it 'should use the parameter settings for the named service from our deployable when creating the deployed services' do
+      @services.each do |service|
+        @deployment.deployable.stubs(:service_parameters).with(service.name).returns({ "foo" => "service #{service.name}" })
+      end
+      @deployment.deploy(@parameters)
+      @services.each do |service|
+        deployed_service = @deployment.deployed_services.detect {|ds| ds.service_name == service.name }
+        deployed_service.parameters.should == @deployment.deployable.service_parameters(service.name)
+      end
+    end
+    
     it 'should use the deployment parameters when creating the deployed services' do
       @deployment.deploy(@parameters)
       @deployment.deployed_services.each do |deployed_service|
