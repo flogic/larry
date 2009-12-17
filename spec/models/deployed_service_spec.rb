@@ -157,4 +157,35 @@ describe DeployedService do
       @deployed_service.customer.should == @deployed_service.deployment.customer
     end
   end
+  
+  it 'should be able to return a configuration hash' do
+    DeployedService.new.should respond_to(:configuration_hash)
+  end
+  
+  describe 'when returning a configuration hash' do
+    before :each do
+      @deployed_service = DeployedService.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @deployed_service.configuration_hash }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @deployed_service.configuration_hash(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    it 'should return a hash' do
+      @deployed_service.configuration_hash.should respond_to(:keys)
+    end
+    
+    it 'should include the service name as the hash name field' do
+      @deployed_service.configuration_hash[:name].should == @deployed_service.service_name
+    end
+    
+    it 'should include the parameters hash as the hash parameters field' do
+      @deployed_service.parameters = { 'foo' => 'bar', 'baz' => 'xyzzy' }
+      @deployed_service.configuration_hash[:parameters].should == @deployed_service.parameters
+    end
+  end
 end

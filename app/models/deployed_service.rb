@@ -30,5 +30,9 @@ class DeployedService < ActiveRecord::Base
   def customer
     return nil unless deployment
     deployment.customer
-  end  
+  end
+  
+  def configuration_hash
+    { :name => service_name, :parameters => parameters.dup }
+  end
 end
