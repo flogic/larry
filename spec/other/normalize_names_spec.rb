@@ -26,6 +26,10 @@ describe NormalizeNames, "when included in a class" do
       @obj.normalize_name('foo').should_not be_empty
     end
     
+    it 'should not fail when given a nil string' do
+      lambda { @obj.normalize_name(nil) }.should_not raise_error
+    end
+    
     it 'should return a string with only letters, numbers, and underscores' do
       @obj.normalize_name('!@#$^%&*()12344567890qwertyQWERTY?[]=._').should_not match(/[^a-zA-Z0-9_]/)
     end
