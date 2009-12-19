@@ -15,30 +15,6 @@ describe DeploymentsController, 'when integrating' do
     it_should_behave_like "a successful action"
   end
 
-  describe 'new' do
-    before :each do
-      @instance = Instance.generate!
-    end
-
-    def do_request
-      get :new, :instance_id => @instance.id.to_s
-    end
-
-    it_should_behave_like "a successful action"
-    
-    describe 'when a instance scope is specified' do
-      it 'should fail if the requested instance cannot be found' do
-        lambda { get :new, :instance_id => (Instance.last.id + 10).to_s }.should raise_error
-      end
-      
-      it 'should make the instance available to the view' do
-        instance = Instance.generate!
-        get :new, :instance_id => instance.id.to_s
-        assigns[:instance].should == instance
-      end
-    end
-  end
-
   describe 'show' do
     def do_request
       get :show, :id => @deployment.id.to_s
@@ -53,31 +29,6 @@ describe DeploymentsController, 'when integrating' do
     end
 
     it_should_behave_like "a successful action"
-  end
-
-  describe 'create' do
-    before :each do
-      @deployment = Deployment.spawn
-      @instance = Instance.generate
-      @params = { :deployment => @deployment.attributes, :instance_id => @instance.id.to_s }
-    end
-
-    def do_request
-      post :create, @params
-    end
-
-    it_should_behave_like "a redirecting action"
-    
-    describe 'when a instance scope is specified' do
-      it 'should fail if the requested instance cannot be found' do
-        lambda { post :create, :deployment => @deployment.attributes, :instance_id => (Instance.last.id + 10).to_s }.should raise_error
-      end
-      
-      it 'should create a new deployment for the specified instance' do
-        do_request
-        Instance.find(@instance.id).deployments.should include(assigns[:deployment])
-      end
-    end
   end
 
   describe 'update' do
