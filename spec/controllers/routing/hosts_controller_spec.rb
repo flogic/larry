@@ -7,11 +7,11 @@ describe HostsController, 'routing' do
     params_from(:get, "/").should == {:controller => "hosts", :action => "index"}
   end
   
-  it "should build params :name => 'foohost', :format => 'pp', :controller => 'hosts', :action => 'configuration' from GET /hosts/configuration/foohost.pp" do
-    params_from(:get, '/hosts/configuration/foohost.pp').should == { :controller => 'hosts', :action => 'configuration', :name => 'foohost', :format => 'pp' }
+  it "should build params :name => ['foohost'], :controller => 'hosts', :action => 'configuration' from GET /hosts/configuration/foohost" do
+    params_from(:get, '/hosts/configuration/foohost').should == { :controller => 'hosts', :action => 'configuration', :name => ['foohost'] }
   end
 
   it "should map :controller => 'hosts', :action => 'configuration', :name => 'foohost' to /hosts/configuration/foohost" do
-    route_for(:controller => 'hosts', :action => 'configuration', :name => 'foohost').should == "/hosts/configuration/foohost"
+    route_for(:controller => 'hosts', :action => 'configuration', :name => ['foohost']).should == "/hosts/configuration/foohost"
   end  
 end

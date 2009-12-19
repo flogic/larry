@@ -1,6 +1,8 @@
 class HostsController < ApplicationController
   resources_controller_for :host
   
+  before_filter :extract_format_from_hostname, :only => [ :configuration ]
+  
   def configuration
     @host = Host.find_by_name!(params[:name])
     respond_to do |format|
@@ -9,5 +11,12 @@ class HostsController < ApplicationController
       format.json { render :json => @host.configuration.to_json }
       format.yaml { render :text => @host.configuration.to_yaml }
     end
+  end
+  
+  protected
+  
+  def extract_format_from_hostname
+    return unless params[:name].first =~ /\./
+    params[:name], params[:format] = (Regexp.new(/^(.*)\.([^.]*)$/).match(params[:name].first)[1..2])
   end
 end

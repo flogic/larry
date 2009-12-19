@@ -23,13 +23,13 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ---
 
 ordered priorities:
- - should be able to pull a puppet manifest from the view
-   - do we want to turn hostnames into slugs? (also the *rest route argument?)
  - should be able to deploy an instance to a host from the view
+ - deploy; load our data
  - should snapshot services + parameters into the deployable and read from there
  
 --- later 
 
+ - look at using load_data (see doc/vendor), or an updated equivalent, to load in per-class parameter settings in puppet
  - also, deal with the various error conditions going up the chain of deployment
  - should be able to un-deploy a deployed instance
  - should automatically un-deploy deployed instances when deploying

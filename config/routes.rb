@@ -1,7 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :deployments, :destinations, :hosts, :services
 
-  map.connect '/hosts/configuration/:name.:format', :controller => 'hosts', :action => 'configuration'
+  map.connect '/hosts/configuration/*name', :controller => 'hosts', :action => 'configuration'
 
   map.resources :customers,    :has_many => :apps
   map.resources :apps,         :has_many => :instances
