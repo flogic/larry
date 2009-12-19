@@ -5,6 +5,9 @@
   %span== | #{link_to 'edit this host', edit_host_path(@host)}
   - if @host.safe_to_delete?
     %span== | #{link_to 'delete this host', host_path(@host), :method => 'delete', :confirm => "Are you sure you wish to delete the host '#{@host.name}'?"}
+  %span== | #{link_to 'puppet manifest', { :controller => 'hosts', :action => 'configuration', :name => @host.name, :format => 'pp'}}
+  %span== | #{link_to '.json', { :controller => 'hosts', :action => 'configuration', :name => @host.name, :format => 'json'}}
+  %span== | #{link_to '.yaml', { :controller => 'hosts', :action => 'configuration', :name => @host.name, :format => 'yaml'}}
   - unless @host.description.blank?
     .description= @host.description
 

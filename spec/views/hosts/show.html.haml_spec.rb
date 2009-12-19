@@ -29,11 +29,26 @@ describe '/hosts/show' do
     do_render
     response.should have_tag('a[href=?]', host_path(@host), :text => /[Dd]elete/)
   end
-  
+
   it 'should not include a link to delete the host if it is not safe to delete the host' do
     @host.stubs(:safe_to_delete?).returns(false)
     do_render
     response.should_not have_tag('a[href=?]', host_path(@host), :text => /[Dd]elete/)    
+  end
+  
+  it "should include a link to the host's puppet manifest" do
+    do_render
+    response.should have_tag('a[href=?]', url_for(:controller => 'hosts', :action => 'configuration', :name => @host.name, :format => 'pp'))
+  end
+  
+  it "should include a link to a JSON version of the host's configuration" do
+    do_render
+    response.should have_tag('a[href=?]', url_for(:controller => 'hosts', :action => 'configuration', :name => @host.name, :format => 'json'))    
+  end
+  
+  it "should include a link to a YAML version of the host's configuration" do
+    do_render
+    response.should have_tag('a[href=?]', url_for(:controller => 'hosts', :action => 'configuration', :name => @host.name, :format => 'yaml'))
   end
   
   it 'should list the apps the host has deployed' do
