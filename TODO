@@ -24,21 +24,27 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 
 ordered priorities:
  - should be able to pull a puppet manifest from the view
+   - do we want to turn hostnames into slugs? (also the *rest route argument?)
  - should be able to deploy an instance to a host from the view
  - should snapshot services + parameters into the deployable and read from there
  
 --- later 
+
  - also, deal with the various error conditions going up the chain of deployment
  - should be able to un-deploy a deployed instance
  - should automatically un-deploy deployed instances when deploying
+
  - should be able to deploy an "audit" somewhere -- even if it requires specifying each audit for each host by hand; so this includes monitoring, log rotation, firewall rules, backups, database backups, etc.
 
 ---
 
-insights from release of puppet-dashboard:
+insights from release (and ongoing review) of puppet-dashboard:
+
  - could definitely make use of their styling, which would force us back to GPL
  - the activity feed is cool, but we don't need it, yet; would be nice to track deployments / undeployments, maybe service changes, host additions, etc.
  - there are a couple of tweaks and fixes that might be useful, mostly it's just the merging of node/report stuff, visual tweaks, ajaxyness and autocompletes
+ - should we pick up authentication bits and save some effort?
+ - would be interesting to make the reporting a Rack slice (rails metal, pancake app, etc.), or perhaps numerous pieces (nodes are core, reporting is a slice on top of nodes, customer/app/services/deployment is another; provisioning is yet another; perhaps CRM and other customer-related data merging is yet another)
 
 ---
 
