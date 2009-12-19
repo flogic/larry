@@ -2,7 +2,8 @@
 // This file is automatically included by javascript_include_tag :defaults
 
 jQuery(function() { 
-  jQuery('textarea').autogrow();
+  $('textarea').autogrow();
+  $('a[rel*=facebox]').facebox();
 }); 
 
 
