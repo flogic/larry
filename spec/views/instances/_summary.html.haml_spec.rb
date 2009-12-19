@@ -23,4 +23,12 @@ describe '/instances/summary' do
     do_render
     response.should have_text(Regexp.new(@instance.description))
   end
+  
+  it 'should show deployment hosts' do
+    deployable = Deployable.generate!(:instance => @instance)
+    deployment = Deployment.generate!(:deployable => deployable)
+    deployed_service = DeployedService.generate!(:deployment => deployment)
+    do_render
+    response.should have_text(Regexp.new(deployed_service.host.name))
+  end
 end

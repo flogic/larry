@@ -24,7 +24,6 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 
 ordered priorities:
  - should be able to deploy an instance to a host from the view
- 
  - deploy; load our data
  - should snapshot services + parameters into the deployable and read from there
  
