@@ -25,10 +25,10 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ordered priorities:
  - should be able to deploy an instance to a host from the view
  - deploy; load our data
- - should snapshot services + parameters into the deployable and read from there
  
 --- later 
 
+ - should snapshot services + parameters into the deployable and read from there
  - look at using load_data (see doc/vendor), or an updated equivalent, to load in per-class parameter settings in puppet
  - do we want to support being an external nodes source, or are the parameters still at a per-node (and not per-class) level?
  - also, deal with the various error conditions going up the chain of deployment

@@ -6,9 +6,12 @@
   - if @instance.safe_to_delete?
     %span== | #{link_to 'delete this instance', instance_path(@instance), :method => 'delete', :confirm => "Are you sure you wish to delete the instance '#{@instance.name}'?"}
   - if @instance.can_deploy?
-    %span== | #{link_to 'deploy this instance', new_instance_deployment_path(@instance) }
+    %span== | #{link_to 'deploy this instance', new_deployment_instance_path(@instance), :rel => 'facebox' }
   - unless @instance.description.blank?
     .description= @instance.description
+    
+  #instance-deploy-form{:style => 'display:none;'}
+    Hiya.
 
 .hosts
   - if @instance.hosts.blank?

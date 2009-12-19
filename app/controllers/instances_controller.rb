@@ -2,7 +2,30 @@ class InstancesController < ApplicationController
   resources_controller_for :instance, :in => :app
   resources_controller_for :instance
   
+  def new_deployment
+    @instance = Instance.find(params[:id])
+    render :layout => false
+  end
+
+  def deploy
+    @instance = Instance.find(params[:id])
+    if @instance.can_deploy?
+      begin
+        @instance.deploy(params[:deployment], params[:deployable])
+        flash[:notice] = 'Instance successfully deployed.'
+      rescue Exception => e
+        flash[:error] = "Instance deployment failed: #{e.to_s}"
+      end
+    else
+      flash[:error] = "Instance cannot be deployed -- ensure that it has services and all required parameters are set."
+    end
+      
+    redirect_to instance_path(@instance) 
+  end
+  
   before_filter :unserialize_parameters_data, :only => [ :create, :update ]
+  
+  protected
   
   # take key-value data from params[:instance]['parameters'] and return the corresponding instance#parameters hash
   def unserialize_parameters_data

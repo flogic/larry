@@ -160,6 +160,78 @@ describe InstancesController, 'when integrating' do
 
     it_should_behave_like "a redirecting action"
   end
+  
+  describe 'new_deployment' do
+    def do_request
+      get :new_deployment, :id => @instance.id.to_s
+    end
+
+    it 'should be successful' do
+      do_request
+      response.should be_success
+    end
+    
+    it 'should not use a layout' do
+      do_request
+      response.layout.should be_nil
+    end
+    
+    it 'should render the new deployment view' do
+      do_request
+      response.should render_template('new_deployment')
+    end
+  end
+  
+  describe 'deploy' do
+    before :each do 
+      @instance = Instance.generate!
+      @deployable = Deployable.generate!(:instance => @instance)
+      @host = Host.generate!
+      @parameters = { :start_time => Time.now, :reason => 'Because.', :host => @host }
+    end
+    
+    def do_request(params = {})
+      post :deploy, {:id => @instance.id.to_s, :deployment => @parameters, :deployable => @deployable }.merge(params)
+    end
+    
+    describe 'when the instance is undeployable' do      
+      it 'should set a flash message indicating the instance cannot be deployed' do
+        do_request
+        flash[:error].should match(/[Cc]annot/)
+      end
+
+      it 'should redirect to the instance show page' do
+        do_request
+        response.should redirect_to(instance_path(@instance))
+      end
+    end
+    
+    describe 'when the instance can be deployed' do
+      before :each do
+        @instance.services << @services = Array.new(2) { Service.generate! }
+      end
+      
+      it 'should attempt to deploy the instance' do
+        do_request
+        @instance.deployments.size.should == 1
+      end
+      
+      it 'should set a flash message indicating success' do
+        do_request
+        flash[:notice].should match(/uccess/)
+      end
+      
+      it 'should set a flash message indicating failure when deployment fails' do
+        do_request(:deployment => {})
+        flash[:error].should match(/[Ff]ail|[Ee]rror/)
+      end
+
+      it 'should redirect to the instance show page' do
+        do_request
+        response.should redirect_to(instance_path(@instance))
+      end
+    end
+  end
 end
 
 describe InstancesController, 'when not integrating' do

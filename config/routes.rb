@@ -5,7 +5,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :customers,    :has_many => :apps
   map.resources :apps,         :has_many => :instances
-  map.resources :instances,    :has_many => :deployments
+  map.resources :instances,    :member => { :new_deployment => :get, :deploy => :post }, :has_many => :deployments
   map.resources :edges,        :only => [ :create, :destroy ]
   map.resources :requirements, :only => [ :create, :destroy ]
 
