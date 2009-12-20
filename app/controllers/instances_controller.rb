@@ -4,6 +4,7 @@ class InstancesController < ApplicationController
   
   def new_deployment
     @instance = Instance.find(params[:id])
+    @hosts = Host.all
     render :layout => false
   end
 
@@ -12,7 +13,8 @@ class InstancesController < ApplicationController
     if @instance.can_deploy?
       begin
         @instance.deploy(params[:deployment], params[:deployable])
-        flash[:notice] = 'Instance successfully deployed.'
+        @host = Host.find(params[:deployment]["host_id"])
+        flash[:notice] = "Instance successfully deployed to host #{@host.name}"
       rescue Exception => e
         flash[:error] = "Instance deployment failed: #{e.to_s}"
       end

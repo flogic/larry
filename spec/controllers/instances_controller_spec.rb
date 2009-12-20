@@ -176,6 +176,17 @@ describe InstancesController, 'when integrating' do
       response.layout.should be_nil
     end
     
+    it 'should make the instance available to the view' do
+      do_request
+      assigns[:instance].id.should == @instance.id
+    end
+    
+    it 'should make a list of hosts available to the view' do
+      Array.new(2) { Host.generate! }
+      do_request
+      assigns[:hosts].sort_by(&:id).should == Host.all.sort_by(&:id)
+    end
+    
     it 'should render the new deployment view' do
       do_request
       response.should render_template('new_deployment')
@@ -187,7 +198,7 @@ describe InstancesController, 'when integrating' do
       @instance = Instance.generate!
       @deployable = Deployable.generate!(:instance => @instance)
       @host = Host.generate!
-      @parameters = { :start_time => Time.now, :reason => 'Because.', :host => @host }
+      @parameters = { :start_time => Time.now, :reason => 'Because.', :host_id => @host.id }
     end
     
     def do_request(params = {})
