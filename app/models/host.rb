@@ -2,7 +2,7 @@ class Host < ActiveRecord::Base
   include NormalizeNames
   
   has_many :all_deployed_services, :class_name => 'DeployedService', :foreign_key => 'host_id'
-  has_many :all_deployments, :class_name => 'Deployment', :through => :all_deployed_services, :source => 'deployment'
+  has_many :all_deployments, :class_name => 'Deployment', :through => :all_deployed_services, :source => 'deployment', :uniq => true
   
   validates_presence_of :name
   validates_uniqueness_of :name

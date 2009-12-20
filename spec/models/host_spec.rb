@@ -357,6 +357,13 @@ describe Host do
       @host.all_deployments.sort_by(&:id).should == @all.collect(&:deployment).sort_by(&:id)        
     end
     
+    it 'should not return duplicate deployments' do
+      new_open = DeployedService.generate!(:host => @host, :deployment => @current_open.deployment)
+      new_open.deployment.update_attribute(:start_time, @early)
+      new_open.deployment.update_attribute(:end_time, nil)
+      @host.all_deployments.size.should == @all.size
+    end
+    
     it 'should be able to find all deployables for the host' do
       @host.all_deployables.sort_by(&:id).should == @all.collect(&:deployable).sort_by(&:id)        
     end
