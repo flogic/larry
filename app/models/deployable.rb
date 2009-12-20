@@ -57,4 +57,23 @@ class Deployable < ActiveRecord::Base
     return {} unless the_service = services.find_by_name(service_name)
     instance.configuration_parameters.slice(*the_service.parameters)
   end
+  
+  def last_deployment_time
+    return "unknown" if all_deployments.blank?
+    ordered_deployments.first.start_time.to_s(:db)
+  end
+  
+  def last_deployment_reason
+    return "unknown" if all_deployments.blank?
+    ordered_deployments.first.reason
+  end
+  
+  def ordered_deployments
+    all_deployments.sort_by {|d| 
+      [ -d.start_time.to_i, 
+        -1*(d.end_time ? 0 : 1),  
+        -1*(d.end_time ? d.end_time.to_i : 0), 
+        -d.created_at.to_i ] 
+    }
+  end
 end
