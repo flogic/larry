@@ -9,7 +9,6 @@
 @text_color: #000;
 @shadow_color: #eee;
 
-
 .rounded_corners (@radius: 5px) {
   -moz-background-clip:          border;
   -moz-background-inline-policy: continuous;
@@ -18,7 +17,6 @@
   -webkit-border-radius:         @radius;
   border-radius:                 @radius;
 }
-
 
 html { 
   background: @page_background; 
@@ -29,6 +27,11 @@ html {
 body { 
   padding:0; 
   margin:0;
+}
+
+textarea {
+  height: 4em;
+  width: 40%;
 }
 
 #header {
@@ -156,14 +159,25 @@ body {
   display: inline; 
 }
 
-textarea {
-  height: 4em;
-  width: 40%;
-}
-
 .form {
   .rounded_corners;
   padding:1em 1em;
   margin: 1ex 1ex; 
   border: 1px solid @border_color; 
+}
+
+.error {
+  background-color: #ffcccc;
+  color: #ff0000;
+  padding: 1ex;
+  margin: 1ex;
+  border: 2px solid #ff0000;
+}
+
+.notice {
+  background-color: #ccffcc;
+  color: #000000;
+  padding: 1ex;
+  margin: 1ex;
+  border: 2px solid #00ff00;
 }
