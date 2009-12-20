@@ -4,6 +4,7 @@ describe '/instances/new_deployment' do
   before :each do
     assigns[:instance] = @instance = Instance.generate!
     assigns[:hosts] = @hosts = Array.new(3) { Host.generate! }
+    assigns[:deployables] = @deployables = Array.new(3) { Deployable.generate!(:instance => @instance) }
   end
 
   def do_render
@@ -35,6 +36,28 @@ describe '/instances/new_deployment' do
           end
         end
       end     
+    end
+    
+    it 'should allow choosing from all the available deployables for this instance' do
+      do_render
+      response.should have_tag('form[id=?][method=?]', 'new_deployment', 'post') do
+        with_tag('select[name=?]', 'deployable[deployable_id]') do
+          @deployables.each do |deployable|
+            with_tag('option[value=?]', deployable.id.to_s, :text => Regexp.new(deployable.last_deployment_time))
+          end
+        end
+      end     
+    end
+    
+    it 'should include an option to create a new deployable when deploying this instance' do
+      do_render
+      response.should have_tag('form[id=?][method=?]', 'new_deployment', 'post') do
+        with_tag('select[name=?]', 'deployable[deployable_id]') do
+          @deployables.each do |deployable|
+            with_tag('option', :text => /[Nn]ew/)
+          end
+        end
+      end      
     end
     
     it 'should have a reason input' do

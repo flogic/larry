@@ -187,6 +187,12 @@ describe InstancesController, 'when integrating' do
       assigns[:hosts].sort_by(&:id).should == Host.all.sort_by(&:id)
     end
     
+    it 'should make the list of current deployables for the instance available to the view' do
+      deployables = Array.new(2) { Deployable.generate!(:instance => @instance) }
+      do_request
+      assigns[:deployables].should == deployables
+    end
+    
     it 'should render the new deployment view' do
       do_request
       response.should render_template('new_deployment')

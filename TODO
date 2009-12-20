@@ -23,8 +23,6 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ---
 
 ordered priorities:
- - should be able to deploy an instance to a host from the view
-   - make a Deployable selector
  - undeploy:
    - model
    - automatically when deploying to the same host with overlapping time interval
