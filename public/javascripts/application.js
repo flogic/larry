@@ -4,6 +4,10 @@
 jQuery(function() { 
   $('textarea').autogrow();
   $('a[rel*=facebox]').facebox();
+  $('input.datetime').livequery(function() { $(this).datetime({
+		userLang	: 'en',
+		americanMode: true,
+	}); });
 }); 
 
 
