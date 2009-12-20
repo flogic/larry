@@ -58,9 +58,14 @@ class Deployable < ActiveRecord::Base
     instance.configuration_parameters.slice(*the_service.parameters)
   end
   
-  def last_deployment_time
+  def last_deployment_time_string
     return "unknown" if all_deployments.blank?
     ordered_deployments.first.start_time.to_s(:db)
+  end
+  
+  def last_deployment_time
+    return nil if all_deployments.blank?
+    ordered_deployments.first.start_time
   end
   
   def last_deployment_reason

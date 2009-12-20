@@ -327,6 +327,56 @@ describe Deployable do
     end
   end
   
+  it 'should have a last deployment time as a string' do
+    Deployable.new.should respond_to(:last_deployment_time_string)
+  end
+  
+  describe 'last deployment time as a string' do
+    before :each do
+      @deployable = Deployable.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @deployable.last_deployment_time_string }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @deployable.last_deployment_time_string(:foo) }.should raise_error(ArgumentError)      
+    end
+
+    it 'should return "unknown" if there are no deployments for this deployable' do
+      @deployable.last_deployment_time_string.should == "unknown"
+    end
+    
+    it 'should return the time string from the deployment with the latest start time' do
+      earlier = @deployable.all_deployments.generate!(:start_time => 1.days.from_now, :reason => 'earlier')
+      later = @deployable.all_deployments.generate!(:start_time => 2.days.from_now, :reason => 'later')
+      Deployable.find(@deployable.id).last_deployment_time_string.should == later.start_time.to_s(:db)
+    end
+    
+    it 'should return the time string from the deployment with a nil end time when start times are equal' do
+      t = 2.days.from_now
+      earlier = @deployable.all_deployments.generate!(:start_time => t, :end_time => 5.days.from_now, :reason => 'non-nil')
+      later = @deployable.all_deployments.generate!(:start_time => t, :end_time => nil, :reason => 'nil')
+      Deployable.find(@deployable.id).last_deployment_time_string.should == later.start_time.to_s(:db)   
+    end
+    
+    it 'should return the time string from the deployment with the most recent end time when start times are equal and multiple have non-nil end times' do
+      t = 2.days.from_now
+      earlier = @deployable.all_deployments.generate!(:start_time => t, :end_time => 5.days.from_now, :reason => 'earlier')
+      later = @deployable.all_deployments.generate!(:start_time => t, :end_time => 6.days.from_now, :reason => 'later')
+      Deployable.find(@deployable.id).last_deployment_time_string.should == later.start_time.to_s(:db)
+    end
+    
+    it 'should return the time string from the deployment with the most recent creation time when start times are equal and multiple have nil end times' do
+      t = 2.days.from_now
+      e = 3.days.from_now
+      earlier = @deployable.all_deployments.generate!(:start_time => t, :end_time => e, :created_at => Time.now, :reason => 'earlier')
+      later = @deployable.all_deployments.generate!(:start_time => t, :end_time => e, :created_at => 5.minutes.from_now, :reason => 'later')
+      Deployable.find(@deployable.id).last_deployment_time_string.should == later.start_time.to_s(:db)
+    end  
+  end
+
   it 'should have a last deployment time' do
     Deployable.new.should respond_to(:last_deployment_time)
   end
@@ -344,36 +394,36 @@ describe Deployable do
       lambda { @deployable.last_deployment_time(:foo) }.should raise_error(ArgumentError)      
     end
 
-    it 'should return "unknown" if there are no deployments for this deployable' do
-      @deployable.last_deployment_time.should == "unknown"
+    it 'should return nil if there are no deployments for this deployable' do
+      @deployable.last_deployment_time.should be_nil
     end
     
-    it 'should return the reason from the deployment with the latest start time' do
+    it 'should return the time string from the deployment with the latest start time' do
       earlier = @deployable.all_deployments.generate!(:start_time => 1.days.from_now, :reason => 'earlier')
       later = @deployable.all_deployments.generate!(:start_time => 2.days.from_now, :reason => 'later')
-      Deployable.find(@deployable.id).last_deployment_time.should == later.start_time.to_s(:db)
+      Deployable.find(@deployable.id).last_deployment_time.to_i.should == later.start_time.to_i
     end
     
-    it 'should return the reason from the deployment with a nil end time when start times are equal' do
+    it 'should return the time string from the deployment with a nil end time when start times are equal' do
       t = 2.days.from_now
       earlier = @deployable.all_deployments.generate!(:start_time => t, :end_time => 5.days.from_now, :reason => 'non-nil')
       later = @deployable.all_deployments.generate!(:start_time => t, :end_time => nil, :reason => 'nil')
-      Deployable.find(@deployable.id).last_deployment_time.should == later.start_time.to_s(:db)   
+      Deployable.find(@deployable.id).last_deployment_time.to_i.should == later.start_time.to_i
     end
     
-    it 'should return the reason from the deployment with the most recent end time when start times are equal and multiple have non-nil end times' do
+    it 'should return the time string from the deployment with the most recent end time when start times are equal and multiple have non-nil end times' do
       t = 2.days.from_now
       earlier = @deployable.all_deployments.generate!(:start_time => t, :end_time => 5.days.from_now, :reason => 'earlier')
       later = @deployable.all_deployments.generate!(:start_time => t, :end_time => 6.days.from_now, :reason => 'later')
-      Deployable.find(@deployable.id).last_deployment_time.should == later.start_time.to_s(:db)
+      Deployable.find(@deployable.id).last_deployment_time.to_i.should == later.start_time.to_i
     end
     
-    it 'should return the reason from the deployment with the most recent creation time when start times are equal and multiple have nil end times' do
+    it 'should return the time string from the deployment with the most recent creation time when start times are equal and multiple have nil end times' do
       t = 2.days.from_now
       e = 3.days.from_now
       earlier = @deployable.all_deployments.generate!(:start_time => t, :end_time => e, :created_at => Time.now, :reason => 'earlier')
       later = @deployable.all_deployments.generate!(:start_time => t, :end_time => e, :created_at => 5.minutes.from_now, :reason => 'later')
-      Deployable.find(@deployable.id).last_deployment_time.should == later.start_time.to_s(:db)
+      Deployable.find(@deployable.id).last_deployment_time.to_i.should == later.start_time.to_i
     end  
   end
 end
