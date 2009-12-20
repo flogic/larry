@@ -43,7 +43,7 @@ describe '/instances/new_deployment' do
       response.should have_tag('form[id=?][method=?]', 'new_deployment', 'post') do
         with_tag('select[name=?]', 'deployable[deployable_id]') do
           @deployables.each do |deployable|
-            with_tag('option[value=?]', deployable.id.to_s, :text => Regexp.new(deployable.last_deployment_time))
+            with_tag('option[value=?]', deployable.id.to_s, :text => Regexp.new(deployable.last_deployment_time_string))
           end
         end
       end     

@@ -2,7 +2,7 @@
 - semantic_form_for @instance, :url => deploy_instance_path(@instance), :html => {:method => 'post', :id => 'new_deployment'} do |f|
   %dl
     %dt Snapshot:
-    %dd= select_tag 'deployable[deployable_id]', options_for_select([['Create a new snapshot', '']] + @deployables.collect {|d| [ "'#{d.last_deployment_reason}' -- last deployed at #{d.last_deployment_time}", d.id] })
+    %dd= select_tag 'deployable[deployable_id]', options_for_deployables(@deployables)
     %dt Host:
     %dd= select_tag 'deployment[host_id]', options_for_select(@hosts.collect {|h| [h.name, h.id] })
     %dt Reason:
