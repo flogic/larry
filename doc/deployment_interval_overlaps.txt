@@ -1,0 +1,92 @@
+--- Handling overlaps in deployment times when deploying a new instance to a host.
+
+Consider a situation where we have some application instance (say a production web server for some website).  We specify that we want that instance deployed to some host over some range of time (start_time ... end_time, with a nil end_time representing a deployment with unbounded future extent).  Later we come in and say, "now, I want to deploy this same instance to the same host during this other time interval as well".  This could be due to a change in the deployment (packages required change over time), some scheme to manage billing, etc., and/or due to operator error.  If the time intervals for the two deployments are independent there is no issue (one is fully in the past with regard to the other).  Where there are overlaps we need to resolve those overlaps in a manner that is consistent and hopefully useful to the end-user.
+
+Consider the following possible overlaps when adding a new deployment ("2") when an existing deployment ("1") is already present.  The simplest case, where there are overlaps, is when the configuration has not changed (in our model it means that we're deploying two deployments of the same Deployable).  In this case we should simply choose the minimum start_time and maximum end_time, and update metadata fields accordingly (e.g., the deployment "reason" -- this simplification may not be the best strategy, as we discuss in the notes below, but it reduces to the enumerated cases anyway).  When deployments use a different configuration (Deployable) then there are a few things which could happen:
+
+I.
+
+   1  |------------|
+      2      |---------------|
+      
+This is a situation where the overlap is from a deployment which is in the past relative to the deployment being added.  There are three "reasonable" solutions:
+
+
+  (a)  Truncate the earlier interval's end time.
+  
+   1  |------|
+      2      |---------------|
+
+  (b)  Move the new interval's start time.  This suffers from either failure or deletion of the new interval when the old interval's end_time is nil (unbounded):
+  
+  1  |------------|
+     2            |----------|
+     
+  (c) Exit in error.  Unambiguous, but requires work on the part of the user.
+  
+
+II.
+
+       1    |--------------|           
+   2  |------------|
+   
+   
+This is a situation where the overlap is in the future, relative to the deployment being added.  There are three "reasonable" solutions here as well:
+
+  (a)  Truncate the end_time of the new interval being added.  This is somewhat surprising, especially if the user explicitly set an end time:
+  
+       1    |--------------|           
+   2  |-----|
+  
+  (b) Move the start_time of the older interval.  This suffers from either failure or deletion of the prior interval when the new interval's end_time is nil (unbounded).
+  
+       1           |-------|           
+   2  |------------|
+  
+   (c) Exit in error.  Unambiguous, but requires work on the part of the user.
+
+
+III.
+
+        1  |--------------|           
+        2  |------------|
+
+This situation has coincident start times, and possibly end times.  Most cases here are degenerate and no easy solution other than deleting an interval and/or failing with error seem reasonable.
+
+Thoughts:
+
+ - The simplest case to implement is "always fail on overlap", and also the least satisfying.
+ - Note that we don't allow creation of deployments which start in the past, which probably comes in slightly handy when implementing solutions here.  It does, however, complicate possible solutions via merging of intervals (e.g., always merge and take the newest Deployable as the definitive deployable), as deployments which are ongoing cannot reasonably have their Deployable changed since the historical deployment up to this point was for a different Deployable.
+ - There is a real advantage to being able to deploy one configuration (Deployable), then at some time in the future switch to a new configuration (Deployable).  The ability to construct an open-ended deployment, then drop-in a new open-ended deployment for a future date is an ideal workflow, and points to I.(a) being a desirable solution for such a case.
+ - We may split the considerations of II. based on whether the new interval is open-ended or not.  If it is open-ended it seems more useful to truncate it at the beginning of the old interval (as then the user doesn't have to think and it does The Right Thing -- filling in the time up to the change with the configuration we've just specified).  But, if a specific end_time is set for the new interval, that specificity is probably importand, and it would seem reasonable that any conflicting later deployments should be adjusted or deactivated.
+ - Clearly this problem scales with more interval overlaps.  However, if a strategy is consistently applied upon adding deployments, it is sufficient to handle each existing deployment interval separately.  Since all proposed operations involve shrinking intervals we cannot introduce new interval collisions where there were none before (to see that this is true note that we can represent the intervals and their overlaps via an Interval Graph [http://en.wikipedia.org/wiki/Interval_graph]; we are maintaining a degenerate interval graph where there are no graph edges -- i.e., it is one large independent set; the operations at our disposal cannot introduce edges...)
+ - It is easy (in fact the code was already written before I stepped back to consider the larger problem) to implement the strategy for I.(a).
+ - Probably most occurrences here are operator error (forgetting which particular time intervals are in play, or re-adding a deployment mistakenly, or getting deployment parameters wrong).  So, we should highlight the potential deployment overlaps prior to deploying (e.g., on the new deployment form, or on the instance show page).
+ - In those cases which aren't operator error, it would seem that the newer deployment should almost always take precedence over the older deployment.  In this case we would implement I.(a) [truncate end time of older interval], II.(b) [move start time of older interval, deleting if older interval is completely overlapped], and applying the same II.(b) strategy where III. occurs.
+ - Deletion of an existing interval could be problematic.  If the interval has been in effect then there are historical record-keeping implications.  If the interval is currently in progress then we're in case I. and deletion shouldn't occur.  If the interval is in the future, then deletion implies that it becomes difficult to resurrect it in case we wish to deploy it to fix errors.  Also, the history of deployables would be affected by removing deployments.  So, we need a means of taking a deployment out of consideration for actual deployment without deleting it from the system.  This sounds like an is_deactivated? flag (for the active named scope, and the active? predicate in the deployment model); should probably also update the Deployment summary so that deactivated deployments are visibly denoted.
+ - merging deployments with overlapped intervals (i.e., configuration (Deployable) is same) may have some benefits, but ultimately we lose the original history of the deployment (including whatever metadata about the deployment reason, and if we go this route, who did it, etc.).  Seems better to just add a distinct new interval.
+ - We should attempt to provide feedback post-facto about what happened.
+ - Maybe we could draw pretty interval maps :-)
+
+---
+
+ psuedocode:
+
+ - at creation time for a new deployment,
+   - new_one: the new deployment being added 
+   - conflicts: the list of conflicting deployments (same instance, same host, overlapping time interval)
+
+   conflicts.each do |conflict| 
+     if conflict.start_time < new_one.start_time
+       conflict.end_time = new_one.start_time
+     else
+       if new_one.end_time.nil? or (!conflict.end_time.nil? and new_one.end_time > conflict.end_time)
+         conflict.deactivate
+       else
+         conflict.start_time = new_one.end_time
+       end
+     end      
+   end
+   
+   # now, finish creation of new_one
+  
