@@ -336,6 +336,12 @@ describe Deployment do
       lambda { @deployment.deploy }.should raise_error(ArgumentError)
     end
     
+    describe "when deploying to a host which already has an active deployment of our deployable's instance" do
+      it 'should shorten the end times of conflicting earlier deployments'
+      it 'should deactivate contained conflicting earlier deployments'
+      it 'should adjust the start times of conflicting, but not contained, later deployments'
+    end
+    
     it 'should create deployed services for each service required by our deployable' do
       @deployment.deploy(@parameters)
       @deployment.deployed_services.size.should == @services.size
