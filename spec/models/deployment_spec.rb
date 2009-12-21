@@ -517,4 +517,80 @@ describe Deployment do
       @deployment.should be_active                        
     end
   end
+  
+  it 'should be able to determine which deployments share our instance, are current, and deployed to a specified host' do
+    Deployment.new.should respond_to(:find_conflicting_deployments_for_host)
+  end
+  
+  describe 'when finding conflicting deployments for a host' do
+    before :each do
+      @deployment = Deployment.generate!
+      @deployed_service = DeployedService.generate!(:deployment => @deployment)
+      @host = @deployed_service.host
+    end
+    
+    it 'should accept a host id' do
+      lambda { @deployment.find_conflicting_deployments_for_host(@host.id) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should require a host id' do
+      lambda { @deployment.find_conflicting_deployments_for_host }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should return the empty list if our deployable is not set' do
+      @deployment.deployable = nil
+      @deployment.find_conflicting_deployments_for_host(@host.id).should == []
+    end
+    
+    it 'should return the empty list if our instance is not set' do
+      @deployment.deployable.instance = nil
+      @deployment.find_conflicting_deployments_for_host(@host.id).should == []      
+    end
+    
+    it 'should fail if no host id is set' do
+      lambda { @deployment.find_conflicting_deployments_for_host(nil) }.should raise_error
+    end
+    
+    it 'should not match deployments which do not share our instance' do
+      other_deployment = Deployment.generate!
+      @deployment.find_conflicting_deployments_for_host(@host.id).should_not include(other_deployment)
+    end
+    
+    it 'should not match deployments which share our instance but do not have deployed services on the provided host' do
+      other_deployable = Deployable.generate!(:instance => @deployment.instance)
+      other_deployment = Deployment.generate!(:deployable => other_deployable)
+      other_deployed_service = DeployedService.generate!(:deployment => other_deployment)
+      @deployment.find_conflicting_deployments_for_host(@host.id).should_not include(other_deployment)
+    end
+    
+    it 'should not match deployments of the same instance to the same host which end before our start time' do
+      other_deployment = Deployment.generate!(:deployable => @deployment.deployable)
+      other_deployment.update_attribute(:start_time, 5.days.ago)
+      other_deployment.update_attribute(:end_time, 4.days.ago)
+      @deployment.update_attribute(:start_time, 1.day.ago)
+      @deployment.update_attribute(:end_time, nil)
+      other_deployed_service = DeployedService.generate!(:deployment => other_deployment, :host => @deployed_service.host)
+      @deployment.find_conflicting_deployments_for_host(@host.id).should_not include(other_deployment)      
+    end
+    
+    it 'should not match deployments of the same instance to the same host which start after our end time' do
+      other_deployment = Deployment.generate!(:deployable => @deployment.deployable)
+      other_deployment.update_attribute(:start_time, 3.days.from_now)
+      other_deployment.update_attribute(:end_time, nil)
+      @deployment.update_attribute(:start_time, 1.days.from_now)
+      @deployment.update_attribute(:end_time, 2.days.from_now)
+      other_deployed_service = DeployedService.generate!(:deployment => other_deployment, :host => @deployed_service.host)
+      @deployment.find_conflicting_deployments_for_host(@host.id).should_not include(other_deployment)            
+    end
+    
+    it 'should match deployments which share our instance, include our start time, and have deployed services on the provided host' do
+      other_deployment = Deployment.generate!(:deployable => @deployment.deployable)
+      other_deployment.update_attribute(:start_time, 2.days.ago)
+      other_deployment.update_attribute(:end_time, 2.days.from_now)
+      @deployment.update_attribute(:start_time, Time.now)
+      @deployment.update_attribute(:end_time, nil)
+      other_deployed_service = DeployedService.generate!(:deployment => other_deployment, :host => @deployed_service.host)
+      @deployment.find_conflicting_deployments_for_host(@host.id).should include(other_deployment)      
+    end
+  end
 end

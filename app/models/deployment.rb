@@ -2,6 +2,10 @@ class Deployment < ActiveRecord::Base
   belongs_to :deployable
   has_many :deployed_services
   
+  named_scope :active, lambda {
+    { :conditions => [ 'start_time <= ? and (end_time is null or end_time > ?)', Time.now, Time.now ] }
+  }
+    
   validates_presence_of :deployable
   validates_presence_of :reason
   validates_presence_of :start_time
@@ -9,10 +13,6 @@ class Deployment < ActiveRecord::Base
   validate :start_time_must_not_be_in_past
   validate :end_time_must_not_be_in_past
   validate :non_nil_end_time_must_follow_start_time
-  
-  named_scope :active, lambda {
-    { :conditions => [ 'start_time <= ? and (end_time is null or end_time > ?)', Time.now, Time.now ] }
-  }
   
   def self.deploy_from_deployable(deployable, params)
     deployment = create!(:deployable => deployable, 
@@ -66,6 +66,12 @@ class Deployment < ActiveRecord::Base
     return false if start_time > Time.now
     return false if end_time and end_time <= Time.now
     true
+  end
+  
+  def find_conflicting_deployments_for_host(host_id)
+    return [] unless deployable and instance
+    @host = Host.find(host_id)
+    instance.all_deployments.select {|d| d.hosts.include?(@host) and d.start_time <= self.start_time and (d.end_time.nil? or d.end_time > self.start_time) }
   end
   
   protected
