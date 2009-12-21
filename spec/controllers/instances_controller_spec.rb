@@ -208,7 +208,7 @@ describe InstancesController, 'when integrating' do
     end
     
     def do_request(params = {})
-      post :deploy, {:id => @instance.id.to_s, :deployment => @parameters, :deployable => @deployable }.merge(params)
+      post :deploy, {:id => @instance.id.to_s, :deployment => @parameters, :deployable => { :deployable_id => @deployable.id.to_s } }.merge(params)
     end
     
     describe 'when the instance is undeployable' do      
@@ -228,24 +228,82 @@ describe InstancesController, 'when integrating' do
         @instance.services << @services = Array.new(2) { Service.generate! }
       end
       
-      it 'should attempt to deploy the instance' do
-        do_request
-        @instance.deployments.size.should == 1
-      end
+      describe 'when a blank deployable id is provided' do
+        it 'should create a new deployable for the instance' do
+          do_request(:deployable => { })
+          @instance.deployables.should_not be_empty
+        end
+        
+        it 'should set a flash message indicating success' do
+          do_request(:deployable => { })
+          flash[:notice].should match(/uccess/)
+        end
       
-      it 'should set a flash message indicating success' do
-        do_request
-        flash[:notice].should match(/uccess/)
-      end
-      
-      it 'should set a flash message indicating failure when deployment fails' do
-        do_request(:deployment => {})
-        flash[:error].should match(/[Ff]ail|[Ee]rror/)
-      end
+        it 'should set a flash message indicating failure when deployment fails' do
+          do_request(:deployment => { }, :deployable => { })
+          flash[:error].should match(/[Ff]ail|[Ee]rror/)
+        end
 
-      it 'should redirect to the instance show page' do
-        do_request
-        response.should redirect_to(instance_path(@instance))
+        it 'should set a flash failure message when there is no host specified' do
+          @parameters[:host_id] = nil
+          do_request(:deployable => { })
+          flash[:error].should match(/[Ff]ail|[Ee]rror/)
+        end
+        
+        it 'should set a flash failure message when the specified host cannot be found' do
+          @parameters[:host_id] = 100000000
+          do_request(:deployable => { })
+          flash[:error].should match(/[Ff]ail|[Ee]rror/)          
+        end
+        
+        it 'should make the specified host available to the view' do
+          do_request
+          assigns[:host].should == @host
+        end
+
+        it 'should redirect to the instance show page' do
+          do_request(:deployable => { })
+          response.should redirect_to(instance_path(@instance))
+        end
+      end
+      
+      describe 'when a deployable id is specified' do
+        it 'should attempt to deploy the instance' do
+          do_request
+          @instance.deployments.size.should == 1
+        end
+      
+        it 'should set a flash message indicating success' do
+          do_request
+          flash[:notice].should match(/uccess/)
+        end
+      
+        it 'should set a flash message indicating failure when deployment fails' do
+          do_request(:deployment => {})
+          flash[:error].should match(/[Ff]ail|[Ee]rror/)
+        end
+        
+        it 'should set a flash failure message when there is no host specified' do
+          @parameters[:host_id] = nil
+          do_request
+          flash[:error].should match(/[Ff]ail|[Ee]rror/)
+        end
+        
+        it 'should set a flash failure message when the specified host cannot be found' do
+          @parameters[:host_id] = 100000000
+          do_request
+          flash[:error].should match(/[Ff]ail|[Ee]rror/)          
+        end
+        
+        it 'should make the specified host available to the view' do
+          do_request
+          assigns[:host].should == @host
+        end
+
+        it 'should redirect to the instance show page' do
+          do_request
+          response.should redirect_to(instance_path(@instance))
+        end
       end
     end
   end

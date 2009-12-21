@@ -5,7 +5,7 @@ class InstancesController < ApplicationController
   def new_deployment
     @instance = Instance.find(params[:id])
     @hosts = Host.all
-    @deployables = @instance.deployables.sort_by {|d| - d.created_at.to_i }
+    @deployables = @instance.deployables
     render :layout => false
   end
 
@@ -13,7 +13,7 @@ class InstancesController < ApplicationController
     @instance = Instance.find(params[:id])
     if @instance.can_deploy?
       begin
-        @deployable = Deployable.find(params[:deployable][:deployable_id]) if params[:deployable][:deployable_id]
+        @deployable = Deployable.find(params[:deployable][:deployable_id]) unless params[:deployable][:deployable_id].blank?
         @instance.deploy(params[:deployment], @deployable)
         @host = Host.find(params[:deployment]["host_id"])
         flash[:notice] = "Instance successfully deployed to host #{@host.name}"
