@@ -41,6 +41,15 @@ describe Deployment do
       @deployment.end_time = time = 1.day.from_now
       @deployment.end_time.should == time
     end
+    
+    it 'should have a deactivated flag' do
+      @deployment.should respond_to(:is_deactivated)
+    end
+    
+    it 'should allow setting and retrieving the deactivated flag' do
+      @deployment.is_deactivated = true
+      @deployment.is_deactivated.should be_true
+    end
   end
   
   describe 'validations' do
@@ -313,6 +322,34 @@ describe Deployment do
       it 'should include deployments with start times in the past and nil end times' do
         Deployment.active.should include(@current_open)
       end
+      
+      it 'should not include deployments which have been deactivated' do
+        @current_open.deactivate
+        Deployment.active.should_not include(@current_open)
+      end
+    end
+  end
+  
+  it 'should be able to be deactivated' do
+    Deployment.new.should respond_to(:deactivate)
+  end
+  
+  describe 'deactivating' do
+    before :each do
+      @deployment = Deployment.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @deployment.deactivate }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @deployment.deactivate(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    it 'should set the deactivated flag' do
+      @deployment.deactivate
+      @deployment.is_deactivated.should be_true
     end
   end
   
@@ -521,6 +558,13 @@ describe Deployment do
       @deployment.start_time = t
       @deployment.end_time = nil
       @deployment.should be_active                        
+    end
+    
+    it 'should not be active if it has been deactivated' do
+      @deployment.start_time = Time.now
+      @deployment.end_time = nil
+      @deployment.deactivate
+      @deployment.should_not be_active
     end
   end
   

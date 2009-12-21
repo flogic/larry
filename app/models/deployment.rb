@@ -3,7 +3,7 @@ class Deployment < ActiveRecord::Base
   has_many :deployed_services
   
   named_scope :active, lambda {
-    { :conditions => [ 'start_time <= ? and (end_time is null or end_time > ?)', Time.now, Time.now ] }
+    { :conditions => [ '(is_deactivated is null or is_deactivated=?) and start_time <= ? and (end_time is null or end_time > ?)', false, Time.now, Time.now ] }
   }
     
   validates_presence_of :deployable
@@ -22,6 +22,10 @@ class Deployment < ActiveRecord::Base
     deployment_params = params.clone
     [ :start_time, :end_time, :reason].each {|key| deployment_params.delete(key) }
     deployment.deploy(deployment_params)
+  end
+  
+  def deactivate
+    update_attribute(:is_deactivated, true)
   end
   
   def deploy(params)
@@ -62,6 +66,7 @@ class Deployment < ActiveRecord::Base
   end
   
   def active?
+    return false if is_deactivated?
     return false unless start_time
     return false if start_time > Time.now
     return false if end_time and end_time <= Time.now

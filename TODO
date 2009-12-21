@@ -35,21 +35,16 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
- D deploy larry; load our data
-
  D model: undeploy automatically when deploying to the same host with overlapping time interval
-   - is_deactivated flag for deployments
-     - update active named scope
-     - update #active?
-     - highlight deactivated deployments in views
-     - deactivate method to set the flag
-   - before_create method
    - update conflicting finder to make sure we get all past and present overlap/conflicts
    - before_save on Deployment to adjust any conflicting intervals, according to the logic on the doc/ document
+
+ D deploy larry; load our data
 
  D view: 
    - list of *current* deployments
      - link to undeploy manually, DeploymentsController#undeploy calls Deployment#undeploy()
+     - highlight deactivated deployments in views
  D view: edit deployment
    - can only shorten end_time for current deployments
    - for future deployments, can set anything (obviously validators will fire)
