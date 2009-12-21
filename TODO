@@ -36,8 +36,7 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ["P" -> provisioning milestone]
 
  D undeploy:
-   - model
-   - automatically when deploying to the same host with overlapping time interval
+   - model: automatically when deploying to the same host with overlapping time interval
    - manually from view (from a list of current deployments)
  D should snapshot services + parameters into the deployable and read from there
  D deploy larry; load our data

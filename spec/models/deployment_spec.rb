@@ -374,6 +374,73 @@ describe Deployment do
     end
   end
 
+  it 'should be able to undeploy' do
+    Deployment.new.should respond_to(:undeploy)
+  end
+  
+  describe 'when undeploying' do
+    before :each do
+      @deployment = Deployment.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @deployment.undeploy }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { @deployment.undeploy(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    describe 'and this deployment is a new record' do
+      before :each do
+        @deployment = Deployment.spawn(:start_time => 5.seconds.ago, :end_time => nil)
+      end
+      
+      it 'should not modify the end time' do
+        @deployment.undeploy
+        @deployment.end_time.should be_nil
+      end
+      
+      it 'should return false' do
+        @deployment.undeploy.should be_false
+      end
+    end
+    
+    describe 'and this deployment is not currently active' do
+      before :each do
+        @end = 1.hour.ago
+        @deployment.update_attribute(:start_time, 1.day.ago)
+        @deployment.update_attribute(:end_time, @end)
+      end
+      
+      it 'should not modify the end time' do
+        @deployment.undeploy
+        @deployment.end_time.should == @end
+      end
+      
+      it 'should return false' do
+        @deployment.undeploy.should be_false
+      end
+    end
+    
+    describe 'and the deployment is currently active' do
+      before :each do
+        @deployment.update_attribute(:start_time, 1.day.ago)
+        @t = Time.now
+        Time.stubs(:now).returns(@t)
+      end
+      
+      it 'should set the end time on the deployment to the current time' do
+        @deployment.undeploy
+        @deployment.end_time.to_i.should == @t.to_i
+      end
+      
+      it 'should return the set end time' do
+        @deployment.undeploy.to_i.should == @t.to_i
+      end
+    end
+  end
+
   it 'should be able to determine if it is currently active' do
     Deployment.new.should respond_to(:active?)
   end

@@ -31,6 +31,12 @@ class Deployment < ActiveRecord::Base
     deployed_services
   end
   
+  def undeploy
+    return false if new_record? or !active?
+    update_attribute(:end_time, Time.now)
+    reload.end_time
+  end
+  
   def hosts
     deployed_services.collect(&:host).uniq
   end
