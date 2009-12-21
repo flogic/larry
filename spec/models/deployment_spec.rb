@@ -642,5 +642,15 @@ describe Deployment do
       other_deployed_service = DeployedService.generate!(:deployment => other_deployment, :host => @deployed_service.host)
       @deployment.find_conflicting_deployments_for_host(@host.id).should include(other_deployment)      
     end
+
+    it 'should match deployments which share our instance, include our end time, and have deployed services on the provided host' do
+      other_deployment = Deployment.generate!(:deployable => @deployment.deployable)
+      other_deployment.update_attribute(:start_time, 2.days.ago)
+      other_deployment.update_attribute(:end_time, 2.days.from_now)
+      @deployment.update_attribute(:start_time, 3.days.ago)
+      @deployment.update_attribute(:end_time, 1.days.ago)
+      other_deployed_service = DeployedService.generate!(:deployment => other_deployment, :host => @deployed_service.host)
+      @deployment.find_conflicting_deployments_for_host(@host.id).should include(other_deployment)      
+    end
   end
 end

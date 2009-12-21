@@ -76,7 +76,11 @@ class Deployment < ActiveRecord::Base
   def find_conflicting_deployments_for_host(host_id)
     return [] unless deployable and instance
     @host = Host.find(host_id)
-    instance.all_deployments.select {|d| d.hosts.include?(@host) and d.start_time <= self.start_time and (d.end_time.nil? or d.end_time > self.start_time) }
+    instance.all_deployments.select do |d| 
+      d.hosts.include?(@host) and
+       ((d.start_time <= self.start_time and (d.end_time.nil?    or d.end_time    > self.start_time)) or
+        (d.start_time  > self.start_time and (self.end_time.nil? or self.end_time > d.start_time)))
+     end
   end
   
   protected
