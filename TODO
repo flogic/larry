@@ -22,73 +22,44 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 
 ---
 
-ordered priorities:
- - undeploy:
-   - model
-   - automatically when deploying to the same host with overlapping time interval
-   - manually from view (from a list of current deployments)
- - deploy larry; load our data
- 
---- later 
+ insights from release (and ongoing review) of puppet-dashboard:
 
- - should snapshot services + parameters into the deployable and read from there
- - look at using load_data (see doc/vendor), or an updated equivalent, to load in per-class parameter settings in puppet
- - raphael-based service graphs, host-service graphs, customer service graphs, app service graphs, instance services graphs, etc.
- - do we want to support being an external nodes source, or are the parameters still at a per-node (and not per-class) level?
- - also, deal with the various error conditions going up the chain of deployment
- - should be able to un-deploy a deployed instance
- - should automatically un-deploy deployed instances when deploying
-
- - should be able to deploy an "audit" somewhere -- even if it requires specifying each audit for each host by hand; so this includes monitoring, log rotation, firewall rules, backups, database backups, etc.
-
----
-
-insights from release (and ongoing review) of puppet-dashboard:
-
- - could definitely make use of their styling, which would force us back to GPL
- - the activity feed is cool, but we don't need it, yet; would be nice to track deployments / undeployments, maybe service changes, host additions, etc.
- - there are a couple of tweaks and fixes that might be useful, mostly it's just the merging of node/report stuff, visual tweaks, ajaxyness and autocompletes
- - should we pick up authentication bits and save some effort?
- - would be interesting to make the reporting a Rack slice (rails metal, pancake app, etc.), or perhaps numerous pieces (nodes are core, reporting is a slice on top of nodes, customer/app/services/deployment is another; provisioning is yet another; perhaps CRM and other customer-related data merging is yet another)
+  - could definitely make use of their styling, which would force us back to GPL
+  - the activity feed is cool, but we don't need it, yet; would be nice to track deployments / undeployments, maybe service changes, host additions, etc.
+  - there are a couple of tweaks and fixes that might be useful, mostly it's just the merging of node/report stuff, visual tweaks, ajaxyness and autocompletes
+  - should we pick up authentication bits and save some effort?
+  - would be interesting to make the reporting a Rack slice (rails metal, pancake app, etc.), or perhaps numerous pieces (nodes are core, reporting is a slice on top of nodes, customer/app/services/deployment is another; provisioning is yet another; perhaps CRM and other customer-related data merging is yet another)
 
 ---
 
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
- - new deployment interface
-   D deployments/new should have a Reason field (mandatory) which explains why this deployment happened
-   D deployments/new can accept a start time (default now), and end time (default nil)
-   D choose a host on which to deploy the instance (this is where Requirements, Pools, and Provisioning smarts come in later)
-   D show instance information on deployments/new form
-   D show current deployments of this Instance on deployments/new page 
-   D show historical deployments of this Instance (including which Deployable version they used)
-   D deployments/new front-end should include an option to choose from old Deployables, otherwise we're creating a new Deployable
-   D deployments/new would only allow choosing old Deployables for this Instance
+ D undeploy:
+   - model
+   - automatically when deploying to the same host with overlapping time interval
+   - manually from view (from a list of current deployments)
+ D should snapshot services + parameters into the deployable and read from there
+ D deploy larry; load our data
+
+ ---
  
- D deployable - before_saving, snapshot the service + parameters data so that we can do a deployment
- D if there is already an active Deployment for this Instance on that Host,  we want to truncate its end time if there is overlap
+ - some sort of "dirty" flag for an instance -- that is, the most recently created deployable is different than what would be deployed for an instance now.
+   - corollary -- we would only create a new snapshot if there were not a "clean" deployable already (i.e., one which represents the same deployment state as before)
+   - it's conceivable that we could track dirty state by Service modification, Service graph modification, Parameter modification (instance, app, customer), and Instance->Service requirements, but it's probably easier just to ask Deployables, wherein they would compare their current snapshot with what a new snapshot would look like
+ 
+ - look at using load_data (see doc/vendor), or an updated equivalent, to load in per-class parameter settings in puppet
+ - raphael-based service graphs, host-service graphs, customer service graphs, app service graphs, instance services graphs, etc.
+ - should be able to deploy an "audit" somewhere -- even if it requires specifying each audit for each host by hand; so this includes monitoring, log rotation, firewall rules, backups, database backups, etc.
  D provide warning if the same host is chosen as a current Deployment that we'll be ending that deployment
- - Deployable stores service list, parameters, instance (meaning we're free from then on out to change services, instances, parameters, etc.)
- D Deployments can be edited so long as they are in the future, ditto deleted -- what will this do to deployed services if we edit?
- D Host manifest generation functionality needs to be updated so that it checks currently active Deployments for the host and uses them to generate manifests (active means start time <= now, and end_time > now)
+ D Deployments can be edited so long as they are in the future, ditto deleted -- what will this do to deployed services if we edit?  Also, could change the end-time of a current or future deployment.
  D Instance show view should show Deployables
  D Instance show view should show current deployments
  D Instance show view should show future deployments
  D Instance show view should show past deployments
- D Deployments show view, index view
- D Deployables show view, index view
- D stop a deployment (set end_time on deployment) from deployments/show page
- D link from deployables/show (maybe also deployables/index) to make a new deployment from that deployable
  D should be able to see services deployed to a Host
- D also, should be able to generate a history of a Host wrt services
- D at some point, deal with audits and audit deployments
- D so a rollback is an attempt to cancel a Deployment and make another Deployment current.  This seems like copying a Deployment from the past, setting the start time to now.
- 
- D be able to look at puppet manifest for a Host on the website
+ D also, should be able to generate a history of a Host wrt services 
  - be able to specify what processor manages a host (puppet, chef, shell scripts, none of the above, etc.)
- 
- - deployment config for the larry app; host this shit somewhere
  
  ---
 
@@ -103,9 +74,6 @@ insights from release (and ongoing review) of puppet-dashboard:
  P pool show view should allow adding host, removing hosts
  P host show view should allow adding to pool, removing from pool
  P deployments/new has a Pool chooser (requires a Pool)
-
- ---
-
  P we can provision hosts that don't exist
  P we can provision hosts into a pool
  P we can ask a pool to provision hosts
@@ -120,8 +88,6 @@ insights from release (and ongoing review) of puppet-dashboard:
  P Requirement model specifies which capacities, roles, etc., will satisfy a deployment attempt
 
  thoughts:
- 
-
  P should be able to specify that certain instances not reside on the same host
  P should be able to specify that certain instances should reside on the same host
  P should be able to specify that a service (or at least, an audit) should be on the same host as another (think log rotation, e.g.)
@@ -146,4 +112,3 @@ insights from release (and ongoing review) of puppet-dashboard:
   
  Q: is the difference between a service that's required by many instances on a host (e.g., postgres) but which only really causes one installation to happen, vs. services that have the same name but differ in parameters and cause multiple things to happen (e.g., setting up a postgres *database* for an app) ... is this something larry needs to concern itself with, or do we just leverage the underlying management tool?  If we're using puppet, puppet can sort things out, but it's not clear that something like chef, e.g., can.
 
- Q - when we talk about customers and apps for a service, we can be talking about two different things:  apps which are referencing this service currently via an Instance<->Requirement<->Service relationship (whether deployed or not); or apps referencing this service because there's a Service -> DeployedService -> Deployment -> Deployable -> Instance -> App relationship, even if it's no longer configured that way for new deployments (i.e., that's the "old way").  Which would we want to really show?
