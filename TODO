@@ -35,28 +35,34 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
- D model: undeploy automatically when deploying to the same host with overlapping time interval
-   - then before_save(?) does a cleanup, as specified in the doc/ file, for conflicting intervals
-    
- D deploy larry; load our data
+ D Deployment#deploy should no-op if there are already deployed_services for this Deployment.
+ 
+ D deploy larry to the ISG slice; load our data
 
  D model: should snapshot services + parameters into the deployable and read from there
+
  D view: 
    - list of *current* deployments
      - link to undeploy manually, DeploymentsController#undeploy calls Deployment#undeploy()
-     - highlight deactivated deployments in views
+     - normally, hide deactivated deployment
+     - show deactived deployments in deploy dropdown, marking them as deactivated (never deployed)
  D view: edit deployment
    - can only shorten end_time for current deployments
    - for future deployments, can set anything (obviously validators will fire)
  D implement a dirty? predicate for deployable:
    - true unless there's a snapshot (degenerate)
    - true if taking a new snapshot would differ from the current snapshot
-
+   - this would show up when showing current deployments
+   - this would show up when showing deployments to choose from
+   
  ---
 
  - talk w/ stahnma:  look at using load_data (see doc/vendor), or an updated equivalent, to load in per-class parameter settings in puppet
+ ? maybe add an activity feed so that when we adjust other deployments by adding/changing a new one, that there's a record of it
+ ? could also get ajaxy and say "ok, if you do this, here's what's going to get modified by this" on the deployment form
  D provide warning if the same host is chosen as a current Deployment that we'll be ending that deployment
- D Deployments can be edited so long as they are in the future, ditto deleted -- what will this do to deployed services if we edit?  Also, could change the end-time of a current or future deployment.
+ D Deployments can be edited so long as they are in the future
+ D can delete a future Deployment, regardless of DeployedServices; should clean up deployed_services 
  D Instance show view should show Deployables
  D Instance show view should show current deployments
  D Instance show view should show future deployments
@@ -70,7 +76,7 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
  ---
  
  P create pool (name, description)
-  P validate pool name presence, uniqueness
+ P validate pool name presence, uniqueness
  P hosts many:many with pool (:through model: PoolMembership)
  P pool menu links
  P pool index view

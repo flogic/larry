@@ -295,12 +295,41 @@ describe Deployment do
       end
     end
     
-    describe 'when saving' do
-      describe "and deploying to a host which already has an active deployment of our deployable's instance" do
-        it 'should shorten the end times of conflicting earlier deployments'
-        it 'should deactivate contained conflicting earlier deployments'
-        it 'should adjust the start times of conflicting, but not contained, later deployments'
-      end      
+    describe "when saving and deployed to a host which already has an active deployment of our deployable's instance" do
+      before :each do
+        @host = Host.generate!
+        @deployable = Deployable.generate!
+      end
+
+      it 'should set the end time of a conflicting earlier deployment if it has no end time' do
+        earlier_open       = Deployment.generate!(:host => @host, :start_time => Time.now, :end_time => nil, :deployable => @deployable)
+        Deployment.generate!(:host => @host, :deployable => @deployable, :start_time => 1.day.from_now, :end_time => 3.days.from_now)
+        Deployment.find(earlier_open.id).end_time.to_i.should == 1.day.from_now.to_i
+      end
+      
+      it 'should shorten the end time of a conflicting earlier deployment if is has an end time' do
+        earlier_closed    = Deployment.generate!(:host => @host, :start_time => Time.now, :end_time => 2.days.from_now, :deployable => @deployable)
+        Deployment.generate!(:host => @host, :deployable => @deployable, :start_time => 1.day.from_now, :end_time => 3.days.from_now)
+        earlier_closed.reload.end_time.to_i.should == 1.day.from_now.to_i
+      end
+      
+      it 'should adjust the start time of a later conflicting deployment if our end time is set' do
+        later_closed      = Deployment.generate!(:host => @host, :start_time => 2.days.from_now, :end_time => nil, :deployable => @deployable)        
+        Deployment.generate!(:host => @host, :deployable => @deployable, :start_time => 1.day.from_now, :end_time => 3.days.from_now)
+        later_closed.reload.start_time.to_i.should == 3.days.from_now.to_i
+      end
+      
+      it 'should set our end time to the start time of a later conflicting deployment if our end time is not set' do
+        Deployment.generate!(:host => @host, :start_time => 2.days.from_now, :end_time => 5.days.from_now, :deployable => @deployable)        
+        deployment = Deployment.generate!(:host => @host, :deployable => @deployable, :start_time => 1.day.from_now, :end_time => nil)
+        deployment.reload.end_time.to_i.should == 2.days.from_now.to_i        
+      end
+      
+      it 'should deactivate contained conflicting later deployments' do
+        later_contained   = Deployment.generate!(:host => @host, :start_time => 2.days.from_now, :end_time => 4.days.from_now, :deployable => @deployable)
+        deployment = Deployment.generate!(:host => @host, :deployable => @deployable, :start_time => 2.days.from_now, :end_time => 5.days.from_now)
+        later_contained.reload.should_not be_active
+      end
     end
     
     it 'should be able to find active deployments' do
@@ -309,6 +338,7 @@ describe Deployment do
     
     describe 'when finding active deployments' do
       before :each do
+        Deployment.any_instance.stubs(:adjust_conflicting_deployments).returns(true)  # otherwise it is very difficult to create this deployment data
         @past = Deployment.generate!
         @past.update_attribute(:start_time,  2.days.ago)
         @past.update_attribute(:end_time, 1.day.ago)
@@ -591,89 +621,83 @@ describe Deployment do
     end
   end
   
-  it 'should be able to determine which deployments share our instance, are current, and deployed to a specified host' do
-    Deployment.new.should respond_to(:find_conflicting_deployments_for_host)
+  it 'should be able to determine which deployments share our instance, are current, and deployed to our host' do
+    Deployment.new.should respond_to(:find_conflicting_deployments)
   end
   
-  describe 'when finding conflicting deployments for a host' do
+  describe 'when finding conflicting deployments' do
     before :each do
-      @deployment = Deployment.generate!
-      @deployed_service = DeployedService.generate!(:deployment => @deployment)
-      @host = @deployed_service.host
+      @host = Host.generate!
+      @deployment = Deployment.generate!(:host => @host)
     end
     
-    it 'should accept a host id' do
-      lambda { @deployment.find_conflicting_deployments_for_host(@host.id) }.should_not raise_error(ArgumentError)
+    it 'should work without arguments' do
+      lambda { @deployment.find_conflicting_deployments }.should_not raise_error(ArgumentError)
     end
     
-    it 'should require a host id' do
-      lambda { @deployment.find_conflicting_deployments_for_host }.should raise_error(ArgumentError)      
+    it 'should not allow arguments' do
+      lambda { @deployment.find_conflicting_deployments(:foo) }.should raise_error(ArgumentError)      
+    end
+    
+    it 'should return the empty list if our host is not set' do
+      @deployment.host = nil
+      @deployment.find_conflicting_deployments.should == []      
     end
     
     it 'should return the empty list if our deployable is not set' do
       @deployment.deployable = nil
-      @deployment.find_conflicting_deployments_for_host(@host.id).should == []
+      @deployment.find_conflicting_deployments.should == []
     end
     
     it 'should return the empty list if our instance is not set' do
       @deployment.deployable.instance = nil
-      @deployment.find_conflicting_deployments_for_host(@host.id).should == []      
-    end
-    
-    it 'should fail if no host id is set' do
-      lambda { @deployment.find_conflicting_deployments_for_host(nil) }.should raise_error
+      @deployment.find_conflicting_deployments.should == []      
     end
     
     it 'should not match deployments which do not share our instance' do
       other_deployment = Deployment.generate!
-      @deployment.find_conflicting_deployments_for_host(@host.id).should_not include(other_deployment)
+      @deployment.find_conflicting_deployments.should_not include(other_deployment)
     end
     
-    it 'should not match deployments which share our instance but do not have deployed services on the provided host' do
+    it 'should not match deployments which share our instance but are not deployed to the same host' do
       other_deployable = Deployable.generate!(:instance => @deployment.instance)
       other_deployment = Deployment.generate!(:deployable => other_deployable)
-      other_deployed_service = DeployedService.generate!(:deployment => other_deployment)
-      @deployment.find_conflicting_deployments_for_host(@host.id).should_not include(other_deployment)
+      @deployment.find_conflicting_deployments.should_not include(other_deployment)
     end
     
-    it 'should not match deployments of the same instance to the same host which end before our start time' do
-      other_deployment = Deployment.generate!(:deployable => @deployment.deployable)
-      other_deployment.update_attribute(:start_time, 5.days.ago)
-      other_deployment.update_attribute(:end_time, 4.days.ago)
-      @deployment.update_attribute(:start_time, 1.day.ago)
-      @deployment.update_attribute(:end_time, nil)
-      other_deployed_service = DeployedService.generate!(:deployment => other_deployment, :host => @deployed_service.host)
-      @deployment.find_conflicting_deployments_for_host(@host.id).should_not include(other_deployment)      
+    it 'should not match deployments of the same instance to our host which end before our start time' do
+      deployment = Deployment.generate!(:host => @host, :start_time => 1.day.from_now, :end_time => 2.days.from_now)
+      other_deployment = Deployment.new(:host => @host, :deployable => deployment.deployable, :start_time => 3.days.from_now, :end_time => 4.days.from_now)
+      other_deployment.find_conflicting_deployments.should_not include(deployment)      
     end
     
     it 'should not match deployments of the same instance to the same host which start after our end time' do
-      other_deployment = Deployment.generate!(:deployable => @deployment.deployable)
-      other_deployment.update_attribute(:start_time, 3.days.from_now)
-      other_deployment.update_attribute(:end_time, nil)
-      @deployment.update_attribute(:start_time, 1.days.from_now)
-      @deployment.update_attribute(:end_time, 2.days.from_now)
-      other_deployed_service = DeployedService.generate!(:deployment => other_deployment, :host => @deployed_service.host)
-      @deployment.find_conflicting_deployments_for_host(@host.id).should_not include(other_deployment)            
+      deployment = Deployment.generate!(:host => @host, :start_time => 4.days.from_now, :end_time => 5.days.from_now)
+      other_deployment = Deployment.new(:host => @host, :deployable => deployment.deployable, :start_time => 2.days.from_now, :end_time => 3.days.from_now)
+      other_deployment.find_conflicting_deployments.should_not include(deployment)      
     end
     
-    it 'should match deployments which share our instance, include our start time, and have deployed services on the provided host' do
-      other_deployment = Deployment.generate!(:deployable => @deployment.deployable)
-      other_deployment.update_attribute(:start_time, 2.days.ago)
-      other_deployment.update_attribute(:end_time, 2.days.from_now)
-      @deployment.update_attribute(:start_time, Time.now)
-      @deployment.update_attribute(:end_time, nil)
-      other_deployed_service = DeployedService.generate!(:deployment => other_deployment, :host => @deployed_service.host)
-      @deployment.find_conflicting_deployments_for_host(@host.id).should include(other_deployment)      
+    it 'should match deployments which share our instance and host, and include our start time' do
+      Deployment.delete_all
+      deployment = Deployment.generate!(:host => @host, :start_time => 1.day.from_now, :end_time => 3.days.from_now)
+      other_deployment = Deployment.new(:host => @host, :deployable => deployment.deployable, :start_time => 2.days.from_now, :end_time => 4.days.from_now)
+      ###
+      other_deployment.find_conflicting_deployments.should include(deployment)      
     end
 
-    it 'should match deployments which share our instance, include our end time, and have deployed services on the provided host' do
-      other_deployment = Deployment.generate!(:deployable => @deployment.deployable)
-      other_deployment.update_attribute(:start_time, 2.days.ago)
-      other_deployment.update_attribute(:end_time, 2.days.from_now)
-      @deployment.update_attribute(:start_time, 3.days.ago)
-      @deployment.update_attribute(:end_time, 1.days.ago)
-      other_deployed_service = DeployedService.generate!(:deployment => other_deployment, :host => @deployed_service.host)
-      @deployment.find_conflicting_deployments_for_host(@host.id).should include(other_deployment)      
+    it 'should match deployments which share our instance and host, and include our end time' do 
+      deployment = Deployment.generate!(:host => @host, :start_time => 1.day.from_now, :end_time => 3.days.from_now)
+      other_deployment = Deployment.new(:host => @host, :deployable => deployment.deployable, :start_time => Time.now, :end_time => 2.days.from_now)
+      other_deployment.find_conflicting_deployments.should include(deployment)      
+    end
+    
+    it 'should not match deployments which have been deactivated' do
+      Deployment.delete_all
+      deployment = Deployment.generate!(:host => @host, :start_time => 1.day.from_now, :end_time => 3.days.from_now)
+      deployment.deactivate
+      deployment.reload
+      other_deployment = Deployment.new(:host => @host, :deployable => deployment.deployable, :start_time => Time.now, :end_time => 2.days.from_now)
+      other_deployment.find_conflicting_deployments.should_not include(deployment)            
     end
   end
 end

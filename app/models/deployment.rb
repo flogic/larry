@@ -16,7 +16,10 @@ class Deployment < ActiveRecord::Base
   validate :end_time_must_not_be_in_past
   validate :non_nil_end_time_must_follow_start_time
   
+  after_save :adjust_conflicting_deployments
+  
   def self.deploy_from_deployable(deployable, params)
+    params = HashWithIndifferentAccess.new(params)
     deployment = create!(:deployable => deployable, 
                          :start_time => params[:start_time], 
                          :reason     => params[:reason], 
@@ -76,13 +79,14 @@ class Deployment < ActiveRecord::Base
     true
   end
   
-  def find_conflicting_deployments_for_host(host_id)
-    return [] unless deployable and instance
-    @host = Host.find(host_id)
-    instance.all_deployments.select do |d| 
-      d.hosts.include?(@host) and
-       ((d.start_time <= self.start_time and (d.end_time.nil?    or d.end_time    > self.start_time)) or
-        (d.start_time  > self.start_time and (self.end_time.nil? or self.end_time > d.start_time)))
+  def find_conflicting_deployments
+    return [] unless host and deployable and instance
+      instance.all_deployments.select do |d|
+        d != self and
+        !d.is_deactivated? and 
+        (d.host_id == self.host_id) and
+         ((d.start_time <= self.start_time and (d.end_time.nil?    or d.end_time    > self.start_time)) or
+          (d.start_time  > self.start_time and (self.end_time.nil? or self.end_time > d.start_time)))
      end
   end
   
@@ -98,5 +102,23 @@ class Deployment < ActiveRecord::Base
   
   def non_nil_end_time_must_follow_start_time
     errors.add(:end_time, "must come after start time") if end_time and start_time and (end_time < start_time)
+  end
+  
+  def adjust_conflicting_deployments
+    return true if is_deactivated?
+    
+    find_conflicting_deployments.each do |conflict|
+      if conflict.start_time < self.start_time
+        conflict.update_attribute(:end_time, self.start_time)
+      else
+        if end_time.nil?
+          update_attribute(:end_time, conflict.start_time)
+          reload
+        else
+          conflict.update_attribute(:start_time, self.end_time)
+        end
+      end
+    end
+    true  # return true to ensure that any later callbacks get called
   end
 end

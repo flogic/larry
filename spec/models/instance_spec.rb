@@ -672,8 +672,9 @@ describe Instance do
   describe 'deploy' do
     before :each do
       @deployable = Deployable.generate!
+      @host = Host.generate!
       @instance = @deployable.instance
-      @parameters = @deployable.attributes.merge(:start_time => Time.now, :reason => 'Because.')
+      @parameters = @deployable.attributes.merge(:host_id => @host.id, :start_time => Time.now, :reason => 'Because.')
     end
     
     it 'should allow parameters' do
