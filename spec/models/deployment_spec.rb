@@ -15,6 +15,15 @@ describe Deployment do
       @deployment.deployable_id.should == 1
     end
     
+    it 'should have a host id' do
+      @deployment.should respond_to(:host_id)
+    end
+    
+    it 'should allow setting and retrieving the host id' do
+      @deployment.host_id = 1
+      @deployment.host_id.should == 1
+    end
+    
     it 'should have a reason' do
       @deployment.should respond_to(:reason)
     end
@@ -67,6 +76,18 @@ describe Deployment do
       @deployment.deployable = Deployable.generate!
       @deployment.valid?
       @deployment.errors.should_not be_invalid(:deployable)
+    end
+    
+    it 'should not be valid without a host' do
+      @deployment.host = nil
+      @deployment.valid?
+      @deployment.errors.should be_invalid(:host)
+    end
+
+    it 'should be valid with a host' do
+      @deployment.host = Host.generate!
+      @deployment.valid?
+      @deployment.errors.should_not be_invalid(:host)
     end
     
     it 'should not be valid without a reason' do
@@ -210,7 +231,7 @@ describe Deployment do
     describe 'when deploying from a deployable' do
       before :each do
         @deployable = Deployable.generate!
-        @parameters = DeployedService.generate!.attributes.merge(:reason => 'Because.', :start_time => Time.now)
+        @parameters = HashWithIndifferentAccess.new(DeployedService.generate!.attributes.merge(:reason => 'Because.', :start_time => Time.now))
       end
       
       it 'should allow a deployable and deployment parameters' do
@@ -272,6 +293,14 @@ describe Deployment do
         deployment.stubs(:deploy).returns('deployed')
         Deployment.deploy_from_deployable(@deployable, @parameters).should == 'deployed'     
       end
+    end
+    
+    describe 'when saving' do
+      describe "and deploying to a host which already has an active deployment of our deployable's instance" do
+        it 'should shorten the end times of conflicting earlier deployments'
+        it 'should deactivate contained conflicting earlier deployments'
+        it 'should adjust the start times of conflicting, but not contained, later deployments'
+      end      
     end
     
     it 'should be able to find active deployments' do
@@ -371,12 +400,6 @@ describe Deployment do
     
     it 'should require deployment parameters' do
       lambda { @deployment.deploy }.should raise_error(ArgumentError)
-    end
-    
-    describe "when deploying to a host which already has an active deployment of our deployable's instance" do
-      it 'should shorten the end times of conflicting earlier deployments'
-      it 'should deactivate contained conflicting earlier deployments'
-      it 'should adjust the start times of conflicting, but not contained, later deployments'
     end
     
     it 'should create deployed services for each service required by our deployable' do

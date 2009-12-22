@@ -36,11 +36,11 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ["P" -> provisioning milestone]
 
  D model: undeploy automatically when deploying to the same host with overlapping time interval
-   - update conflicting finder to make sure we get all past and present overlap/conflicts
-   - before_save on Deployment to adjust any conflicting intervals, according to the logic on the doc/ document
-
+   - then before_save(?) does a cleanup, as specified in the doc/ file, for conflicting intervals
+    
  D deploy larry; load our data
 
+ D model: should snapshot services + parameters into the deployable and read from there
  D view: 
    - list of *current* deployments
      - link to undeploy manually, DeploymentsController#undeploy calls Deployment#undeploy()
@@ -48,14 +48,13 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
  D view: edit deployment
    - can only shorten end_time for current deployments
    - for future deployments, can set anything (obviously validators will fire)
- D should snapshot services + parameters into the deployable and read from there
+ D implement a dirty? predicate for deployable:
+   - true unless there's a snapshot (degenerate)
+   - true if taking a new snapshot would differ from the current snapshot
 
  ---
 
- - look at using load_data (see doc/vendor), or an updated equivalent, to load in per-class parameter settings in puppet
- ? raphael-based service graphs, host-service graphs, customer service graphs, app service graphs, instance services graphs, etc.
- ? raphael-based interval maps?
- - should be able to deploy an "audit" somewhere -- even if it requires specifying each audit for each host by hand; so this includes monitoring, log rotation, firewall rules, backups, database backups, etc.
+ - talk w/ stahnma:  look at using load_data (see doc/vendor), or an updated equivalent, to load in per-class parameter settings in puppet
  D provide warning if the same host is chosen as a current Deployment that we'll be ending that deployment
  D Deployments can be edited so long as they are in the future, ditto deleted -- what will this do to deployed services if we edit?  Also, could change the end-time of a current or future deployment.
  D Instance show view should show Deployables
@@ -64,15 +63,12 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
  D Instance show view should show past deployments
  D should be able to see services deployed to a Host
  D also, should be able to generate a history of a Host wrt services 
- - be able to specify what processor manages a host (puppet, chef, shell scripts, none of the above, etc.)
- 
- - some sort of "dirty" flag for an instance -- that is, the most recently created deployable is different than what would be deployed for an instance now.
-   - corollary -- we would only create a new snapshot if there were not a "clean" deployable already (i.e., one which represents the same deployment state as before)
-   - it's conceivable that we could track dirty state by Service modification, Service graph modification, Parameter modification (instance, app, customer), and Instance->Service requirements, but it's probably easier just to ask Deployables, wherein they would compare their current snapshot with what a new snapshot would look like
- 
+ ? raphael-based service graphs, host-service graphs, customer service graphs, app service graphs, instance services graphs, etc.
+ ? raphael-based interval maps?
+ - should be able to deploy an "audit" somewhere -- even if it requires specifying each audit for each host by hand; so this includes monitoring, log rotation, firewall rules, backups, database backups, etc.
+
  ---
  
-
  P create pool (name, description)
   P validate pool name presence, uniqueness
  P hosts many:many with pool (:through model: PoolMembership)

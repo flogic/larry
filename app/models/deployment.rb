@@ -1,5 +1,6 @@
 class Deployment < ActiveRecord::Base
   belongs_to :deployable
+  belongs_to :host
   has_many :deployed_services
   
   named_scope :active, lambda {
@@ -7,6 +8,7 @@ class Deployment < ActiveRecord::Base
   }
     
   validates_presence_of :deployable
+  validates_presence_of :host
   validates_presence_of :reason
   validates_presence_of :start_time
   
@@ -18,7 +20,8 @@ class Deployment < ActiveRecord::Base
     deployment = create!(:deployable => deployable, 
                          :start_time => params[:start_time], 
                          :reason     => params[:reason], 
-                         :end_time   => params[:end_time])
+                         :end_time   => params[:end_time],
+                         :host_id    => params[:host_id])
     deployment_params = params.clone
     [ :start_time, :end_time, :reason].each {|key| deployment_params.delete(key) }
     deployment.deploy(deployment_params)
