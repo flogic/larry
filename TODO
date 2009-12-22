@@ -35,8 +35,6 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
- D Deployment#deploy should no-op if there are already deployed_services for this Deployment.
- 
  D deploy larry to the ISG slice; load our data
 
  D model: should snapshot services + parameters into the deployable and read from there

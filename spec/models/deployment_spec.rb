@@ -432,6 +432,22 @@ describe Deployment do
       lambda { @deployment.deploy }.should raise_error(ArgumentError)
     end
     
+    describe 'and the deployment already has deployed services' do
+      before :each do
+        @deployment.deployed_services.generate!
+      end
+      
+      it 'should not change the deployed services' do
+        deployed_services = @deployment.deployed_services
+        @deployment.deploy(@parameters)
+        @deployment.deployed_services.should == deployed_services
+      end
+      
+      it 'should return false' do
+        @deployment.deploy(@parameters).should be_false        
+      end
+    end
+    
     it 'should create deployed services for each service required by our deployable' do
       @deployment.deploy(@parameters)
       @deployment.deployed_services.size.should == @services.size

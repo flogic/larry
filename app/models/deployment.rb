@@ -35,6 +35,7 @@ class Deployment < ActiveRecord::Base
   end
   
   def deploy(params)
+    return false unless deployed_services.empty?
     deployable.services.collect(&:name).each do |name| 
       deployed_services.create!(params.merge(:service_name => name, :parameters => deployable.service_parameters(name))) 
     end
