@@ -304,25 +304,25 @@ describe Deployment do
       it 'should set the end time of a conflicting earlier deployment if it has no end time' do
         earlier_open       = Deployment.generate!(:host => @host, :start_time => Time.now, :end_time => nil, :deployable => @deployable)
         Deployment.generate!(:host => @host, :deployable => @deployable, :start_time => 1.day.from_now, :end_time => 3.days.from_now)
-        Deployment.find(earlier_open.id).end_time.to_i.should == 1.day.from_now.to_i
+        Deployment.find(earlier_open.id).end_time.to_i.should be_close(1.day.from_now.to_i, 2)
       end
       
       it 'should shorten the end time of a conflicting earlier deployment if is has an end time' do
         earlier_closed    = Deployment.generate!(:host => @host, :start_time => Time.now, :end_time => 2.days.from_now, :deployable => @deployable)
         Deployment.generate!(:host => @host, :deployable => @deployable, :start_time => 1.day.from_now, :end_time => 3.days.from_now)
-        earlier_closed.reload.end_time.to_i.should == 1.day.from_now.to_i
+        earlier_closed.reload.end_time.to_i.should be_close(1.day.from_now.to_i, 2)
       end
       
       it 'should adjust the start time of a later conflicting deployment if our end time is set' do
         later_closed      = Deployment.generate!(:host => @host, :start_time => 2.days.from_now, :end_time => nil, :deployable => @deployable)        
         Deployment.generate!(:host => @host, :deployable => @deployable, :start_time => 1.day.from_now, :end_time => 3.days.from_now)
-        later_closed.reload.start_time.to_i.should == 3.days.from_now.to_i
+        later_closed.reload.start_time.to_i.should be_close(3.days.from_now.to_i, 2)
       end
       
       it 'should set our end time to the start time of a later conflicting deployment if our end time is not set' do
         Deployment.generate!(:host => @host, :start_time => 2.days.from_now, :end_time => 5.days.from_now, :deployable => @deployable)        
         deployment = Deployment.generate!(:host => @host, :deployable => @deployable, :start_time => 1.day.from_now, :end_time => nil)
-        deployment.reload.end_time.to_i.should == 2.days.from_now.to_i        
+        deployment.reload.end_time.to_i.should be_close(2.days.from_now.to_i, 2)
       end
       
       it 'should deactivate contained conflicting later deployments' do
