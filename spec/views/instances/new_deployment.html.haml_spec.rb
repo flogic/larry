@@ -73,6 +73,14 @@ describe '/instances/new_deployment' do
         with_tag('input[type=?][name=?]', 'text', 'deployment[start_time]')
       end      
     end
+    
+    it 'should render the initial start time in the current local time zone' do
+      Time.zone = ActiveSupport::TimeZone["Beijing"]
+      do_render
+      response.should have_tag('form[id=?]', 'new_deployment') do
+        with_tag('input[type=?][name=?][value=?]', 'text', 'deployment[start_time]', Time.zone.now.to_s(:picker))
+      end            
+    end
 
     it 'should have a submit button' do
       do_render
