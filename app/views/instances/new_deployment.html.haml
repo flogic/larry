@@ -7,7 +7,7 @@
     %dd= select_tag 'deployment[host_id]', options_for_select(@hosts.collect {|h| [h.name, h.id] })
     %dt Reason:
     %dd= text_field_tag 'deployment[reason]', "Reason"
-    %dt Start Time:
+    %dt== Start Time (#{Time.zone.name}):
     %dd= text_field_tag 'deployment[start_time]', Time.now.to_s(:db), :class => 'datetime', :id => 'start_time_chooser'
     %dt#optional_end_time
       %a#specify_end_time{:href => '#'} specify an optional end time for this deployment
