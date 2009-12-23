@@ -8,7 +8,7 @@
     %dt Reason:
     %dd= text_field_tag 'deployment[reason]', "Reason"
     %dt== Start Time (#{Time.zone.name}):
-    %dd= text_field_tag 'deployment[start_time]', Time.now.to_s(:db), :class => 'datetime', :id => 'start_time_chooser'
+    %dd= text_field_tag 'deployment[start_time]', Time.now.to_s(:picker), :class => 'datetime', :id => 'start_time_chooser'
     %dt#optional_end_time
       %a#specify_end_time{:href => '#'} specify an optional end time for this deployment
     %dt#end_time_label{:style => 'display:none'} End Time:

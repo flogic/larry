@@ -35,6 +35,8 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
+ - the time zone name is correct on deployment start_time form, but the start time which is output is in UTC.  WTF.
+
  D load in OGC data
 
  D model: should snapshot services + parameters into the deployable and read from there
