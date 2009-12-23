@@ -17,6 +17,7 @@ class HostsController < ApplicationController
   
   def extract_format_from_hostname
     return unless params[:name].first =~ /\./
+    return unless params[:format].blank?
     params[:name], params[:format] = (Regexp.new(/^(.*)\.([^.]*)$/).match(params[:name].first)[1..2])
   end
 end

@@ -34,11 +34,12 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
-    
- D fix route globbing problem -- this looks like, for some reason, if &format=foo is present then the name is pulling the whole name as one array entry, maybe just need to change the logic -- is this different remotely than here?
+
+ D HTTP-basic auth wrapper    
  D load in OGC data
  
  D model: should snapshot services + parameters into the deployable and read from there
+ D LDAP auth?
 
  ---
 

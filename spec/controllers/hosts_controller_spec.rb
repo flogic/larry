@@ -79,6 +79,29 @@ describe HostsController, 'when integrating' do
     
     it_should_behave_like 'a redirecting action'
     
+    it 'should extract the response format from the host "name" when no format is provided and the name has "."s' do
+      host_name = 'smegatron.rickbradley.com'
+      format = 'pp'
+      name = [ host_name, format ].join('.')
+      @host = Host.generate!(:name => host_name)
+      get :configuration, :name => [ name ]
+      assigns[:host].should == @host
+    end
+    
+    it 'should not extract the response format from the host "name" when the host name has no "."s' do
+      name = host_name = 'smegatron'
+      @host = Host.generate!(:name => name)
+      get :configuration, :name => [ name ]
+      assigns[:host].should == @host      
+    end
+    
+    it 'should not extract the response format from the host "name" when a format is provided' do
+      name = host_name = 'smegatron.rickbradley.com'
+      @host = Host.generate!(:name => name)
+      get :configuration, :name => [ name ], :format => 'pp'
+      assigns[:host].should == @host            
+    end
+    
     it 'should fail when an unknown host name is provided' do
       lambda { get :configuration, :name => 'unknownhost' }.should raise_error
     end
