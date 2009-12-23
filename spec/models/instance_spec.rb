@@ -210,7 +210,7 @@ describe Instance do
     end
     
     it 'should accept a service' do 
-      lambda { @instance.requirement_for(:foo) }.should_not raise_error(ArgumentError)
+      lambda { @instance.requirement_for(@instance) }.should_not raise_error(ArgumentError)
     end
     
     it 'should require a service' do

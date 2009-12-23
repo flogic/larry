@@ -469,7 +469,7 @@ describe Service do
     end
     
     it 'should accept a service' do
-      lambda { @service.edge_to(:foo) }.should_not raise_error(ArgumentError)
+      lambda { @service.edge_to(@service) }.should_not raise_error(ArgumentError)
     end
 
     it 'should require a service' do
@@ -509,7 +509,7 @@ describe Service do
     end
     
     it 'should accept a service' do
-      lambda { @service.edge_from(:foo) }.should_not raise_error(ArgumentError)
+      lambda { @service.edge_from(@service) }.should_not raise_error(ArgumentError)
     end
 
     it 'should require a service' do
