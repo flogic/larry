@@ -35,6 +35,11 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
     
+ D get rid of object_id deprecation notices
+ D fix route globbing problem -- this looks like, for some reason, if &format=foo is present then the name is pulling the whole name as one array entry, maybe just need to change the logic -- is this different remotely than here?
+ D load in OGC data
+ D put hoptoad under the hood so I can catch exceptions while people muck with it
+    
  D model: should snapshot services + parameters into the deployable and read from there
 
  D view: 

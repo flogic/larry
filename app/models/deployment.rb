@@ -4,7 +4,7 @@ class Deployment < ActiveRecord::Base
   has_many :deployed_services
   
   named_scope :active, lambda {
-    { :conditions => [ '(is_deactivated is null or is_deactivated=?) and start_time <= ? and (end_time is null or end_time > ?)', false, Time.now, Time.now ] }
+    { :conditions => [ '(is_deactivated is null or is_deactivated=?) and start_time <= ? and (end_time is null or end_time > ?)', false, Time.now.utc, Time.now.utc ] }
   }
     
   validates_presence_of :deployable
