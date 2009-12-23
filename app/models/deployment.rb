@@ -94,15 +94,15 @@ class Deployment < ActiveRecord::Base
   protected
   
   def start_time_must_not_be_in_past
-    errors.add(:start_time, "must not be in the past") if start_time and (Time.now - start_time > 60)
+    errors.add(:start_time, "must not be in the past (was #{start_time})") if start_time and (Time.now - start_time > 60)
   end
   
   def end_time_must_not_be_in_past
-    errors.add(:end_time, "must not be in the past") if end_time and (Time.now - end_time > 60)
+    errors.add(:end_time, "must not be in the past (was #{end_time})") if end_time and (Time.now - end_time > 60)
   end
   
   def non_nil_end_time_must_follow_start_time
-    errors.add(:end_time, "must come after start time") if end_time and start_time and (end_time < start_time)
+    errors.add(:end_time, "must come after start time (end time #{end_time} is before (#{start_time}))") if end_time and start_time and (end_time < start_time)
   end
   
   def adjust_conflicting_deployments
