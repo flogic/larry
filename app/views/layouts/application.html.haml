@@ -22,7 +22,11 @@
     = javascript_include_tag 'jquery.livequery', 'jquery.autogrow-textarea', '/facebox/facebox'
     = javascript_include_tag '/datetimepicker/jquery_ui_datepicker.js', '/datetimepicker/timepicker.js'
     = javascript_include_tag 'instance.js'
-    
+
+    / capture time zone offset for automatic correction of time-zones on the front-end
+    - unless @time_zone
+      = javascript_tag "$.get('/user_sessions/compute_time_zone_offset', 'offset_minutes':(-1 * (new Date()).getTimezoneOffset())})"
+      
   %body
     #header
       %ul
