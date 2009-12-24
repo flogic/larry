@@ -1,6 +1,6 @@
 .service
   = brief(service)
-  == (used by #{pluralize(service.dependents.size, 'service')}, #{pluralize(service.apps.size, 'app')},
+  == (used by #{pluralize(service.dependents.size, 'service')}, #{pluralize(service.apps.size, 'app')})
 
   - unless service.description.blank?
     .description= service.description
