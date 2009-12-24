@@ -27,9 +27,6 @@
     / capture time zone offset for automatic correction of time-zones on the front-end
     - unless @time_zone
       = javascript_tag "jQuery.get('/user_sessions/compute_time_zone_offset', { 'offset_minutes':(-1 * (new Date()).getTimezoneOffset()) })"
-      %h4 No time zone.
-    - else
-      %h4== Time zone: #{@time_zone.name}
       
     #header
       %ul
