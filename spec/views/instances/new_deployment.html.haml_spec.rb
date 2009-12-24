@@ -78,7 +78,7 @@ describe '/instances/new_deployment' do
       Time.zone = ActiveSupport::TimeZone["Beijing"]
       do_render
       response.should have_tag('form[id=?]', 'new_deployment') do
-        with_tag('input[type=?][name=?][value=?]', 'text', 'deployment[start_time]', Time.zone.now.to_s(:picker))
+        with_tag('input[type=?][name=?][value*=?]', 'text', 'deployment[start_time]', Regexp.new(Time.zone.now.to_s(:picker).sub(/:\d+$/, '')))
       end            
     end
 
