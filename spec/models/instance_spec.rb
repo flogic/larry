@@ -726,4 +726,55 @@ describe Instance do
       end
     end
   end
+  
+  it 'should be able to compute all the services needed to deploy this instance' do
+    Instance.new.should respond_to(:all_required_services)
+  end
+  
+  describe 'when computing all the services needed to deploy this instance' do
+    before :each do
+      @instance = Instance.generate!
+    end
+    
+    it 'should work without arguments' do
+      lambda { @instance.all_required_services }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do      
+      lambda { @instance.all_required_services(:foo) }.should raise_error(ArgumentError)
+    end
+    
+    it 'should return the empty list if we require no services' do
+      @instance.all_required_services.should == []
+    end
+    
+    it 'should return all the services we require' do
+      @instance.services << services = Array.new(2) { Service.generate! }
+      @instance.all_required_services.sort_by(&:id).should == services.sort_by(&:id)
+    end
+    
+    it 'should return all the services that our required services depend on' do
+      kid1 = Service.generate!
+      kid1.depends_on << grandkids1 = Array.new(2) { Service.generate! }
+      kid2 = Service.generate!
+      kid2.depends_on << grandkids2 = Array.new(2) { Service.generate! }
+      services = [ kid1, kid2 ]
+      all_services = services + grandkids1 + grandkids2
+      @instance.services << services
+      result = @instance.all_required_services
+      all_services.each {|service| result.should include(service) }
+    end
+    
+    it 'should not include duplicate services' do
+      kid1 = Service.generate!
+      kid2 = Service.generate!
+      grandkids = Array.new(2) { Service.generate! }
+      kid1.depends_on << grandkids
+      kid2.depends_on << grandkids
+      services = [ kid1, kid2 ]
+      @instance.services << services
+      all_services = grandkids << kid1 << kid2
+      @instance.all_required_services.sort_by(&:id).should == all_services.sort_by(&:id)
+    end
+  end
 end

@@ -45,6 +45,10 @@ class Instance < ActiveRecord::Base
     deployables.collect(&:all_hosts).flatten.uniq
   end
 
+  def all_required_services
+    (services + services.collect(&:all_depends_on)).flatten.compact.uniq
+  end
+
   def configuration_name
     [customer.name, app.name, name].collect {|str| normalize_name(str) }.join('__')
   end

@@ -418,8 +418,12 @@ describe Deployment do
   
   describe 'when deploying' do
     before :each do
+      @services = Array.new(2) { Service.generate! }
+      dependencies = Array.new(2) { Service.generate! }
+      @services.first.depends_on << dependencies
       @deployment = Deployment.generate!
-      @deployment.deployable.services << @services = Array.new(2) { Service.generate! }
+      @deployment.instance.services << @services
+      @services += dependencies
       @parameters = DeployedService.generate!.attributes
       @parameters.delete("id")
     end
@@ -448,7 +452,7 @@ describe Deployment do
       end
     end
     
-    it 'should create deployed services for each service required by our deployable' do
+    it 'should create deployed services for all the services required by our deployable' do
       @deployment.deploy(@parameters)
       @deployment.deployed_services.size.should == @services.size
     end

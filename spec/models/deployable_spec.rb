@@ -125,9 +125,9 @@ describe Deployable do
       @deployable.should respond_to(:services)
     end
     
-    it "should return the instance's services when looking up the service" do
+    it "should return all of the services required by our instance" do
       @deployable = Deployable.generate!
-      @deployable.services.should == @deployable.instance.services
+      @deployable.services.should == @deployable.instance.all_required_services
     end
   end
   

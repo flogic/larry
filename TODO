@@ -36,7 +36,9 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ["P" -> provisioning milestone]
 
  D load in OGC data
-
+ 
+ D puppet manifest should probably include a class for each customer, a class for each app, a class for each instance, in case we need to hook anything off of them (these would probably have the settings at the appropriate level (i.e., customer class would get only customer-level parameter settings, etc.))
+ 
  D model: should snapshot services + parameters into the deployable and read from there
  D LDAP auth?
  D view: 
@@ -55,6 +57,11 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
    
  ---
 
+ - really need some sort of visibility of the time range that instances, hosts deployments are going to be in effect (definitely raphael graphs would rock)
+ - get better page titles showing up
+ - should probably do sorting by case-insensitive names
+ - links in descriptions could be auto-linked on display
+ - probably need way more h() calls in the views
  - talk w/ stahnma:  look at using load_data (see doc/vendor), or an updated equivalent, to load in per-class parameter settings in puppet
  ? maybe add an activity feed so that when we adjust other deployments by adding/changing a new one, that there's a record of it
  ? could also get ajaxy and say "ok, if you do this, here's what's going to get modified by this" on the deployment form
