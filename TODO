@@ -35,10 +35,8 @@ Services deployed to some set of Hosts.  Using the Deployment information, we ca
 ["D" -> deployment milestone]
 ["P" -> provisioning milestone]
 
- D load in OGC data
- 
+ - Q: should there be merging of services, or do we expect something like puppet to take care of that?  what if puppet is not using it?  E.g., we want apache installed, by 10 apps, but only one apache installation should happen.  We can deduce this by the fact that there aren't any variations in the parameters applied to apache for the various instances.  Should we do something with this?
  D puppet manifest should probably include a class for each customer, a class for each app, a class for each instance, in case we need to hook anything off of them (these would probably have the settings at the appropriate level (i.e., customer class would get only customer-level parameter settings, etc.))
- 
  D model: should snapshot services + parameters into the deployable and read from there
  D LDAP auth?
  D view: 
