@@ -1,2 +1,0 @@
- - update the README
- - install hooks (look at maybe git-deploy for good examples)
