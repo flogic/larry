@@ -4,9 +4,12 @@ staging:
   deploy_config_to: "/opt/ogc/var/www/project_config"
   repository: "git://github.com/rick/larry.git"
   config_repository: "git@ogtastic.com:project_config.git"
-  branch: "master"
+  rake_env:
+    RAILS_ENV: 'production'
 local:
   repository: "git://github.com/rick/larry.git"
   config_repository: "git@ogtastic.com:project_config.git"
   deploy_to: "/Users/rick/git/larry"
   deploy_config_to: "/Users/rick/git/project_config"
+  rake_env:
+    RAILS_ENV: 'production'
