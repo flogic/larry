@@ -491,9 +491,18 @@ module ActionController #:nodoc:
               filtered_parameters[key] = '[FILTERED]'
             elsif value.is_a?(Hash)
               filtered_parameters[key] = filter_parameters(value)
+            elsif value.is_a?(Array)
+              filtered_parameters[key] = value.collect do |item|
+                case item
+                when Hash, Array
+                  filter_parameters(item)
+                else
+                  item
+                end
+              end
             elsif block_given?
               key = key.dup
-              value = value.dup if value
+              value = value.dup if value.duplicable?
               yield key, value
               filtered_parameters[key] = value
             else
@@ -810,7 +819,6 @@ module ActionController #:nodoc:
       #   render :text => proc { |response, output|
       #     10_000_000.times do |i|
       #       output.write("This is line #{i}\n")
-      #       output.flush
       #     end
       #   }
       #
@@ -952,7 +960,7 @@ module ActionController #:nodoc:
 
           elsif options.include?(:json)
             json = options[:json]
-            json = json.to_json unless json.is_a?(String)
+            json = ActiveSupport::JSON.encode(json) unless json.is_a?(String)
             json = "#{options[:callback]}(#{json})" unless options[:callback].blank?
             response.content_type ||= Mime::JSON
             render_for_text(json, options[:status])
