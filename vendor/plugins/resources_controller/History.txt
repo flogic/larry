@@ -1,3 +1,34 @@
+* added ResourceMethods#destroy_resource, which calls destroy on the resource_service, which in turn finds the best way to 
+  destroy the resource to trigger any association callbacks.  Changed actions to use the destroy_resource method. (reported by Jason Lee)
+  
+  NOTE: this may break some of your controller specs, they may report an unexpected :destroy message sent to an association.  
+        You just need to expect this to happen when you have an enclosing resource.
+
+* ResourceMethods#new_resource looks in params[singular_resource_class_name] for attributes, which makes RC much
+  more compatible with form_for (reported by Jason Lee)
+
+* resource_service.new now calls #build if the service is an association, or #new otherwise (reported by Jason Lee)
+
+  NOTE: this may break some of your specs if you are expecting, say, a POST action to call :new on an association.
+        You just need to change the mocks to expect :build (when there's an enclosing resource, and resource_service.new is called)
+
+* resource methods (new_resource, find_resource, and find_resources) are now in a mixin so it's easier
+  to override them.  Just include a new mixin after the resources_controller_for call, or add them to your
+  action module.
+
+* Allow new_resource to use the block initialisation syntax in rails 2.3 (reported by Chris Hapgood)
+
+* Fix bug where id is the same name as the resource name [mocoso]
+
+* Bugs introduced with RequestPathIntrospection (#5 and #6 on lighthouse) solved thanks to Sergei Serdyuk
+
+* RC no longer uses the route that invoked the controller to figure out wildcard enclosing resources.
+
+  - this change means that you will no longer get those pesky 'NoRecognizedRoute' errors when your controller
+    is invoked by another route, such as a :controller/:action/:id route.
+
+* Further relaxed RC's route pickiness.  If a route is not recognised, construct segments from the params
+
 * Relaxed RC's pickiness about what route was used to invoke a controller.
 
 * Removed deprecation warning from save_resource, and added cautionary notes to the comments instead

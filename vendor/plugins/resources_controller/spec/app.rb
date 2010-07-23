@@ -4,6 +4,7 @@
 # Routing
 ##########
 
+ActionController::Routing::Routes.clear!
 ActionController::Routing::Routes.draw do |map|
   # this tests :resource_path (or :erp), for named routes that map to resources
   map.root :controller => 'forums', :action => 'index', :resource_path => '/forums'
@@ -18,13 +19,6 @@ ActionController::Routing::Routes.draw do |map|
     end
   end
   
-  map.resource :account do |account|
-    account.resources :posts
-    account.resource :info do |info|
-      info.resources :tags
-    end
-  end
-  
   map.resources :users do |user|
     user.resources :interests
     user.resources :posts, :controller => 'user_posts'
@@ -35,22 +29,33 @@ ActionController::Routing::Routes.draw do |map|
   end
   
   map.resources :forums do |forum|
+    forum.resources :interests
+    forum.resources :posts, :controller => 'forum_posts' do |post|
+      post.resources :comments do |comment|
+        comment.resources :tags
+      end
+      post.resources :tags
+    end
     forum.resource :owner do |owner|
       owner.resources :posts do |post|
         post.resources :tags
       end
     end
-    forum.resources :interests
     forum.resources :tags
-    forum.resources :posts, :controller => 'forum_posts' do |post|
-      post.resources :tags
-      post.resources :comments do |comment|
-        comment.resources :tags
-      end
+  end
+  
+  map.resource :account do |account|
+    account.resources :posts
+    account.resource :info do |info|
+      info.resources :tags
     end
   end
   
   map.resources :tags
+
+  map.with_options :path_prefix => ":tag_id", :name_prefix => "tag_" do |tag|
+    tag.resources :forums
+  end
   
   # the following routes are for testing errors
   map.resources :posts, :controller => 'forum_posts'
@@ -58,7 +63,7 @@ ActionController::Routing::Routes.draw do |map|
     foo.resources :bars, :controller => 'forum_posts'
   end
   
-  map.connect ':controller/:action/:id'
+  map.default ':controller/:action/:id' # naming this so we can test missing segment errors
   map.connect ':controller/:action/:id.:format'
 end
 
@@ -146,6 +151,7 @@ class Forum < ActiveRecord::Base
   has_many :posts
   has_many :tags, :as => :taggable
   has_many :interests, :as => :interested_in
+  has_many :users, :through => :posts
   belongs_to :owner, :class_name => "User"
 end
 
@@ -233,11 +239,13 @@ class OwnersController < ApplicationController
 end
 
 class PostsAbstractController < ApplicationController
+  include Ardes::ResourcesController::ResourceMethods
   attr_accessor :filter_trace
   
   # for testing filter load order
   before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :abstract}
-  
+
+protected
   # redefine find_resources
   def find_resources
     resource_service.find :all, :order => 'id DESC'
