@@ -11,6 +11,7 @@ Rails::Initializer.run do |config|
   config.gem 'haml'
   config.gem 'mocha'
   config.gem 'less'
+  config.gem 'formtastic'
   config.gem 'mislav-will_paginate', :version => '~> 2.3.8', :lib => 'will_paginate', 
     :source => 'http://gems.github.com'
 
