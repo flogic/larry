@@ -31,10 +31,7 @@ Ultimately, even though it is historically connected closely to Puppet, Larry is
 
 ### Obligatory model diagram ###
 
-![Domain Model Diagram][domain_model]
-[domain_model]: http://github.com/rick/larry/raw/master/doc/domain-model.png
-
-
+<a href="http://github.com/rick/larry/raw/master/doc/domain-model.png"><img src="http://github.com/rick/larry/raw/master/doc/domain-model.png" width="480" height="380"></a>
 
 ### Status ###
 
