@@ -1,26 +1,3 @@
-# encoding: utf-8
-#--
-# Copyright (c) 2006-2008, Michael Schuerig, michael@schuerig.de
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#++
 require 'active_record/reflection'
 require 'ostruct'
 
@@ -32,8 +9,10 @@ module ActiveRecordExtensions # :nodoc:
 
     extend self
 
-    # Look for config/initalizer here in:
-    CONFIG_PATH = ::Dir.glob((::File.join(RAILS_ROOT, 'config', '**', 'validation_reflection.rb').to_s rescue '')).first || ''
+    require_path = ::File.join((defined?(Rails) ? Rails.root : RAILS_ROOT), 'config', '**', 'validation_reflection.rb').to_s rescue ''
+
+    # Look for config/initializer here in:
+    CONFIG_PATH = ::Dir.glob(require_path).first || ''
     CORE_VALIDATONS = [
        :validates_acceptance_of,
        :validates_associated,
@@ -121,7 +100,7 @@ module ActiveRecordExtensions # :nodoc:
         #
         def remember_validation_metadata(validation_type, *attr_names)
           configuration = attr_names.last.is_a?(::Hash) ? attr_names.pop : {}
-          attr_names.each do |attr_name|
+          attr_names.flatten.each do |attr_name|
             self.write_inheritable_array :validations,
               [::ActiveRecord::Reflection::MacroReflection.new(validation_type, attr_name.to_sym, configuration, self)]
           end

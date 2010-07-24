@@ -1,9 +1,9 @@
 require "cases/helper"
+require 'models/post'
 require 'models/author'
 require 'models/developer'
 require 'models/project'
 require 'models/comment'
-require 'models/post'
 require 'models/category'
 
 class MethodScopingTest < ActiveRecord::TestCase
@@ -589,6 +589,16 @@ class DefaultScopingTest < ActiveRecord::TestCase
     expected = Developer.find(:all, :order => 'salary DESC').collect { |dev| dev.salary }
     received = DeveloperOrderedBySalary.find(:all).collect { |dev| dev.salary }
     assert_equal expected, received
+  end
+
+  def test_default_scope_with_conditions_string
+    assert_equal Developer.find_all_by_name('David').map(&:id).sort, DeveloperCalledDavid.all.map(&:id).sort
+    assert_equal nil, DeveloperCalledDavid.create!.name
+  end
+
+  def test_default_scope_with_conditions_hash
+    assert_equal Developer.find_all_by_name('Jamis').map(&:id).sort, DeveloperCalledJamis.all.map(&:id).sort
+    assert_equal 'Jamis', DeveloperCalledJamis.create!.name
   end
 
   def test_default_scoping_with_threads

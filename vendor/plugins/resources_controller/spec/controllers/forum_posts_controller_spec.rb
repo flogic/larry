@@ -104,11 +104,6 @@ describe ForumPostsController, " errors" do
   it "should raise ResourceMismatch, when route does not contain the resource segment" do
     lambda{ get :index, :foo_id => 1}.should raise_error(Ardes::ResourcesController::ResourceMismatch)
   end
-  
-  it "should raise NoRecognizedRoute when no route is recognized" do
-    ::ActionController::Routing::Routes.stub!(:routes_for_controller_and_action).and_return([])
-    lambda{ get :index }.should raise_error(Ardes::ResourcesController::NoRecognizedRoute)
-  end
 end
 
 describe "resource_service in ForumPostsController" do
@@ -267,7 +262,7 @@ describe "Requesting /forums/2/posts/new using GET" do
   before(:each) do
     setup_mocks
     @post = mock('new Post')
-    @forum_posts.stub!(:new).and_return(@post)
+    @forum_posts.stub!(:build).and_return(@post)
   end
   
   def do_get
@@ -284,8 +279,8 @@ describe "Requesting /forums/2/posts/new using GET" do
     response.should render_template(:new)
   end
   
-  it "should create an new thing" do
-    @forum_posts.should_receive(:new).and_return(@post)
+  it "should build an new thing" do
+    @forum_posts.should_receive(:build).and_return(@post)
     do_get
   end
   
@@ -344,15 +339,15 @@ describe "Requesting /forums/2/posts using POST" do
     @post = mock('Post')
     @post.stub!(:save).and_return(true)
     @post.stub!(:to_param).and_return("1")
-    @forum_posts.stub!(:new).and_return(@post)
+    @forum_posts.stub!(:build).and_return(@post)
   end
   
   def do_post
     post :create, :post => {:name => 'Post'}, :forum_id => "2"
   end
   
-  it "should make a new post" do
-    @forum_posts.should_receive(:new).with({'name' => 'Post'}).and_return(@post)
+  it "should build a new post" do
+    @forum_posts.should_receive(:build).with({'name' => 'Post'}).and_return(@post)
     do_post
   end
 
@@ -419,20 +414,18 @@ describe "Requesting /forums/2/posts/1 using DELETE" do
     setup_mocks
     @post = mock('Post', :null_object => true)
     @forum_posts.stub!(:find).and_return(@post)
+    @forum_posts.stub!(:destroy)
   end
   
   def do_delete
     delete :destroy, :id => "1", :forum_id => "2"
   end
 
-  it "should find the post requested" do
+  it "should find and destroy the post requested" do
     @forum_posts.should_receive(:find).with("1").and_return(@post)
+    @forum_posts.should_receive(:destroy).with("1")
     do_delete
-  end
-  
-  it "should call destroy on the found thing" do
-    @post.should_receive(:destroy)
-    do_delete
+    assigns['post'].should == @post
   end
   
   it "should redirect to the things list" do

@@ -192,7 +192,7 @@ describe "Requesting /users/dave/addresses/new using GET" do
   before(:each) do
     setup_mocks
     @address = mock('new Address')
-    @user_addresses.stub!(:new).and_return(@address)
+    @user_addresses.stub!(:build).and_return(@address)
   end
   
   def do_get
@@ -210,7 +210,7 @@ describe "Requesting /users/dave/addresses/new using GET" do
   end
   
   it "should create an new thing" do
-    @user_addresses.should_receive(:new).and_return(@address)
+    @user_addresses.should_receive(:build).and_return(@address)
     do_get
   end
   
@@ -269,7 +269,7 @@ describe "Requesting /users/dave/addresses using POST" do
     @address = mock('Address')
     @address.stub!(:save).and_return(true)
     @address.stub!(:to_param).and_return("1")
-    @user_addresses.stub!(:new).and_return(@address)
+    @user_addresses.stub!(:build).and_return(@address)
   end
   
   def do_post
@@ -277,7 +277,7 @@ describe "Requesting /users/dave/addresses using POST" do
   end
   
   it "should create a new address" do
-    @user_addresses.should_receive(:new).with({'name' => 'Address'}).and_return(@address)
+    @user_addresses.should_receive(:build).with({'name' => 'Address'}).and_return(@address)
     do_post
   end
 
@@ -331,22 +331,20 @@ describe "Requesting /users/dave/addresses/1 using DELETE" do
 
   before(:each) do
     setup_mocks
-    @address = mock('Address', :null_object => true)
+    @address = mock('Address', :id => "1", :null_object => true)
     @user_addresses.stub!(:find).and_return(@address)
+    @user_addresses.stub!(:destroy)
   end
   
   def do_delete
     delete :destroy, :id => "1", :user_id => "dave"
   end
 
-  it "should find the address requested" do
+  it "should find and destroy the address requested" do
     @user_addresses.should_receive(:find).with("1").and_return(@address)
+    @user_addresses.should_receive(:destroy).with("1")
     do_delete
-  end
-  
-  it "should call destroy on the found thing" do
-    @address.should_receive(:destroy)
-    do_delete
+    assigns(:address).should == @address
   end
   
   it "should redirect to the things list" do

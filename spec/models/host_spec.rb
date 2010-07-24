@@ -52,7 +52,7 @@ describe Host do
 
   describe 'relationships' do
     before :each do
-      @host = Host.new
+      @host = Host.generate!
     end
     
     it 'should have many deployed services' do

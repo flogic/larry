@@ -1,10 +1,28 @@
+require 'yaml'
+
+YAML.add_builtin_type("omap") do |type, val|
+  ActiveSupport::OrderedHash[val.map(&:to_a).map(&:first)]
+end
+
 # OrderedHash is namespaced to prevent conflicts with other implementations
 module ActiveSupport
-  # Hash is ordered in Ruby 1.9!
-  if RUBY_VERSION >= '1.9'
-    OrderedHash = ::Hash
-  else
-    class OrderedHash < Hash #:nodoc:
+  class OrderedHash < ::Hash #:nodoc:
+    def to_yaml_type
+      "!tag:yaml.org,2002:omap"
+    end
+
+    def to_yaml(opts = {})
+      YAML.quick_emit(self, opts) do |out|
+        out.seq(taguri, to_yaml_style) do |seq|
+          each do |k, v|
+            seq.add(k => v)
+          end
+        end
+      end
+    end
+
+    # Hash is ordered in Ruby 1.9!
+    if RUBY_VERSION < '1.9'
       def initialize(*args, &block)
         super
         @keys = []
@@ -12,11 +30,25 @@ module ActiveSupport
 
       def self.[](*args)
         ordered_hash = new
-        args.each_with_index { |val,ind|
-          # Only every second value is a key.
-          next if ind % 2 != 0
+
+        if (args.length == 1 && args.first.is_a?(Array))
+          args.first.each do |key_value_pair|
+            next unless (key_value_pair.is_a?(Array))
+            ordered_hash[key_value_pair[0]] = key_value_pair[1]
+          end
+
+          return ordered_hash
+        end
+
+        unless (args.size % 2 == 0)
+          raise ArgumentError.new("odd number of arguments for Hash")
+        end
+
+        args.each_with_index do |val, ind|
+          next if (ind % 2 != 0)
           ordered_hash[val] = args[ind + 1]
-        }
+        end
+
         ordered_hash
       end
 
@@ -38,7 +70,7 @@ module ActiveSupport
         end
         super
       end
-      
+
       def delete_if
         super
         sync_keys!
@@ -106,15 +138,21 @@ module ActiveSupport
         dup.merge!(other_hash)
       end
 
+      # When replacing with another hash, the initial order of our keys must come from the other hash -ordered or not.
+      def replace(other)
+        super
+        @keys = other.keys
+        self
+      end
+
       def inspect
         "#<OrderedHash #{super}>"
       end
 
-    private
-
-      def sync_keys!
-        @keys.delete_if {|k| !has_key?(k)}
-      end
+      private
+        def sync_keys!
+          @keys.delete_if {|k| !has_key?(k)}
+        end
     end
   end
 end
