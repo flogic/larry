@@ -31,9 +31,9 @@ Ultimately, even though it is historically connected closely to Puppet, Larry is
 
 ### Obligatory model diagram ###
 
-<a href="http://github.com/flogic/larry/raw/master/doc/domain-model.png"><img src="http://github.com/flogic/larry/raw/master/doc/domain-model.png" width="480" height="380"></a>
+<a href="http://github.com/flogic/larry/raw/master/doc/domain-model-small.png"><img src="http://github.com/flogic/larry/raw/master/doc/domain-model-small.png" width="480" height="380"></a>
 <br/>
-<a href="http://github.com/flogic/larry/raw/master/doc/domain-model.png">(or click here)</a>
+<a href="http://github.com/flogic/larry/raw/master/doc/domain-model-small.png">(or click here)</a>
 
 ### Status ###
 
