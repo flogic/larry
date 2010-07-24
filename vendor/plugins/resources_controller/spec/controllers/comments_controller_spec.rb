@@ -225,7 +225,7 @@ describe "Requesting /forums/3/posts/3/comments/new using GET" do
   before(:each) do
     setup_mocks
     @comment = mock('new Comment')
-    @post_comments.stub!(:new).and_return(@comment)
+    @post_comments.stub!(:build).and_return(@comment)
   end
   
   def do_get
@@ -242,8 +242,8 @@ describe "Requesting /forums/3/posts/3/comments/new using GET" do
     response.should render_template(:new)
   end
   
-  it "should create a new comment" do
-    @post_comments.should_receive(:new).and_return(@comment)
+  it "should build a new comment" do
+    @post_comments.should_receive(:build).and_return(@comment)
     do_get
   end
   
@@ -302,15 +302,15 @@ describe "Requesting /forums/3/posts/3/comments using POST" do
     @comment = mock('Comment')
     @comment.stub!(:save).and_return(true)
     @comment.stub!(:to_param).and_return("1")
-    @post_comments.stub!(:new).and_return(@comment)
+    @post_comments.stub!(:build).and_return(@comment)
   end
   
   def do_post
     post :create, :comment => {:name => 'Comment'}, :forum_id => '3', :post_id => '2'
   end
   
-  it "should create a new comment" do
-    @post_comments.should_receive(:new).with({'name' => 'Comment'}).and_return(@comment)
+  it "should build a new comment" do
+    @post_comments.should_receive(:build).with({'name' => 'Comment'}).and_return(@comment)
     do_post
   end
 
@@ -364,22 +364,20 @@ describe "Requesting /forums/3/posts/3/comments/1 using DELETE" do
 
   before(:each) do
     setup_mocks
-    @comment = mock('Comment', :null_object => true)
+    @comment = mock('Comment', :id => '1', :null_object => true)
     @post_comments.stub!(:find).and_return(@comment)
+    @post_comments.stub!(:destroy)
   end
   
   def do_delete
     delete :destroy, :id => "1", :forum_id => '3', :post_id => '2'
   end
 
-  it "should find the comment requested" do
+  it "should find and destroy the comment requested" do
     @post_comments.should_receive(:find).with("1").and_return(@comment)
+    @post_comments.should_receive(:destroy).with("1")
     do_delete
-  end
-  
-  it "should call destroy on the found comment" do
-    @comment.should_receive(:destroy)
-    do_delete
+    assigns['comment'].should == @comment
   end
   
   it "should redirect to the comments list" do
